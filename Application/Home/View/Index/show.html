@@ -1,0 +1,72 @@
+<!DOCTYPE html>  
+<html>  
+<head>  
+<title>消息显示界面--车辆实时调度系统v0.1</title> 
+<script src="https://cdn.bootcss.com/jquery/1.12.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
+<meta charset="utf8" />
+</head>  
+<body>  
+    <div>  
+       <!-- <input id="content" type="text" value="这个内容是中文" name="content" />  
+        <input type="button" value="send" onclick="send()" />  -->
+    </div>  
+    <div id="messages"></div>  
+    
+	<script type="text/javascript">  
+	var id = '客户id_'+Math.floor(Math.random()*100);
+	//alert(id);
+	client = new Paho.MQTT.Client("116.62.171.54", Number(8082), id);//建立客户端实例  
+        client.connect({onSuccess:onConnect});//连接服务器并注册连接成功处理事件  
+        function onConnect() {  
+            console.log("onConnected");  
+            client.subscribe("test");//订阅主题  
+        }  
+        client.onConnectionLost = onConnectionLost;//注册连接断开处理事件  
+        client.onMessageArrived = onMessageArrived;//注册消息接收处理事件  
+        function onConnectionLost(responseObject) {  
+            if (responseObject.errorCode !== 0) {  
+                console.log("onConnectionLost:"+responseObject.errorMessage);  
+                console.log("连接已断开");  
+             }  
+        }  
+        function onMessageArrived(message) {  
+          console.log("收到消息:"+message.payloadString);
+		  //alert(message.payloadString);
+		  $("#messages").append(message.payloadString+'<br />');
+        }  
+		function send(){
+			var content = $("#content").val();
+			message = new Paho.MQTT.Message(content);  
+			message.destinationName = "test";  
+			client.send(message); 
+		}
+        //发送消息  
+        //message = new Paho.MQTT.Message("hello");  
+       // message.destinationName = "/topic";  
+       // client.send(message);  
+	
+	//var ms = new Mosquitto();
+	//ms.connect('ws://116.62.171.54:8082');
+	///ms.publish('test','xxx');
+	/*
+        var webSocket = new WebSocket('ws://116.62.171.54:8082');  
+        webSocket.onerror = function(event) {  
+            alert(event.data);  
+        };  
+        //与WebSocket建立连接  
+        webSocket.onopen = function(event) {  
+            document.getElementById('messages').innerHTML = '与服务器端建立连接';  
+        };  
+        //处理服务器返回的信息  
+        webSocket.onmessage = function(event) {  
+            document.getElementById('messages').innerHTML += '<br />'+ event.data;  
+        };  
+        function start() {  
+            //向服务器发送请求  
+            webSocket.send('我是jCuckoo');  
+        }
+*/		
+    </script>  
+</body>  
+</html>  

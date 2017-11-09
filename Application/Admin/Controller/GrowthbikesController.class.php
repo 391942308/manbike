@@ -49,11 +49,26 @@ class GrowthbikesController extends CommonController {
 				}
 
 				$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-				$arr_bikes_num = array();
-				$arr_bikes_ts = array();
+				$kq = array();
+				$mb = array();
+				$xm = array();
+				$ofo = array();
+				$hb = array();
 				foreach($buckets as $k=>$v){
-					$arr_bikes_num[$k] = $v["doc_count"];
-					$arr_bikes_ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					foreach($v[3]["buckets"] as $k2=>$v2){
+						if($v2["key"]=='酷骑'){
+							$kq[] = $v2["doc_count"];
+						}else if($v2["key"]=='摩拜'){
+							$mb[] = $v2["doc_count"];
+						}else if($v2["key"]=='小鸣单车'){
+							$xm[] = $v2["doc_count"];
+						}else if($v2["key"]=='ofo'){
+							$ofo[] = $v2["doc_count"];
+						}else if($v2["key"]=='HelloBike'){
+							$hb[] = $v2["doc_count"];
+						}
+						$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					}
 				}
 			}else if($tj==2){
 				$this->assign("tj",$tj);
@@ -96,11 +111,26 @@ class GrowthbikesController extends CommonController {
 				}
 
 				$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-				$arr_bikes_num = array();
-				$arr_bikes_ts = array();
+				$kq = array();
+				$mb = array();
+				$xm = array();
+				$ofo = array();
+				$hb = array();
 				foreach($buckets as $k=>$v){
-					$arr_bikes_num[$k] = $v["doc_count"];
-					$arr_bikes_ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					foreach($v[3]["buckets"] as $k2=>$v2){
+						if($v2["key"]=='酷骑'){
+							$kq[] = $v2["doc_count"];
+						}else if($v2["key"]=='摩拜'){
+							$mb[] = $v2["doc_count"];
+						}else if($v2["key"]=='小鸣单车'){
+							$xm[] = $v2["doc_count"];
+						}else if($v2["key"]=='ofo'){
+							$ofo[] = $v2["doc_count"];
+						}else if($v2["key"]=='HelloBike'){
+							$hb[] = $v2["doc_count"];
+						}
+						$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					}
 				}
 			}
 		}else{
@@ -108,22 +138,40 @@ class GrowthbikesController extends CommonController {
 			$end = 9507697943118;
 			$allbikes_trend = $this->getbikes_all($start,$end);
 			$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-			$arr_bikes_num = array();
-			$arr_bikes_ts = array();
+			$kq = array();
+			$mb = array();
+			$xm = array();
+			$ofo = array();
+			$hb = array();
 			foreach($buckets as $k=>$v){
-				$arr_bikes_num[$k] = $v["doc_count"];
-				$arr_bikes_ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+				foreach($v[3]["buckets"] as $k2=>$v2){
+					if($v2["key"]=='酷骑'){
+						$kq[] = $v2["doc_count"];
+					}else if($v2["key"]=='摩拜'){
+						$mb[] = $v2["doc_count"];
+					}else if($v2["key"]=='小鸣单车'){
+						$xm[] = $v2["doc_count"];
+					}else if($v2["key"]=='ofo'){
+						$ofo[] = $v2["doc_count"];
+					}else if($v2["key"]=='HelloBike'){
+						$hb[] = $v2["doc_count"];
+					}
+					$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+				}
 			}
 		}
-
-
-		//查询所有区块
-		$blocklist = M('info_block')->select();
-		$this->assign("blocklist",$blocklist);
-		$str1 = json_encode($arr_bikes_num);
-		$str2 = json_encode($arr_bikes_ts);
-		$this->assign("str1",$str1);
-		$this->assign("str2",$str2);
+		$j_kq = json_encode($kq);
+		$j_mb = json_encode($mb);
+		$j_xm = json_encode($xm);
+		$j_ofo = json_encode($ofo);
+		$j_hb = json_encode($hb);
+		$j_ts = json_encode($ts);
+		$this->assign("j_kq",$j_kq);
+		$this->assign("j_mb",$j_mb);
+		$this->assign("j_xm",$j_xm);
+		$this->assign("j_ofo",$j_ofo);
+		$this->assign("j_hb",$j_hb);
+		$this->assign("j_ts",$j_ts);
 		$this->display();
 	}
 	//总的车辆增长数据
@@ -142,9 +190,20 @@ class GrowthbikesController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1d",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "company",
+            "size": 10,
+            "order": {
+              "_term": "desc"
+            }
+          }
+        }
       }
     }
   },
@@ -163,13 +222,6 @@ class GrowthbikesController extends CommonController {
           }
         },
         {
-          "match_phrase": {
-            "_index": {
-              "query": "bike_index_v6"
-            }
-          }
-        },
-        {
           "range": {
             "timestamp": {
               "gte": "'.$start.'",
@@ -179,7 +231,15 @@ class GrowthbikesController extends CommonController {
           }
         }
       ],
-      "must_not": []
+      "must_not": [
+        {
+          "match_phrase": {
+            "company": {
+              "query": "其他"
+            }
+          }
+        }
+      ]
     }
   },
   "_source": {
@@ -208,13 +268,6 @@ class GrowthbikesController extends CommonController {
                 }
               },
               {
-                "match_phrase": {
-                  "_index": {
-                    "query": "bike_index_v6"
-                  }
-                }
-              },
-              {
                 "range": {
                   "timestamp": {
                     "gte": "'.$start.'",
@@ -224,7 +277,15 @@ class GrowthbikesController extends CommonController {
                 }
               }
             ],
-            "must_not": []
+            "must_not": [
+              {
+                "match_phrase": {
+                  "company": {
+                    "query": "其他"
+                  }
+                }
+              }
+            ]
           }
         }
       }
@@ -260,9 +321,20 @@ class GrowthbikesController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1d",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "company",
+            "size": 10,
+            "order": {
+              "_term": "desc"
+            }
+          }
+        }
       }
     }
   },
@@ -297,7 +369,15 @@ class GrowthbikesController extends CommonController {
           }
         }
       ],
-      "must_not": []
+      "must_not": [
+        {
+          "match_phrase": {
+            "company": {
+              "query": "其他"
+            }
+          }
+        }
+      ]
     }
   },
   "_source": {
@@ -335,14 +415,22 @@ class GrowthbikesController extends CommonController {
               {
                 "range": {
                   "timestamp": {
-                     "gte": "'.$start.'",
-              		"lte": "'.$end.'",
+                    "gte": "'.$start.'",
+                    "lte": "'.$end.'",
                     "format": "epoch_millis"
                   }
                 }
               }
             ],
-            "must_not": []
+            "must_not": [
+              {
+                "match_phrase": {
+                  "company": {
+                    "query": "其他"
+                  }
+                }
+              }
+            ]
           }
         }
       }
@@ -378,9 +466,20 @@ class GrowthbikesController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1d",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
+      },
+      "aggs": {
+        "3": {
+          "terms": {
+            "field": "company",
+            "size": 10,
+            "order": {
+              "_term": "desc"
+            }
+          }
+        }
       }
     }
   },
@@ -409,13 +508,21 @@ class GrowthbikesController extends CommonController {
           "range": {
             "timestamp": {
               "gte": "'.$start.'",
-              "lte": "'.$end.'",
+              "lte":"'.$end.'" ,
               "format": "epoch_millis"
             }
           }
         }
       ],
-      "must_not": []
+      "must_not": [
+        {
+          "match_phrase": {
+            "company": {
+              "query": "其他"
+            }
+          }
+        }
+      ]
     }
   },
   "_source": {
@@ -460,7 +567,15 @@ class GrowthbikesController extends CommonController {
                 }
               }
             ],
-            "must_not": []
+            "must_not": [
+              {
+                "match_phrase": {
+                  "company": {
+                    "query": "其他"
+                  }
+                }
+              }
+            ]
           }
         }
       }

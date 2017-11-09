@@ -26,6 +26,7 @@
                     <span style="color: red">
                         提示：<br>
                         填写车位ID，选择开始时间和结束时间，点击查询即可看到该时间段车辆新增情况。<br>
+                        选择行政区，选择开始时间和结束时间，点击查询即可看到该时间段车辆新增情况。<br>
                         不选看到的是总的车辆新增数据。
                     </span>
                     <ul class="nav navbar-right panel_toolbox">
@@ -47,102 +48,198 @@
                 </div>
 
                 <div class="x_content">
-                    <!--                    <p><a class="btn btn-primary" href="javascript:;" onclick="add()">添加区块信息</a></p>-->
-                    <select class="form-control" style="width: 200px;height:35px;" id="tj">
-                        <option value="1" <if condition="$tj eq 1">selected</if>>根据车位查询</option>
-                        <option value="2" <if condition="$tj eq 2">selected</if>>根据行政区查询</option>
-                    </select>
-                    <div style="height: 30px"></div>
-                    <div style="margin-bottom: 10px;" class="input-group" id="tj1">
-                        <form method="GET" action="{:U('Admin/Growthbikes/index',array('tj'=>1))}">
-                            <input id="name" type="text" class="form-control" style="width: 150px;margin-bottom: 10px;" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
-                            <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
-                                <input name="start" id="start" class="form-control" size="16" type="text" placeholder="开始时间" value="{$start}" readonly style="width: 250px">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                    <div style="width:100%;height: 300px;">
+                        <div style="width:50%;height: 300px;float: left">
+                            <p>根据车位和时间查询</p>
+                            <div style="height: 30px"></div>
+                            <div style="margin-bottom: 10px;" class="input-group" id="tj1">
+                                <form method="GET" action="{:U('Admin/Growthbikes/index',array('tj'=>1))}">
+                                    <input id="name" type="text" class="form-control" style="width: 150px;margin-bottom: 10px;" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
+                                    <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
+                                        <input name="start" id="start" class="form-control" size="16" type="text" placeholder="开始时间" value="{$start}" readonly style="width: 250px">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
+                                        <input name="end" id="end" class="form-control" size="16" type="text" placeholder="结束时间" value="{$end}" readonly style="width: 250px">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <input type="submit" value="查询" class="btn btn-default"/>
+                                </form>
                             </div>
-                            <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
-                                <input name="end" id="end" class="form-control" size="16" type="text" placeholder="结束时间" value="{$end}" readonly style="width: 250px">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                        </div>
+                        <div style="width:50%;height: 300px;float: right">
+                            <p>根据行政区域和时间查询</p>
+                            <div style="height: 30px"></div>
+                            <div style="margin-bottom: 10px;" class="input-group" id="tj2">
+                                <form method="GET" action="{:U('Admin/Growthbikes/index',array('tj'=>2))}">
+                                    <div data-toggle="distpicker" id="target">
+                                        <select name="province" style="height: 30px" ></select>
+                                        <select name="city" style="height: 30px"></select>
+                                        <select name="area" style="height: 30px"></select>
+                                    </div>
+                                    <div style="height: 20px"></div>
+                                    <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
+                                        <input name="start" id="start" class="form-control" size="16" type="text" placeholder="开始时间" value="{$start}" readonly style="width: 250px">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
+                                        <input name="end" id="end" class="form-control" size="16" type="text" placeholder="结束时间" value="{$end}" readonly style="width: 250px">
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
+                                        <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
+                                    </div>
+                                    <input type="submit" value="查询" class="btn btn-default"/>
+                                </form>
                             </div>
-                            <input type="submit" value="查询" class="btn btn-default"/>
-                        </form>
+                        </div>
                     </div>
-                    <div style="margin-bottom: 10px;" class="input-group" id="tj2">
-                        <form method="GET" action="{:U('Admin/Growthbikes/index',array('tj'=>2))}">
-                            <div data-toggle="distpicker" id="target">
-                                <select name="province" style="height: 30px" ></select>
-                                <select name="city" style="height: 30px"></select>
-                                <select name="area" style="height: 30px"></select>
-                            </div>
-                            <div style="height: 20px"></div>
-                            <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
-                                <input name="start" id="start" class="form-control" size="16" type="text" placeholder="开始时间" value="{$start}" readonly style="width: 250px">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                            <div class="input-group date form_datetime col-md-10" data-date-format="yyyy-mm-dd hh:ii:00" data-link-field="dtp_input1">
-                                <input name="end" id="end" class="form-control" size="16" type="text" placeholder="结束时间" value="{$end}" readonly style="width: 250px">
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-                                <span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-                            </div>
-                            <input type="submit" value="查询" class="btn btn-default"/>
-                        </form>
-                    </div>
-                    <div id="main" style="width: 100%;height:300px;"></div>
+                    <div id="main" style="width: 100%;height:600px;"></div>
                     <input id="iid" type="hidden" value="{$dwz_info_id}" />
                 </div>
             </div>
         </div>
     </div>
-<div id="main" style="width: 100%;height:450px;"></div>
+<div id="main" style="width: 100%;height:700px;"></div>
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
     //var test = genData(50);
 //    app.title = '坐标轴刻度与标签对齐';
-    var jstr1 = $.parseJSON('{$str1}');
-    var jstr2 = $.parseJSON('{$str2}');
+    var j_kq = $.parseJSON('{$j_kq}');
+    var j_mb = $.parseJSON('{$j_mb}');
+    var j_xm = $.parseJSON('{$j_xm}');
+    var j_ofo = $.parseJSON('{$j_ofo}');
+    var j_hb = $.parseJSON('{$j_hb}');
+    var j_ts = $.parseJSON('{$j_ts}');
     option = {
-        color: ['#3398DB'],
         tooltip : {
             trigger: 'axis',
             axisPointer : {            // 坐标轴指示器，坐标轴触发有效
                 type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+            },
+//            formatter: function (params){
+//                return params[0].name + '<br/>'
+//                    + params[0].seriesName + ' : ' + params[0].value + '<br/>'
+//                    + params[1].seriesName + ' : ' + (params[1].value + params[0].value);
+//            }
+        },
+        legend: {
+            selectedMode:false,
+            data:['酷骑', '摩拜','小鸣单车','ofo','HelloBike']
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                mark : {show: true},
+                dataView : {show: true, readOnly: false},
+                restore : {show: true},
+                saveAsImage : {show: true}
             }
         },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
+        calculable : true,
         xAxis : [
             {
                 type : 'category',
-                data : jstr2,
-                axisTick: {
-                    alignWithLabel: true
-                }
+                data : j_ts
             }
         ],
         yAxis : [
             {
-                type : 'value'
+                type : 'value',
+                boundaryGap: [0, 0.1]
             }
         ],
         series : [
             {
-                name:'直接访问',
+                name:'酷骑',
                 type:'bar',
-                barWidth: '60%',
-                data:jstr1
-            }
+                stack: 'sum',
+//                barCategoryGap: '50%',
+                itemStyle: {
+                    normal: {
+                        color: '#33ff33',
+                        barBorderColor: '#33ff33',
+                        barBorderWidth: 6,
+                        barBorderRadius:0,
+//                        label : {
+//                            show: false, position: 'insideTop'
+//                        }
+                    }
+                },
+                data:j_kq
+            },
+            {
+                name:'摩拜',
+                type:'bar',
+                stack: 'sum',
+                itemStyle: {
+                    normal: {
+                        color: 'orange',
+                        barBorderColor: 'orange',
+                        barBorderWidth: 6,
+                        barBorderRadius:0,
+//                        label : {
+//                            show: true, position: 'insideTop'
+//                        }
+                    }
+                },
+                data:j_mb
+            },
+            {
+                name:'小鸣单车',
+                type:'bar',
+                stack: 'sum',
+                itemStyle: {
+                    normal: {
+                        color: '#66ccff',
+                        barBorderColor: '#66ccff',
+                        barBorderWidth: 6,
+                        barBorderRadius:0,
+//                        label : {
+//                            show: true, position: 'insideTop'
+//                        }
+                    }
+                },
+                data:j_xm
+            },
+            {
+                name:'ofo',
+                type:'bar',
+                stack: 'sum',
+                itemStyle: {
+                    normal: {
+                        color: '#FFD700',
+                        barBorderColor: '#FFD700',
+                        barBorderWidth: 6,
+                        barBorderRadius:0,
+//                        label : {
+//                            show: true, position: 'insideTop'
+//                        }
+                    }
+                },
+                data:j_ofo
+            },
+            {
+                name:'HelloBike',
+                type:'bar',
+                stack: 'sum',
+                itemStyle: {
+                    normal: {
+                        color: '#E6E6FA',
+                        barBorderColor: '#E6E6FA',
+                        barBorderWidth: 6,
+                        barBorderRadius:0,
+//                        label : {
+//                            show: true, position: 'insideTop'
+//                        }
+                    }
+                },
+                data:j_hb
+            },
         ]
     };
-
-
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
 </script>
@@ -173,29 +270,5 @@
         });
 
     </script>
-    <script>
-        $(function(){
-            $("#tj2").hide();
-            var returntj = $("#returntj").val();
-            if(returntj==1){
-                $("#tj1").show();
-                $("#tj2").hide();
-            }else if(returntj==2){
-                $("#tj1").hide();
-                $("#tj2").show();
-            }
-        });
-        $("#tj").change(function(){
-            var tj = $("#tj").val();
-            if(tj==1){
-                $("#tj1").show();
-                $("#tj2").hide();
-            }else if(tj==2){
-                $("#tj1").hide();
-                $("#tj2").show();
-            }
-        });
-    </script>
-
 <!-- /page content -->
 </block>

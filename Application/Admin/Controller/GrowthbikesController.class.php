@@ -6,10 +6,44 @@ class GrowthbikesController extends CommonController {
 		parent::_initialize();
 	}
 	public function index() {
+		$uid = $_SESSION['auth']['id'];
+		$this->assign("uid",$uid);
+		if($uid!=1){
+			$province2 = $_SESSION['auth']['province'];
+			$data["province"]=$province2;
+			$city2 = $_SESSION['auth']['city'];
+			$data["city"]=$city2;
+			$area2 = $_SESSION['auth']['area'];
+			$data["area"]=$area2;
+			$this->assign("province2",$province2);
+			$this->assign("city2",$city2);
+			$this->assign("area2",$area2);
+			$arr_id = M('info')->where($data)->select();
+		}else{
+			$arr_id = M('info')->select();
+		}
+		$this->assign("arr_id",$arr_id);
 		if($_GET){
 			$tj = $_GET["tj"];
+			$this->assign("tj",$tj);
+			if($uid!=1){
+				if($_REQUEST["area"]!=$area2 && $_REQUEST["area"]!=''){
+					echo "<script>alert('选择的行政区不正确，您只能看".$area2."的数据！');window.history.back();</script>";
+				}
+				if(isset($_REQUEST["dwz_info_id"]) && $_REQUEST["dwz_info_id"]!=''){
+					$dwz_info_id = $_REQUEST["dwz_info_id"];
+					$arr = array();
+					foreach ($arr_id as $k=>$v) {
+						if($dwz_info_id==$v["id"]){
+							$arr[]=1;
+						}
+					}
+					if(count($arr)==0){
+						echo "<script>alert('选择的车位不正确，您只能看".$area2."内车位的数据！');window.history.back();</script>";
+					}
+				}
+			}
 			if($tj==1){
-				$this->assign("tj",$tj);
 				if(isset($_REQUEST["dwz_info_id"]) && $_REQUEST["dwz_info_id"]!=''){
 					$dwz_info_id = $_REQUEST["dwz_info_id"];
 					$this->assign("dwz_info_id",$dwz_info_id);
@@ -45,33 +79,13 @@ class GrowthbikesController extends CommonController {
 				}else if($_REQUEST["dwz_info_id"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_all($start,$end);
-				}
-
-				$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-				$kq = array();
-				$mb = array();
-				$xm = array();
-				$ofo = array();
-				$hb = array();
-				foreach($buckets as $k=>$v){
-					foreach($v[3]["buckets"] as $k2=>$v2){
-						if($v2["key"]=='酷骑'){
-							$kq[] = $v2["doc_count"];
-						}else if($v2["key"]=='摩拜'){
-							$mb[] = $v2["doc_count"];
-						}else if($v2["key"]=='小鸣单车'){
-							$xm[] = $v2["doc_count"];
-						}else if($v2["key"]=='ofo'){
-							$ofo[] = $v2["doc_count"];
-						}else if($v2["key"]=='HelloBike'){
-							$hb[] = $v2["doc_count"];
-						}
-						$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					if($uid==1){
+						$allbikes_trend = $this->getbikes_all($start,$end);
+					}else{
+						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
 					}
 				}
 			}else if($tj==2){
-				$this->assign("tj",$tj);
 				if(isset($_REQUEST["area"]) && $_REQUEST["area"]!=''){
 					$area = $_REQUEST["area"];
 					$this->assign("area",$area);
@@ -107,57 +121,43 @@ class GrowthbikesController extends CommonController {
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_all($start,$end);
-				}
-
-				$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-				$kq = array();
-				$mb = array();
-				$xm = array();
-				$ofo = array();
-				$hb = array();
-				foreach($buckets as $k=>$v){
-					foreach($v[3]["buckets"] as $k2=>$v2){
-						if($v2["key"]=='酷骑'){
-							$kq[] = $v2["doc_count"];
-						}else if($v2["key"]=='摩拜'){
-							$mb[] = $v2["doc_count"];
-						}else if($v2["key"]=='小鸣单车'){
-							$xm[] = $v2["doc_count"];
-						}else if($v2["key"]=='ofo'){
-							$ofo[] = $v2["doc_count"];
-						}else if($v2["key"]=='HelloBike'){
-							$hb[] = $v2["doc_count"];
-						}
-						$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+					if($uid==1){
+						$allbikes_trend = $this->getbikes_all($start,$end);
+					}else{
+						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
 					}
 				}
 			}
 		}else{
 			$start = 0;
 			$end = 9507697943118;
-			$allbikes_trend = $this->getbikes_all($start,$end);
-			$buckets = $allbikes_trend["aggregations"][2]["buckets"];
-			$kq = array();
-			$mb = array();
-			$xm = array();
-			$ofo = array();
-			$hb = array();
-			foreach($buckets as $k=>$v){
-				foreach($v[3]["buckets"] as $k2=>$v2){
-					if($v2["key"]=='酷骑'){
-						$kq[] = $v2["doc_count"];
-					}else if($v2["key"]=='摩拜'){
-						$mb[] = $v2["doc_count"];
-					}else if($v2["key"]=='小鸣单车'){
-						$xm[] = $v2["doc_count"];
-					}else if($v2["key"]=='ofo'){
-						$ofo[] = $v2["doc_count"];
-					}else if($v2["key"]=='HelloBike'){
-						$hb[] = $v2["doc_count"];
-					}
-					$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
+			if($uid==1){
+				$allbikes_trend = $this->getbikes_all($start,$end);
+			}else{
+				$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+			}
+
+		}
+		$buckets = $allbikes_trend["aggregations"][2]["buckets"];
+		$kq = array();
+		$mb = array();
+		$xm = array();
+		$ofo = array();
+		$hb = array();
+		foreach($buckets as $k=>$v){
+			foreach($v[3]["buckets"] as $k2=>$v2){
+				if($v2["key"]=='酷骑'){
+					$kq[] = $v2["doc_count"];
+				}else if($v2["key"]=='摩拜'){
+					$mb[] = $v2["doc_count"];
+				}else if($v2["key"]=='小鸣单车'){
+					$xm[] = $v2["doc_count"];
+				}else if($v2["key"]=='ofo'){
+					$ofo[] = $v2["doc_count"];
+				}else if($v2["key"]=='HelloBike'){
+					$hb[] = $v2["doc_count"];
 				}
+				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
 		}
 		$j_kq = json_encode($kq);

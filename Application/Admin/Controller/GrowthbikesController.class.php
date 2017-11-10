@@ -30,7 +30,7 @@ class GrowthbikesController extends CommonController {
 				if($_REQUEST["area"]!=$area2 && $_REQUEST["area"]!=''){
 					echo "<script>alert('选择的行政区不正确，您只能看".$area2."的数据！');window.history.back();</script>";
 				}
-				if(isset($_REQUEST["dwz_info_id"]) && $_REQUEST["dwz_info_id"]!=''){
+				if(isset($_REQUEST["dwz_info_id"]) && $_REQUEST["dwz_info_id"]!='' && $_REQUEST["dwz_info_id"]!='请选择车位'){
 					$dwz_info_id = $_REQUEST["dwz_info_id"];
 					$arr = array();
 					foreach ($arr_id as $k=>$v) {
@@ -59,7 +59,15 @@ class GrowthbikesController extends CommonController {
 				if($_REQUEST["dwz_info_id"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					if($_REQUEST["dwz_info_id"] == '请选择车位'){
+						if($uid==1){
+							$allbikes_trend = $this->getbikes_all($start,$end);
+						}else{
+							$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+						}
+					}else{
+						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					}
 				}else if($_REQUEST["dwz_info_id"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
 					$start = 0;
 					$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);

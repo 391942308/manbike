@@ -57,6 +57,7 @@
                                 <tr>
                                     <td>
                                         <select class="form-control" style="width: 200px;height:35px;margin-bottom: 10px;" name="dwz_info_id">
+                                            <option value="请选择车位">请选择车位：</option>
                                             <volist name="arr_id" id="vo">
                                                 <option value="{$vo.id}" <if condition='$dwz_info_id eq $vo["id"]'>selected</if>>{$vo.id}&nbsp;&nbsp;{$vo.title}</option>
                                             </volist>

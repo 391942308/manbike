@@ -70,11 +70,21 @@ class GrowthbikesController extends CommonController {
 					}
 				}else if($_REQUEST["dwz_info_id"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
 					$start = 0;
-					$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					if($_REQUEST["dwz_info_id"]=='请选择车位'){
+						$allbikes_trend = $this->getbikes_all($start,$end);
+					}else{
+						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					}
 				}else if($_REQUEST["dwz_info_id"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]==''){
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					if($_REQUEST["dwz_info_id"]=='请选择车位'){
+						$allbikes_trend = $this->getbikes_all($start,$end);
+					}else{
+						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					}
 				}else if($_REQUEST["dwz_info_id"]==''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
+					$start = 0;
+					$end = 9507697943118;
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["dwz_info_id"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
 					$start = 0;
@@ -83,7 +93,11 @@ class GrowthbikesController extends CommonController {
 					$end = 9507697943118;
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["dwz_info_id"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
-					$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					if($_REQUEST["dwz_info_id"]=='请选择车位'){
+						$allbikes_trend = $this->getbikes_all($start,$end);
+					}else{
+						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
+					}
 				}else if($_REQUEST["dwz_info_id"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;

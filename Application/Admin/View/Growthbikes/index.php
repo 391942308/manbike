@@ -1,9 +1,11 @@
 <extend name="Public:left" />
 <block name="main">
+    <link href="__PUBLIC__/myjslib/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+
     <script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.js"></script>
     <script src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
-    <link href="http://116.62.171.54:8080/manbike0.3/Public/myjslib/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
-    <script src="__PUBLIC__/JS/distpicker.js"></script>
+    <script type="text/javascript" src="__PUBLIC__/myjslib/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
+    <script type="text/javascript" src="__PUBLIC__/myjslib/js/locales/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
     <style>
         table tr td{
             padding-right: 15px;
@@ -57,7 +59,7 @@
                                 <tr>
                                     <td>
                                         <select class="form-control" style="width: 200px;height:35px;margin-bottom: 10px;" name="dwz_info_id">
-                                            <option value="请选择车位">请选择车位</option>
+                                            <option value="请选择车位">请选择车位：</option>
                                             <volist name="arr_id" id="vo">
                                                 <option value="{$vo.id}" <if condition='$dwz_info_id eq $vo["id"]'>selected</if>>{$vo.id}&nbsp;&nbsp;{$vo.title}</option>
                                             </volist>
@@ -279,6 +281,7 @@
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
 </script>
+    <script src="__PUBLIC__/JS/distpicker.js"></script>
     <script>
         var area = $("#h_area").val();
         options = {
@@ -289,23 +292,7 @@
         $('#target').distpicker(options);
 
     </script>
-    <script type="text/javascript" src="http://116.62.171.54:8080/manbike0.3/Public/myjslib/jquery/jquery-1.8.3.min.js" charset="UTF-8"></script>
-    <script type="text/javascript" src="http://116.62.171.54:8080/manbike0.3/Public/myjslib/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="http://116.62.171.54:8080/manbike0.3/Public/myjslib/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
-    <script type="text/javascript" src="http://116.62.171.54:8080/manbike0.3/Public/myjslib/js/locales/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
-    <script type="text/javascript">
-        $('.form_datetime').datetimepicker({
-            //language:  'fr',
-            weekStart: 1,
-            todayBtn:  1,
-            autoclose: 1,
-            todayHighlight: 1,
-            startView: 2,
-            forceParse: 0,
-            showMeridian: 1
-        });
 
-    </script>
     <script>
         $(function(){
             $("#tj2").hide();
@@ -328,6 +315,21 @@
                 $("#tj2").show();
             }
         });
+    </script>
+
+
+    <script type="text/javascript">
+        $('.form_datetime').datetimepicker({
+            //language:  'fr',
+            weekStart: 1,
+            todayBtn:  1,
+            autoclose: 1,
+            todayHighlight: 1,
+            startView: 2,
+            forceParse: 0,
+            showMeridian: 1
+        });
+
     </script>
 <!-- /page content -->
 </block>

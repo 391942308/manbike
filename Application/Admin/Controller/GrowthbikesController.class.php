@@ -166,7 +166,61 @@ class GrowthbikesController extends CommonController {
 		$xm = array();
 		$ofo = array();
 		$hb = array();
+		$size = sizeof($buckets);
+		//var_dump($buckets);
+		//exit;
+
+		foreach ($buckets as $k=>$v) {
+			if(sizeof($v[3]['buckets'])==5){
+				$init=$v[3]['buckets'];
+			}
+			breek;
+		}
+		foreach ($init as $k=>$v) {
+			$init[$k]['doc_count']=0;
+		}
+
+		//var_dump($init);
+		//exit;
+
 		foreach($buckets as $k=>$v){
+			//var_dump($v[3]['buckets']);
+			if(sizeof($v[3]['buckets'])<5){
+				//将有的赋值上去
+				foreach($v[3]['buckets'] as $kk=>$vv){
+					//var_dump($vv['key']);
+					//if($should[$k][]){
+					//根据key获取到对应的数组下标
+					//}
+					foreach($init as $kkk=>$vvv){
+						if($vvv['key']==$vv['key']){
+							$init[$kkk]=$vv;
+						}
+					}
+				}
+				//var_dump($init);
+				$buckets[$k][3]['buckets']=$init;
+			}
+		}
+		//var_dump($buckets);
+		//exit;
+
+		foreach($buckets as $k=>$v){
+			//要追加的数组
+			$arr1["key"] = "酷骑";
+			$arr1["doc_count"] = 0;
+			$arr2["key"] = "摩拜";
+			$arr2["doc_count"] = 0;
+			$arr3["key"] = "小鸣单车";
+			$arr3["doc_count"] = 0;
+			$arr4["key"] = "ofo";
+			$arr4["doc_count"] = 0;
+			$arr5["key"] = "HelloBike";
+			$arr5["doc_count"] = 0;
+//			var_dump($v[3]["buckets"]);
+//			var_dump("<br>");
+//			var_dump("<br>");
+//			var_dump("<br>");
 			foreach($v[3]["buckets"] as $k2=>$v2){
 				if($v2["key"]=='酷骑'){
 					$kq[] = $v2["doc_count"];
@@ -182,6 +236,12 @@ class GrowthbikesController extends CommonController {
 				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
 		}
+//		var_dump($kq);
+//		var_dump("<br>");
+//		var_dump($hb);var_dump("<br>");
+//		var_dump($xm);var_dump("<br>");
+//		var_dump($ofo);var_dump("<br>");
+//		var_dump($hb);var_dump("<br>");
 		$j_kq = json_encode($kq);
 		$j_mb = json_encode($mb);
 		$j_xm = json_encode($xm);

@@ -26,7 +26,7 @@ class IndexController extends CommonController {
 		//var_dump($list);
     }
 	public function index(){
-		
+		date_default_timezone_set('Asia/Shanghai'); 
 		//var_dump($res_es);
 		
 		$gno = M("auth_group")->count();
@@ -90,7 +90,7 @@ class IndexController extends CommonController {
 			//var_dump($res_es['hits']['total']);
 			foreach($buckets as $k => $v){
 				//var_dump($v);
-				$arr1[]=$v['key'];
+				$arr1[]=$v['key'].'('.$v['doc_count'].')';
 				$temp['name']=$v['key'].'('.$v['doc_count'].')';
 				$temp['value']=$v['doc_count'];
 				$arr2[]=(object)$temp;
@@ -106,6 +106,41 @@ class IndexController extends CommonController {
 			$this->assign('str2',$str2);
 			
 			$this->assign('bno',$res_es['hits']['total']);
+			
+			
+			//一个星期 新增单车数量 默认为7天
+			$day=$_REQUEST['day'];
+			
+			if($day==''){
+				$day=7;
+			}
+			$this->assign('day',$day);
+			//var_dump($day);
+			$end = $t0 = strtotime(date('Y-m-d'));
+			$seconds=3600*24*$day;
+			$start=$t0 - $seconds;
+			$start=$start*1000;
+			$end=$end*1000;
+			
+			$buckets = $this->oneweek_1($start,$end,$area);
+			//var_dump($buckets);
+			$arr11=array();
+			$arr22=array();
+			$j = 0;
+			foreach($buckets as $k=>$v){
+				$arr11[$j]=$v['key'].'('.$v['doc_count'].')';
+				//$arr22[$j]['name']=$v['key'].'('.$v['doc_count'].')';
+				//$arr22[$j]['value']=$v['doc_count'];
+				$arr22[$j]=$v['doc_count'];
+				$j++;
+			}
+			
+			$str11 = json_encode($arr11);
+			$str22 = json_encode($arr22);
+			//$this->assign('length',$length);
+			$this->assign('str11',$str11);
+			$this->assign('str22',$str22);
+			
 			$this->display();
         }else{
 			
@@ -134,7 +169,7 @@ class IndexController extends CommonController {
 						{
 							
 							if($v=='ofo'){
-								$condition .= " name like '$v' or ";	
+								$condition .= " name like '$v%' or ";	
 							}else{
 								$condition .= " name like '$v%' or ";
 							}
@@ -149,7 +184,7 @@ class IndexController extends CommonController {
 					else
 						{
 							if($v=='ofo'){
-								$condition .= " name like '$v' ";	
+								$condition .= " name like '$v%' ";	
 							}else{
 								$condition .= " name like '$v%' ";	
 							}
@@ -180,7 +215,7 @@ class IndexController extends CommonController {
 			$bnoo=0;
 			foreach($data as $k => $v){
 				//var_dump($v);
-				$arr1[]=$v[0]['name'];
+				$arr1[]=$v[0]['name'].'('.$v[0]['numbers'].')';
 				$temp['name']=$v[0]['name'].'('.$v[0]['numbers'].')';
 				$temp['value']=$v[0]['numbers'];
 				$arr2[]=(object)$temp;
@@ -204,23 +239,244 @@ class IndexController extends CommonController {
 			$str2 = json_encode($arr2);
 			$this->assign('length',$length);
 			$this->assign('str1',$str1);
-			//var_dump($str2);
 			$this->assign('str2',$str2);
+		//	var_dump($str1);
+			//var_dump($str2);
 			$this->assign('title','首页');
-			$this->display();
 			
+			
+			//一个星期 新增单车数量 默认为7天
+			$day=$_REQUEST['day'];
+			
+			if($day==''){
+				$day=7;
+			}
+			$this->assign('day',$day);
+			//var_dump($day);
+			$end = $t0 = strtotime(date('Y-m-d'));
+			$seconds=3600*24*$day;
+			$start=$t0 - $seconds;
+			$start=$start*1000;
+			$end=$end*1000;
+			//var_dump($start);
+			//var_dump($end);
+			//$start = strtotime("last Monday")*1000;
+			//$end = strtotime("Monday")*1000;
+			//$this->assign('start',date("Y/m/d",strtotime("last Monday")));
+			//$this->assign('end',date("Y/m/d",strtotime("Monday")));
+			//var_dump(date("Y-m-d H:i:s",strtotime("last Monday")));
+			//var_dump(date("Y-m-d H:i:s",strtotime("Monday")));
+			
+			$buckets = $this->oneweek($start,$end);
+			//var_dump($buckets);
+			$arr11=array();
+			$arr22=array();
+			$j = 0;
+			foreach($buckets as $k=>$v){
+				$arr11[$j]=$v['key'].'('.$v['doc_count'].')';
+				//$arr22[$j]['name']=$v['key'].'('.$v['doc_count'].')';
+				//$arr22[$j]['value']=$v['doc_count'];
+				$arr22[$j]=$v['doc_count'];
+				$j++;
+			}
+			
+			$str11 = json_encode($arr11);
+			$str22 = json_encode($arr22);
+			//$this->assign('length',$length);
+			$this->assign('str11',$str11);
+			$this->assign('str22',$str22);
+			
+			$this->display();
 		}
-		
-		
-		
-		
-		
-		
-		
     }
-	public function ajax_index(){
+	private function oneweek($start,$end){
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		//$hosts = [
+		//'dododo.shop:9200',         // IP + Port
+		//];
+		$hosts = [
+		'116.62.171.54:8081',      // IP + Port
+		];
 		
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+		
+		//获取当前一星期的时间
+		//$start = strtotime("last Monday")*1000;
+		//$end = strtotime("Monday")*1000;
+		//var_dump($start);
+		//var_dump($end);
+	
+		$json = '{
+		  "size": 0,
+		  "query": {
+			"bool": {
+			  "must": [
+				{
+				  "match_all": {}
+				},
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime_first"
+					}
+				  }
+				},
+				{
+				  "range": {
+					"timestamp": {
+					  "gte": '.$start.',
+					  "lte": '.$end.',
+					  "format": "epoch_millis"
+					}
+				  }
+				}
+			  ],
+			  "must_not": [
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime_last"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"company": {
+					  "query": "其他"
+					}
+				  }
+				}
+			  ]
+			}
+		  },
+		  "_source": {
+			"excludes": []
+		  },
+		  "aggs": {
+			"3": {
+			  "terms": {
+				"field": "company",
+				"size": 20,
+				"order": {
+				  "_count": "desc"
+				}
+			  }
+			}
+		  }
+		}';
+
+		
+		$params = [
+			'index' => 'bike_index_v6',
+			'type' => 'dbs_realtime_first',
+			'body' => $json
+		];
+
+		$results = $client->search($params);
+		$buckets = $results['aggregations'][3]['buckets'];
+		//var_dump($buckets);
+		return $buckets;
 	}
+	private function oneweek_1($start,$end,$area){
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		//$hosts = [
+		//'dododo.shop:9200',         // IP + Port
+		//];
+		$hosts = [
+		'116.62.171.54:8081',      // IP + Port
+		];
+		
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+		
+		//获取当前一星期的时间
+		//$start = strtotime("last Monday")*1000;
+		//$end = strtotime("Monday")*1000;
+		//var_dump($start);
+		//var_dump($end);
+	
+		$json = '{
+		  "size": 0,
+		  "query": {
+			"bool": {
+			  "must": [
+				{
+				  "match_all": {}
+				},
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime_first"
+					}
+				  }
+				},
+				{
+				  "range": {
+					"timestamp": {
+					  "gte": '.$start.',
+					  "lte": '.$end.',
+					  "format": "epoch_millis"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"area": {
+					  "query": "'.$area.'"
+					}
+				  }
+				}
+			  ],
+			  "must_not": [
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime_last"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"company": {
+					  "query": "其他"
+					}
+				  }
+				}
+			  ]
+			}
+		  },
+		  "_source": {
+			"excludes": []
+		  },
+		  "aggs": {
+			"3": {
+			  "terms": {
+				"field": "company",
+				"size": 20,
+				"order": {
+				  "_count": "desc"
+				}
+			  }
+			}
+		  }
+		}';
+
+		
+		$params = [
+			'index' => 'bike_index_v6',
+			'type' => 'dbs_realtime_first',
+			'body' => $json
+		];
+
+		$results = $client->search($params);
+		$buckets = $results['aggregations'][3]['buckets'];
+		//var_dump($buckets);
+		return $buckets;
+	}
+	
 	public function clear(){
 		$redis = new \Redis();
 		$redis->connect('116.62.171.54', 8085);
@@ -252,8 +508,6 @@ class IndexController extends CommonController {
 			//M("bike")->where($map)->delete();
 		}
 		//删除redis错误数据
-		
-		
 	}
 	public function clearx(){
 		$redis = new \Redis();
@@ -301,174 +555,7 @@ class IndexController extends CommonController {
 		$this->assign('cno',$cno);
 		$this->display();
 	}
-	//根据省获取
-	private function getbikes_p($province){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		//$hosts = [
-		//'dododo.shop:9200',         // IP + Port
-		//];
-		$hosts = [
-		'116.62.171.54:8081',      // IP + Port
-		];
-		
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-		
-		$json = '{
-				  "size": 0,
-				  "query": {
-					"bool": {
-					  "must": [
-						{
-						  "match_all": {}
-						},
-						{
-						  "match_phrase": {
-							"province": {
-							  "query": "'.$province.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"city": {
-							  "query": "'.$city.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"area": {
-							  "query": "'.$area.'"
-							}
-						  }
-						},
-						{
-						  "range": {
-							"timestamp": {
-							  "gte": 0,
-							  "lte": 9507697943118,
-							  "format": "epoch_millis"
-							}
-						  }
-						}
-					  ],
-					  "must_not": []
-					}
-				  },
-				  "_source": {
-					"excludes": []
-				  },
-				  "aggs": {
-					"3": {
-					  "terms": {
-						"field": "company",
-						"size": 20,
-						"order": {
-						  "_count": "desc"
-						}
-					  }
-					}
-				  }
-				}';
-
-			$params = [
-				'index' => 'bike_index_v3',
-				'type' => 'dwz_bike_sub_realtime_last',
-				'body' => $json
-			];
-
-			$results = $client->search($params);
-			//$ts = $results['hits']['hits'][0]['_source']['ts'];
-			//var_dump($results);
-			//var_dump($ts);
-			return $results;
-	}
-	//根据省市获取
-	private function getbikes_pc($province,$city){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		//$hosts = [
-		//'dododo.shop:9200',         // IP + Port
-		//];
-		
-		$hosts = [
-		'116.62.171.54:8081',     // IP + Port
-		];
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-		
-		$json = '{
-				  "size": 0,
-				  "query": {
-					"bool": {
-					  "must": [
-						{
-						  "match_all": {}
-						},
-						{
-						  "match_phrase": {
-							"province": {
-							  "query": "'.$province.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"city": {
-							  "query": "'.$city.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"area": {
-							  "query": "'.$area.'"
-							}
-						  }
-						},
-						{
-						  "range": {
-							"timestamp": {
-							  "gte": 0,
-							  "lte": 9507697943118,
-							  "format": "epoch_millis"
-							}
-						  }
-						}
-					  ],
-					  "must_not": []
-					}
-				  },
-				  "_source": {
-					"excludes": []
-				  },
-				  "aggs": {
-					"3": {
-					  "terms": {
-						"field": "company",
-						"size": 20,
-						"order": {
-						  "_count": "desc"
-						}
-					  }
-					}
-				  }
-				}';
-
-			$params = [
-				'index' => 'bike_index_v3',
-				'type' => 'dwz_bike_sub_realtime_last',
-				'body' => $json
-			];
-
-			$results = $client->search($params);
-			//$ts = $results['hits']['hits'][0]['_source']['ts'];
-			//var_dump($results);
-			//var_dump($ts);
-			return $results;
-	}
+	
 	//根据省市区获取
 	private function getbikes_pca($province,$city,$area){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
@@ -551,8 +638,8 @@ class IndexController extends CommonController {
 				}';
 
 			$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 			];
 

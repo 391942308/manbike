@@ -65,7 +65,7 @@
         
 		var jstr1 = $.parseJSON('{$str1}');
 		var jstr2 = $.parseJSON('{$str2}');
-		
+		var jstr3 = $.parseJSON('{$str_color}');
 
 		option = {
 			title : {
@@ -77,6 +77,7 @@
 				trigger: 'item',
 				formatter: "{a} <br/>{b} : {c} ({d}%)"
 			},
+			color:jstr3,
 			legend: {
 				type: 'scroll',
 				orient: 'vertical',

@@ -89,17 +89,24 @@ class IndexController extends CommonController {
 			
 			//var_dump($res_es['hits']['total']);
 			foreach($buckets as $k => $v){
-				//var_dump($v);
 				$arr1[]=$v['key'].'('.$v['doc_count'].')';
 				$temp['name']=$v['key'].'('.$v['doc_count'].')';
 				$temp['value']=$v['doc_count'];
 				$arr2[]=(object)$temp;
+				if($v["key"] == "其他"){
+					$arr_color[] = 'rgba(193,35,43,1)';
+				}else{
+					$data["title"] = $v["key"];
+					$arr_color[] = M('bike_company')->where($data)->getField('color');
+				}
 			}
 			
-			//var_dump($arr1);
-			//var_dump($arr2);
+//			var_dump($arr1);
+//			var_dump($arr2);
+			$str_color = json_encode($arr_color);
 			$str1 = json_encode($arr1);
 			$str2 = json_encode($arr2);
+			$this->assign('str_color',$str_color);
 			$this->assign('length',$length);
 			$this->assign('str1',$str1);
 			//var_dump($str2);
@@ -214,7 +221,13 @@ class IndexController extends CommonController {
 			$length=sizeof($data);
 			$bnoo=0;
 			foreach($data as $k => $v){
-				//var_dump($v);
+//				var_dump($v[0]['name']);
+				if(trim($v[0]['name']) == "其他"){
+					$arr_color[] = 'rgba(193,35,43,1)';
+				}else{
+					$map["title"] = trim($v[0]['name']);
+					$arr_color[] = M('bike_company')->where($map)->getField('color');
+				}
 				$arr1[]=$v[0]['name'].'('.$v[0]['numbers'].')';
 				$temp['name']=$v[0]['name'].'('.$v[0]['numbers'].')';
 				$temp['value']=$v[0]['numbers'];
@@ -232,9 +245,10 @@ class IndexController extends CommonController {
 				$bno = $bno + $v->value;
 			}
 			$this->assign('bno',$bno);
-			
 			//var_dump($arr1);
 			//var_dump($arr2);
+			$str_color = json_encode($arr_color);
+			$this->assign('str_color',$str_color);
 			$str1 = json_encode($arr1);
 			$str2 = json_encode($arr2);
 			$this->assign('length',$length);
@@ -279,7 +293,7 @@ class IndexController extends CommonController {
 				$arr22[$j]=$v['doc_count'];
 				$j++;
 			}
-			
+
 			$str11 = json_encode($arr11);
 			$str22 = json_encode($arr22);
 			//$this->assign('length',$length);

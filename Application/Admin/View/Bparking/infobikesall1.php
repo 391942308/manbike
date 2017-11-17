@@ -17,8 +17,6 @@
     </div>
     <div id="main" style="width: 100%;height:600px;"></div>
     <a href="{:U('Admin/Bparking/infobikesall3',array('id'=>$id))}">查看详情</a>
-
-	<!--<a href="{:U('Admin/Bparking/infobikesall2')}">查看详情</a>-->
     <!--可以隔一定时间记录一次，然后显示变化情况-->
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <script type="text/javascript">
@@ -29,6 +27,7 @@
 
         var jstr1 = $.parseJSON('{$str1}');
         var jstr2 = $.parseJSON('{$str2}');
+        var jstr3 = $.parseJSON('{$str_color}');
         option = {
             title : {
                 text: '车位历史各个单车公司单车数量统计表',
@@ -39,6 +38,7 @@
                 trigger: 'item',
                 formatter: "{a} <br/>{b} : {c} ({d}%)"
             },
+            color:jstr3,
             legend: {
                 type: 'scroll',
                 orient: 'vertical',

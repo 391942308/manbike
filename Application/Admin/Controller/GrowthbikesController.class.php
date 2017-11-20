@@ -173,8 +173,9 @@ class GrowthbikesController extends CommonController {
 		foreach ($buckets as $k=>$v) {
 			if(sizeof($v[3]['buckets'])==5){
 				$init=$v[3]['buckets'];
+				break;
 			}
-			breek;
+
 		}
 		foreach ($init as $k=>$v) {
 			$init[$k]['doc_count']=0;
@@ -188,7 +189,7 @@ class GrowthbikesController extends CommonController {
 			if(sizeof($v[3]['buckets'])<5){
 				//将有的赋值上去
 				foreach($v[3]['buckets'] as $kk=>$vv){
-					//var_dump($vv['key']);
+//					var_dump($vv);
 					//if($should[$k][]){
 					//根据key获取到对应的数组下标
 					//}
@@ -202,7 +203,7 @@ class GrowthbikesController extends CommonController {
 				$buckets[$k][3]['buckets']=$init;
 			}
 		}
-		//var_dump($buckets);
+//		var_dump($buckets);
 		//exit;
 
 		foreach($buckets as $k=>$v){
@@ -224,14 +225,19 @@ class GrowthbikesController extends CommonController {
 			foreach($v[3]["buckets"] as $k2=>$v2){
 				if($v2["key"]=='酷骑'){
 					$kq[] = $v2["doc_count"];
+					$kq_color = M('bike_company')->where("title='酷骑'")->getField('color');
 				}else if($v2["key"]=='摩拜'){
 					$mb[] = $v2["doc_count"];
+					$mb_color = M('bike_company')->where("title='摩拜'")->getField('color');
 				}else if($v2["key"]=='小鸣单车'){
 					$xm[] = $v2["doc_count"];
+					$xm_color = M('bike_company')->where("title='小鸣单车'")->getField('color');
 				}else if($v2["key"]=='ofo'){
 					$ofo[] = $v2["doc_count"];
+					$ofo_color = M('bike_company')->where("title='ofo'")->getField('color');
 				}else if($v2["key"]=='HelloBike'){
 					$hb[] = $v2["doc_count"];
+					$hb_color = M('bike_company')->where("title='HelloBike'")->getField('color');
 				}
 				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
@@ -241,18 +247,29 @@ class GrowthbikesController extends CommonController {
 //		var_dump($hb);var_dump("<br>");
 //		var_dump($xm);var_dump("<br>");
 //		var_dump($ofo);var_dump("<br>");
-//		var_dump($hb);var_dump("<br>");
+//		var_dump($ts);var_dump("<br>");
 		$j_kq = json_encode($kq);
+		$j_kq_color = json_encode($kq_color);
+//		var_dump($kq_color);
 		$j_mb = json_encode($mb);
+		$j_mb_color = json_encode($mb_color);
 		$j_xm = json_encode($xm);
+		$j_xm_color = json_encode($xm_color);
 		$j_ofo = json_encode($ofo);
+		$j_ofo_color = json_encode($ofo_color);
 		$j_hb = json_encode($hb);
+		$j_hb_color = json_encode($hb_color);
 		$j_ts = json_encode($ts);
 		$this->assign("j_kq",$j_kq);
+		$this->assign("j_kq_color",$j_kq_color);
 		$this->assign("j_mb",$j_mb);
+		$this->assign("j_mb_color",$j_mb_color);
 		$this->assign("j_xm",$j_xm);
+		$this->assign("j_xm_color",$j_xm_color);
 		$this->assign("j_ofo",$j_ofo);
+		$this->assign("j_ofo_color",$j_ofo_color);
 		$this->assign("j_hb",$j_hb);
+		$this->assign("j_hb_color",$j_hb_color);
 		$this->assign("j_ts",$j_ts);
 		$this->display();
 	}

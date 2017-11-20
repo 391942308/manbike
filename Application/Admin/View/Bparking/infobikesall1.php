@@ -17,6 +17,8 @@
     </div>
     <div id="main" style="width: 100%;height:600px;"></div>
     <a href="{:U('Admin/Bparking/infobikesall3',array('id'=>$id))}">查看详情</a>
+
+	<!--<a href="{:U('Admin/Bparking/infobikesall2')}">查看详情</a>-->
     <!--可以隔一定时间记录一次，然后显示变化情况-->
     <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
     <script type="text/javascript">
@@ -42,10 +44,10 @@
             legend: {
                 type: 'scroll',
                 orient: 'vertical',
-                right: 10,
-                top: 20,
+                right: 30,
+                top: 50,
                 bottom: 20,
-                data: jstr1
+                data: jstr2
             },
             series : [
                 {

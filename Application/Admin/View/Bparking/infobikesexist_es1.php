@@ -20,20 +20,20 @@
 		location.reload();
 		console.log("realtime");
 	}
-	setInterval("realtime()",60000);
+	setInterval("realtime()",60000)
 	</script>
 	<script type="text/javascript">
-
-		// 基于准备好的dom，初始化echarts实例
-		var myChart = echarts.init(document.getElementById('main'));
-		//var test = genData(50);
-
+		
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+//var test = genData(50);
+        
 		var jstr1 = $.parseJSON('{$str1}');
 		var jstr2 = $.parseJSON('{$str2}');
 		var jstr3 = $.parseJSON('{$str_color}');
 		option = {
 			title : {
-				text: '车位历史各个单车公司单车数量统计表',
+				text: '实时车位各个公司单车数量',
 				//subtext: '纯属虚构',
 				x:'left'
 			},
@@ -45,8 +45,8 @@
 			legend: {
 				type: 'scroll',
 				orient: 'vertical',
-				right: 60,
-				top: 80,
+				right: 30,
+				top: 50,
 				bottom: 20,
 				data: jstr2
 			},
@@ -54,7 +54,7 @@
 				{
 					name: '车企',
 					type: 'pie',
-					radius : '55%',
+					radius : '80%',
 					center: ['40%', '50%'],
 					data: jstr2,
 					itemStyle: {
@@ -69,14 +69,8 @@
 		};
 
 
-		// 使用刚指定的配置项和数据显示图表。
-		myChart.setOption(option);
-
-		function realtime(){
-			location.reload();
-			console.log("realtime");
-		}
-		setInterval("realtime()",60000)
-	</script>
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
     <!-- /page content -->
 </block>

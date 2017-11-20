@@ -139,10 +139,15 @@
     //var test = genData(50);
 //    app.title = '坐标轴刻度与标签对齐';
     var j_kq = $.parseJSON('{$j_kq}');
+    var j_kq_color = $.parseJSON('{$j_kq_color}');
     var j_mb = $.parseJSON('{$j_mb}');
+    var j_mb_color = $.parseJSON('{$j_mb_color}');
     var j_xm = $.parseJSON('{$j_xm}');
+    var j_xm_color = $.parseJSON('{$j_xm_color}');
     var j_ofo = $.parseJSON('{$j_ofo}');
+    var j_ofo_color = $.parseJSON('{$j_ofo_color}');
     var j_hb = $.parseJSON('{$j_hb}');
+    var j_hb_color = $.parseJSON('{$j_hb_color}');
     var j_ts = $.parseJSON('{$j_ts}');
     option = {
         tooltip : {
@@ -197,8 +202,8 @@
 //                barCategoryGap: '50%',
                 itemStyle: {
                     normal: {
-                        color: '#669933',
-                        barBorderColor: '#669933',
+                        color: j_kq_color,
+                        barBorderColor: j_kq_color,
                         barBorderWidth: 6,
                         barBorderRadius:0,
 //                        label : {
@@ -214,8 +219,8 @@
                 stack: 'sum',
                 itemStyle: {
                     normal: {
-                        color: '#CC9933',
-                        barBorderColor: '#CC9933',
+                        color: j_mb_color,
+                        barBorderColor: j_mb_color,
                         barBorderWidth: 6,
                         barBorderRadius:0,
 //                        label : {
@@ -231,8 +236,8 @@
                 stack: 'sum',
                 itemStyle: {
                     normal: {
-                        color: '#6699CC',
-                        barBorderColor: '#6699CC',
+                        color: j_xm_color,
+                        barBorderColor: j_xm_color,
                         barBorderWidth: 6,
                         barBorderRadius:0,
 //                        label : {
@@ -248,8 +253,8 @@
                 stack: 'sum',
                 itemStyle: {
                     normal: {
-                        color: '#CCCC66',
-                        barBorderColor: '#CCCC66',
+                        color: j_ofo_color,
+                        barBorderColor: j_ofo_color,
                         barBorderWidth: 6,
                         barBorderRadius:0,
 //                        label : {
@@ -265,8 +270,8 @@
                 stack: 'sum',
                 itemStyle: {
                     normal: {
-                        color: '#999999',
-                        barBorderColor: '#999999',
+                        color:j_hb_color ,
+                        barBorderColor:j_hb_color ,
                         barBorderWidth: 1,
                         barBorderRadius:0,
 //                        label : {

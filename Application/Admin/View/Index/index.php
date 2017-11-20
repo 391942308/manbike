@@ -117,8 +117,9 @@
 		
 		var jstr11 = $.parseJSON('{$str11}');
 		var jstr22 = $.parseJSON('{$str22}');
-		bar(jstr11,jstr22);
-		function bar(jstr11,jstr22){
+		var jstr33 = $.parseJSON('{$str_color33}');
+		bar(jstr11,jstr22,jstr33);
+		function bar(jstr11,jstr22,jstr33){
 			// 基于准备好的dom，初始化echarts实例
 			var myChart1 = echarts.init(document.getElementById("main1"));
 			var app = {};
@@ -136,7 +137,7 @@
 					boundaryGap: [0, 0.01],  
 					axisLabel:{
 						interval:0,
-						rotate:-30
+						rotate:-30,
 					},
 					data: jstr11
 				},
@@ -144,9 +145,23 @@
 				series: [{
 					name: '数量',
 					type: 'bar',
+					itemStyle: {
+						normal: {
+							color: function(params) {
+								// build a color map as your need.
+//								var colorList =['yellow', 'green','yellow','blue','white'];
+								var colorList =jstr33;
+								return colorList[params.dataIndex]
+							},
+							label: {
+								show: true,
+								position: 'top',
+								formatter: '{b}\n{c}'
+							}
+						}
+					},
 					data: jstr22
-				}],
-				color:['#4876FF', 'green','yellow','blueviolet']
+				}]
 			};;
 			
 			myChart1.setOption(option1, true);

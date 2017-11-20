@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class BcompanyController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
 	public function index()
 	{
 		$title = "";
@@ -28,7 +25,6 @@ class BcompanyController extends CommonController {
 		$pagelist = $page->fpage();
 		$this->assign('show', $pagelist);
 		$this->assign("a_menu_list", $info);
-		$this->assign('title','车企列表');
 		$this->display();
 	}
 	/**
@@ -37,6 +33,7 @@ class BcompanyController extends CommonController {
 	public function add(){
 		$data['title'] = $_POST['title'];
 		$data['keyword'] = $_POST['keyword'];
+		$data['color'] = $_POST['color'];
 		$result=M('bike_company')->add($data);
 		if ($result) {
 			$this->success('添加成功',U('Admin/Bcompany/index'));
@@ -50,6 +47,7 @@ class BcompanyController extends CommonController {
 	public function edit(){
 		$data['title'] = $_POST['title'];
 		$data['keyword'] = $_POST['keyword'];
+		$data['color'] = $_POST['color'];
 		$id = $_POST['id'];
 		$result=M('bike_company')->where("id=$id")->save($data);
 		if ($result) {

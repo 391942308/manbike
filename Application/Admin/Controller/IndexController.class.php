@@ -139,9 +139,21 @@ class IndexController extends CommonController {
 				//$arr22[$j]['name']=$v['key'].'('.$v['doc_count'].')';
 				//$arr22[$j]['value']=$v['doc_count'];
 				$arr22[$j]=$v['doc_count'];
+				$arr33[]=$v['key'];
 				$j++;
 			}
-			
+			foreach($arr33 as $k=>$v){
+//				var_dump($v);
+				if(trim($v) == "其他"){
+					$arr_color33[] = 'rgba(193,35,43,1)';
+				}else{
+					$data33["title"] = trim($v);
+					$arr_color33[] = M('bike_company')->where($data33)->getField('color');
+
+				}
+			}
+			$str_color33 = json_encode($arr_color33);
+			$this->assign('str_color33',$str_color33);
 			$str11 = json_encode($arr11);
 			$str22 = json_encode($arr22);
 			//$this->assign('length',$length);
@@ -285,18 +297,31 @@ class IndexController extends CommonController {
 			//var_dump($buckets);
 			$arr11=array();
 			$arr22=array();
+			$arr33=array();
 			$j = 0;
 			foreach($buckets as $k=>$v){
 				$arr11[$j]=$v['key'].'('.$v['doc_count'].')';
 				//$arr22[$j]['name']=$v['key'].'('.$v['doc_count'].')';
 				//$arr22[$j]['value']=$v['doc_count'];
 				$arr22[$j]=$v['doc_count'];
+				$arr33[]=$v['key'];
 				$j++;
 			}
+			foreach($arr33 as $k=>$v){
+//				var_dump($v);
+				if(trim($v) == "其他"){
+					$arr_color33[] = 'rgba(193,35,43,1)';
+				}else{
+					$data33["title"] = trim($v);
+					$arr_color33[] = M('bike_company')->where($data33)->getField('color');
 
+				}
+			}
 			$str11 = json_encode($arr11);
 			$str22 = json_encode($arr22);
-			//$this->assign('length',$length);
+			$str_color33 = json_encode($arr_color33);
+//			var_dump($str_color33);
+			$this->assign('str_color33',$str_color33);
 			$this->assign('str11',$str11);
 			$this->assign('str22',$str22);
 			

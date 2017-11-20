@@ -1,6 +1,7 @@
 <extend name="Public:left" />
 <block name="main">
-    <script src="https://cdn.bootcss.com/jquery/2.1.2/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/2.1.2/jquery.js">
+        <script type="text/javascript" src="__PUBLIC__/JS/jquery.colorpicker.js"></script>
     <!-- page content -->
         <div class="">
             <div class="page-title">
@@ -67,6 +68,7 @@
                                         </th>
                                         <th class="column-title">车企名称 </th>
                                         <th class="column-title">关键字 </th>
+                                        <th class="column-title">颜色 </th>
                                         <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
@@ -83,9 +85,10 @@
                                             </td>
                                             <td class=" ">{$vo.title}</td>
                                             <td class=" ">{$vo.keyword} </td>
+                                            <td class=" ">{$vo.color} </td>
                                             <td class=" last">
                                                 <a href="#">
-                                                    <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navKeyword="{$vo['keyword']}" onclick="edit(this)">修改</a>
+                                                    <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navKeyword="{$vo['keyword']}" navColor="{$vo['color']}" onclick="edit(this)">修改</a>
                                                     |<a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bcompany/delete',array('id'=>$vo['id']))}'">删除</a>
                                                 </a>
                                             </td>
@@ -126,6 +129,12 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th width="20%">颜色：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="color">
+                                </td>
+                            </tr>
+                            <tr>
                                 <th></th>
                                 <td>
                                     <input class="btn btn-success" type="submit" value="添加">
@@ -161,6 +170,12 @@
                                 </td>
                             </tr>
                             <tr>
+                                <th width="20%">颜色：</th>
+                                <td>
+                                    <input class="input-medium" type="text" name="color">
+                                </td>
+                            </tr>
+                            <tr>
                                 <th></th>
                                 <td>
                                     <input class="btn btn-success" type="submit" value="修改">
@@ -184,8 +199,10 @@
             var navId=$(obj).attr('navId');
             var navTitle=$(obj).attr('navTitle');
             var navKeyword=$(obj).attr('navKeyword');
+            var navColor=$(obj).attr('navColor');
             $("input[name='id']").val(navId);
             $("input[name='title']").val(navTitle);
+            $("input[name='color']").val(navColor);
             $("#m_content").val(navKeyword);
             $('#bjy-edit').modal('show');
         }
@@ -202,6 +219,18 @@
             window.location.href=href;
             return false;
         });
+    </script>
+    <script>
+        $("#cp5").colorpicker({
+            fillcolor:true,
+            event:'mouseover',
+            target:$("#cp5text")
+        });
+        $("#cp5").click(
+           function(){
+               alert(1);
+           }
+        );
     </script>
     <!-- /page content -->
 </block>

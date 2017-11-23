@@ -169,7 +169,6 @@
             }
         },
         legend: {
-            selectedMode:false,
             data:['酷骑', '摩拜','小鸣单车','ofo','HelloBike']
         },
         toolbox: {
@@ -177,6 +176,7 @@
             feature : {
                 mark : {show: true},
                 dataView : {show: true, readOnly: false},
+                magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
                 restore : {show: true},
                 saveAsImage : {show: true}
             }

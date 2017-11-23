@@ -470,7 +470,7 @@ class BparkingController extends CommonController {
 						{
 						  "match_phrase": {
 							"_type": {
-							  "query": "dwz_bike_sub_realtime"
+							  "query": "dbs_realtime"
 							}
 						  }
 						}
@@ -480,8 +480,8 @@ class BparkingController extends CommonController {
 				  }
 				}';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
 				'body' => $json
 		];
 
@@ -527,7 +527,7 @@ class BparkingController extends CommonController {
 						{
 						  "match_phrase": {
 							"_type": {
-							  "query": "dwz_bike_sub_realtime_last"
+							  "query": "dbs_realtime_last"
 							}
 						  }
 						}
@@ -537,8 +537,8 @@ class BparkingController extends CommonController {
 				  }
 				}';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 
@@ -1114,6 +1114,148 @@ class BparkingController extends CommonController {
 		exit(json_encode(array('error_code'=>0,'error_reason'=>'修改成功','res'=>$res)));
 	}
 	
+	//更新单个车位的数量
+	public function update_info(){
+		$id = $_REQUEST['id'];
+		if($id == ''){
+			$this->error("参数错误");
+		}
+		
+		$type = 'dbs_realtime';
+		$this->update_dbs_realtime($id,$type);
+		
+		$type = 'dbs_realtime_last';
+		$this->update_dbs_realtime($id,$type);
+		$type = 'dbs_realtime_first';
+		$this->update_dbs_realtime($id,$type);
+		
+		$type = 'dbs_realtime_one_last';
+		$this->update_dbs_realtime($id,$type);
+		$type = 'dbs_realtime_one_first';
+		$this->update_dbs_realtime($id,$type);
+		
+		$this->success('更新成功',U('Admin/Bparking/index'));
+	}
+	
+	private function update_dbs_realtime($id,$type){
+		//获取当天的时间
+		//$start = strtotime(date('Y-m-d'));
+		$start = 0;
+		$end = time();
+		$end = $end*1000;
+		
+		$map['id']=array("eq",$id);
+		$info = M("info")->where($map)->find();
+		//var_dump($info);
+		$area = $info['area'];
+		$lng = $info['lng'];
+		$lat = $info['lat'];
+		//var_dump($area);
+		
+		//根据车位修改后的状态更新
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		
+		$hosts = [
+		'116.62.171.54:8081',         // IP + Port
+		];
+		
+		
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		
+		$json = '{
+			  "version": true,
+			  "size": 10000,
+			  "sort": [
+				{
+				  "timestamp": {
+					"order": "desc",
+					"unmapped_type": "boolean"
+				  }
+				}
+			  ],
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "match_all": {}
+					},
+					{
+					  "match_phrase": {
+						"dwz_info_id": {
+						  "query": "'.$id.'"
+						}
+					  }
+					},
+					{
+					  "match_phrase": {
+						"_type": {
+						  "query": "'.$type.'"
+						}
+					  }
+					},
+					{
+					  "range": {
+						"timestamp": {
+						  "gte": '.$start.',
+						  "lte": '.$end.',
+						  "format": "epoch_millis"
+						}
+					  }
+					}
+				  ],
+				  "must_not": [
+					{
+					  "match_phrase": {
+						"area": {
+						  "query": "余杭区"
+						}
+					  }
+					}
+				  ]
+				}
+			  }
+			}';
+
+			
+			$params = [
+				'index' => 'bike_index_v6',
+				'type' => $type,
+				'body' => $json
+			];
+
+			$results = $client->search($params);
+			//var_dump($results);
+			//exit;
+			foreach($results['hits']['hits'] as $k=>$v){
+				//更新dbs_realtime_last
+				$id = $v['_id'];	
+				
+				$params = [
+					'index' => 'bike_index_v6',
+					'type' => $type,
+					'id' => $id,
+					'body' => [
+						'doc' => [
+							'area' => $area,
+							"location"=>[
+								"lat"=>$lat,
+								"lon"=>$lng
+							],
+						]
+					]
+				];
+
+				// Update doc at /my_index/my_type/my_id
+				$response = $client->update($params);
+				//var_dump($response);
+				//var_dump($id);			
+				//exit;
+			}	
+	}
+	
+	
+	
 	private function es_history($id,$s,$e){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
@@ -1129,113 +1271,70 @@ class BparkingController extends CommonController {
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 		
 		$json = '{
-  "version": true,
-  "size": 500,
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "query_string": {
-            "analyze_wildcard": true,
-            "query": "'.$id.'"
-          }
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dwz_bike_sub_realtime"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": '.$s.',
-              "lte": '.$e.',
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": []
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "30m",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "query_string": {
-                  "analyze_wildcard": true,
-                  "query": "5894",
-                  "all_fields": true
-                }
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dwz_bike_sub_realtime"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                    "gte": 1509379200000,
-                    "lte": 1509465599999,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": []
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
+			  "version": true,
+			  "size": 500,
+			  "sort": [
+				{
+				  "timestamp": {
+					"order": "desc",
+					"unmapped_type": "boolean"
+				  }
+				}
+			  ],
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "query_string": {
+						"analyze_wildcard": true,
+						"query": "'.$id.'"
+					  }
+					},
+					{
+					  "match_phrase": {
+						"_type": {
+						  "query": "dbs_realtime"
+						}
+					  }
+					},
+					{
+					  "range": {
+						"timestamp": {
+						  "gte": '.$s.',
+						  "lte": '.$e.',
+						  "format": "epoch_millis"
+						}
+					  }
+					}
+				  ],
+				  "must_not": []
+				}
+			  },
+			  "_source": {
+				"excludes": []
+			  },
+			  "aggs": {
+				"2": {
+				  "date_histogram": {
+					"field": "timestamp",
+					"interval": "30m",
+					"time_zone": "Asia/Shanghai",
+					"min_doc_count": 1
+				  }
+				}
+			  },
+			  "stored_fields": [
+				"*"
+			  ],
+			  "script_fields": {},
+			  "docvalue_fields": [
+				"timestamp"
+			  ]
+			}';
 
 			$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
 				'body' => $json
 			];
 
@@ -1549,7 +1648,7 @@ class BparkingController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dwz_bike_sub_realtime_last"
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -1602,7 +1701,7 @@ class BparkingController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dwz_bike_sub_realtime_last"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -1640,8 +1739,8 @@ class BparkingController extends CommonController {
   }
 }';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 
@@ -1667,136 +1766,136 @@ class BparkingController extends CommonController {
 		//获取es最后更新的时间,在更新的时候使用
 
 		$json = '{
-  "version": true,
-  "from":"'.$from.'",
-  "size": "'.$size.'",
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dwz_bike_sub_realtime_history"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "dwz_info_id": {
-              "query": "'.$dwz_info_id.'"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 0,
-				"lte": 9507697943118,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": [
-        {
-          "match_phrase": {
-            "company": {
-              "query": "其他"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dwz_bike_sub_realtime_history"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "dwz_info_id": {
-                    "query": "'.$dwz_info_id.'"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                    "gte": 0,
+		  "version": true,
+		  "from":"'.$from.'",
+		  "size": "'.$size.'",
+		  "sort": [
+			{
+			  "timestamp": {
+				"order": "desc",
+				"unmapped_type": "boolean"
+			  }
+			}
+		  ],
+		  "query": {
+			"bool": {
+			  "must": [
+				{
+				  "match_all": {}
+				},
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime_one_last"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"dwz_info_id": {
+					  "query": "'.$dwz_info_id.'"
+					}
+				  }
+				},
+				{
+				  "range": {
+					"timestamp": {
+					  "gte": 0,
 						"lte": 9507697943118,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": [
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "其他"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
+					  "format": "epoch_millis"
+					}
+				  }
+				}
+			  ],
+			  "must_not": [
+				{
+				  "match_phrase": {
+					"company": {
+					  "query": "其他"
+					}
+				  }
+				}
+			  ]
+			}
+		  },
+		  "_source": {
+			"excludes": []
+		  },
+		  "aggs": {
+			"2": {
+			  "date_histogram": {
+				"field": "timestamp",
+				"interval": "12h",
+				"time_zone": "Asia/Shanghai",
+				"min_doc_count": 1
+			  }
+			}
+		  },
+		  "stored_fields": [
+			"*"
+		  ],
+		  "script_fields": {},
+		  "docvalue_fields": [
+			"timestamp"
+		  ],
+		  "highlight": {
+			"pre_tags": [
+			  "@kibana-highlighted-field@"
+			],
+			"post_tags": [
+			  "@/kibana-highlighted-field@"
+			],
+			"fields": {
+			  "*": {
+				"highlight_query": {
+				  "bool": {
+					"must": [
+					  {
+						"match_all": {}
+					  },
+					  {
+						"match_phrase": {
+						  "_type": {
+							"query": "dbs_realtime_one_last"
+						  }
+						}
+					  },
+					  {
+						"match_phrase": {
+						  "dwz_info_id": {
+							"query": "'.$dwz_info_id.'"
+						  }
+						}
+					  },
+					  {
+						"range": {
+						  "timestamp": {
+							"gte": 0,
+								"lte": 9507697943118,
+							"format": "epoch_millis"
+						  }
+						}
+					  }
+					],
+					"must_not": [
+					  {
+						"match_phrase": {
+						  "company": {
+							"query": "其他"
+						  }
+						}
+					  }
+					]
+				  }
+				}
+			  }
+			},
+			"fragment_size": 2147483647
+		  }
+		}';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_history',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_one_last',
 				'body' => $json
 		];
 
@@ -1882,33 +1981,33 @@ class BparkingController extends CommonController {
 		//获取es最后更新的时间,在更新的时候使用
 
 		$json = '{
-  "version": true,
-  "size": 1,
-  "sort": [
-    {
-      "ts": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "query_string": {
-            "query": "dwz_info_id:'.$dwz_info_id.'",
-            "analyze_wildcard": true
-          }
-        }
-      ],
-      "must_not": []
-    }
-  }
-}';
+			  "version": true,
+			  "size": 1,
+			  "sort": [
+				{
+				  "ts": {
+					"order": "desc",
+					"unmapped_type": "boolean"
+				  }
+				}
+			  ],
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "query_string": {
+						"query": "dwz_info_id:'.$dwz_info_id.'",
+						"analyze_wildcard": true
+					  }
+					}
+				  ],
+				  "must_not": []
+				}
+			  }
+			}';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
 				'body' => $json
 		];
 
@@ -1929,45 +2028,45 @@ class BparkingController extends CommonController {
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 		//获取es某mac地址在某车位上被采集到的次数
 		$json = '{
-  "version": true,
-  "size": 1,
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "query_string": {
-            "analyze_wildcard": true,
-            "query": "'.$mac.'"
-          }
-        },
-        {
-          "match_phrase": {
-            "_index": {
-              "query": "bike_index_v5"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dwz_bike_sub_realtime"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "dwz_info_id": {
-              "query": "'.$dwz_info_id.'"
-            }
-          }
-        }
-      ]
-    }
-  }
-}';
+		  "version": true,
+		  "size": 1,
+		  "query": {
+			"bool": {
+			  "must": [
+				{
+				  "query_string": {
+					"analyze_wildcard": true,
+					"query": "'.$mac.'"
+				  }
+				},
+				{
+				  "match_phrase": {
+					"_index": {
+					  "query": "bike_index_v6"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"_type": {
+					  "query": "dbs_realtime"
+					}
+				  }
+				},
+				{
+				  "match_phrase": {
+					"dwz_info_id": {
+					  "query": "'.$dwz_info_id.'"
+					}
+				  }
+				}
+			  ]
+			}
+		  }
+		}';
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
 				'body' => $json
 		];
 
@@ -1984,19 +2083,24 @@ class BparkingController extends CommonController {
 		//从redis获取到数据 ，然后使用图表形式展现
 		$exist = $redis->scard("infobikesexist:$id");
 		$arr_exist = $this->getbikes_exist_es2($id);
+		//var_dump($arr_exist["hits"]["hits"][0]["_source"]["timestamp"]);
 		$exist_list2 = $arr_exist["hits"]["hits"][0]["_source"]["bikes"];
 		$exist_list3 = json_decode($exist_list2,true);
 		
 		foreach($exist_list3 as $k=>$v){
 			if($v['name']=='') $exist_list3[$k]['name']=$redis->get('bikes:'.$v['mac']);
+			$exist_list3[$k]['lasttime']=date("Y-m-d H:i:s",$arr_exist["hits"]["hits"][0]["_source"]["timestamp"]/1000);
+			$exist_list3[$k]['num']=$redis->scard("infobike:$id:".$v['mac']);
 		}
-		
-		$this->assign('exist',$exist);
+		//var_dump($exist_list3);
+		//$this->assign('arr_exist4',$exist_list3);
+		//$this->assign('exist',$exist);
 		$arr =array();
 		$bike_company=M("bike_company")->select();
 		foreach($bike_company as $k=>$v){
 			$arr[$v['title']]=explode('|',$v['keyword']);
 		}
+		$exist_list4=array();
 		foreach($exist_list3 as $k=>$v){
 			$flag = 'no';
 			$name = $v['name'];
@@ -2005,14 +2109,17 @@ class BparkingController extends CommonController {
 					if($this->startwith($name,$vvv)){
 						$bike_names[]=$kk;
 						$flag = 'yes';
+						$exist_list4[] = $v;
 					}
 				}
 			}
-//			if($flag=='no'){
-//				$bike_names[]='其他';
-//			}
+			/*if($flag=='no'){
+				$bike_names[]='其他';
+			}*/
 		}
 
+		$this->assign('arr_exist4',$exist_list4);
+		$this->assign('exist',sizeof($exist_list4));
 		$arr1 = $bnames = array_unique($bike_names);
 		foreach($arr1 as $k=>$v){
 			if($v == "其他"){

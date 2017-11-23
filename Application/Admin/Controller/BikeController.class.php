@@ -319,7 +319,7 @@ class BikeController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dwz_bike_sub_realtime_last"
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -389,7 +389,7 @@ class BikeController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dwz_bike_sub_realtime_last"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -429,8 +429,8 @@ class BikeController extends CommonController {
 		}
 
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 
@@ -605,7 +605,7 @@ class BikeController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dwz_bike_sub_realtime_last"
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -682,7 +682,7 @@ class BikeController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dwz_bike_sub_realtime_last"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -729,8 +729,8 @@ class BikeController extends CommonController {
 		}
 
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 
@@ -918,7 +918,7 @@ class BikeController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dwz_bike_sub_realtime_last"
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -1002,7 +1002,7 @@ class BikeController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dwz_bike_sub_realtime_last"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -1056,8 +1056,8 @@ class BikeController extends CommonController {
 		}
 
 		$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 

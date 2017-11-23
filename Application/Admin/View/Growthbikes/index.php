@@ -197,7 +197,7 @@
         series : [
             {
                 name:'酷骑',
-                type:'bar',
+                type:'line',
                 stack: 'sum',
 //                barCategoryGap: '50%',
                 itemStyle: {
@@ -215,7 +215,7 @@
             },
             {
                 name:'摩拜',
-                type:'bar',
+                type:'line',
                 stack: 'sum',
                 itemStyle: {
                     normal: {
@@ -232,7 +232,7 @@
             },
             {
                 name:'小鸣单车',
-                type:'bar',
+                type:'line',
                 stack: 'sum',
                 itemStyle: {
                     normal: {
@@ -249,7 +249,7 @@
             },
             {
                 name:'ofo',
-                type:'bar',
+                type:'line',
                 stack: 'sum',
                 itemStyle: {
                     normal: {
@@ -266,7 +266,7 @@
             },
             {
                 name:'HelloBike',
-                type:'bar',
+                type:'line',
                 stack: 'sum',
                 itemStyle: {
                     normal: {

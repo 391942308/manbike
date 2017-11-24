@@ -245,7 +245,6 @@ class ChangebikesController extends CommonController {
 		}
 		$j_kq = json_encode($kq);
 		$j_kq_color = json_encode($kq_color);
-//		var_dump($kq_color);
 		$j_mb = json_encode($mb);
 		$j_mb_color = json_encode($mb_color);
 		$j_xm = json_encode($xm);

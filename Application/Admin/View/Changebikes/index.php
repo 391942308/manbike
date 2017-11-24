@@ -29,7 +29,7 @@
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>车辆总量变化曲线</h3>
+                <h3>车辆增长管理&nbsp;&nbsp;&nbsp; <small>车辆增长数据统计</small></h3>
             </div>
         </div>
         <div class="row">
@@ -41,7 +41,7 @@
             <div class="x_panel">
                 <div class="x_title">
                     <span style="color: red">
-                        提示：填写车位，选择开始时间和结束时间，点击查询即可看到该时间段车辆总量变化情况。选择行政区，选择开始时间和结束时间，点击查询即可看到该时间段车辆总量变化情况。不选看到的是总的车辆变化曲线。
+                        提示：填写车位，选择开始时间和结束时间，点击查询即可看到该时间段车辆新增情况。选择行政区，选择开始时间和结束时间，点击查询即可看到该时间段车辆新增情况。不选看到的是总的车辆新增数据。
                     </span>
                     <ul class="nav navbar-right panel_toolbox">
                     </ul>
@@ -49,10 +49,10 @@
                 </div>
 
                 <div class="x_content">
-                        <select class="form-control" style="width: 200px;height:35px;margin-bottom: 10px;" id="tj">
-                            <option value="1" <if condition="$tj eq 1">selected</if>>根据车位查询</option>
-                            <option value="2" <if condition="$tj eq 2">selected</if>>根据行政区查询</option>
-                        </select>
+                    <select class="form-control" style="width: 200px;height:35px;margin-bottom: 10px;" id="tj">
+                        <option value="1" <if condition="$tj eq 1">selected</if>>根据车位查询</option>
+                        <option value="2" <if condition="$tj eq 2">selected</if>>根据行政区查询</option>
+                    </select>
                     <div style="margin-bottom: 10px;" class="input-group" id="tj1">
                         <form method="GET" action="{:U('Admin/Changebikes/index',array('tj'=>1))}">
                             <table>
@@ -98,11 +98,11 @@
                                                 <select name="area" style="height: 34px"></select>
                                             </div>
                                             <else />
-                                                <div>
-                                                    <input type="text" class="pca" name="province"  value="{$province2}" readonly="readonly"/>
-                                                    <input type="text" class="pca" name="city" value="{$city2}" readonly="readonly"/>
-                                                    <input type="text" class="pca" name="area"  value="{$area2}" readonly="readonly"/>
-                                                </div>
+                                            <div>
+                                                <input type="text" class="pca" name="province"  value="{$province2}" readonly="readonly"/>
+                                                <input type="text" class="pca" name="city" value="{$city2}" readonly="readonly"/>
+                                                <input type="text" class="pca" name="area"  value="{$area2}" readonly="readonly"/>
+                                            </div>
                                         </if>
 
                                     </td>
@@ -138,8 +138,9 @@
                             <a><img class="allbike34" src="__PUBLIC__/images/allbike4.png"/></a>
                         </div>
                     </div>
+                    <div id="main" style="width: 100%;height:610px;">
 
-                    <div id="main" style="width: 100%;height:610px;"></div>
+                    </div>
                     <input id="iid" type="hidden" value="{$dwz_info_id}" />
                 </div>
             </div>

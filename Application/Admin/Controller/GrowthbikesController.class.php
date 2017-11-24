@@ -245,12 +245,6 @@ class GrowthbikesController extends CommonController {
 		for($i=0;$i<sizeof($mb);$i++){
 			$sum[] = $kq[$i] + $mb[$i] + $xm[$i]+ $ofo[$i]+ $hb[$i];
 		}
-//		var_dump($sum);
-//		var_dump("<br>");
-//		var_dump($hb);var_dump("<br>");
-//		var_dump($xm);var_dump("<br>");
-//		var_dump($ofo);var_dump("<br>");
-//		var_dump($ts);var_dump("<br>");
 		$j_kq = json_encode($kq);
 		$j_kq_color = json_encode($kq_color);
 //		var_dump($kq_color);

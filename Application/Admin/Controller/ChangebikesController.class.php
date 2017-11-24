@@ -175,10 +175,12 @@ class ChangebikesController extends CommonController {
 				$init=$v[3]['buckets'];
 				break;
 			}
+
 		}
 		foreach ($init as $k=>$v) {
 			$init[$k]['doc_count']=0;
 		}
+
 		//var_dump($init);
 		//exit;
 
@@ -240,21 +242,41 @@ class ChangebikesController extends CommonController {
 				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
 		}
-		for($i=0;$i<sizeof($mb);$i++){
-			$sum[] = $kq[$i] + $mb[$i] + $xm[$i]+ $ofo[$i]+ $hb[$i];
+		$sum_kq = 0;
+		$sum_mb = 0;
+		$sum_xm = 0;
+		$sum_ofo = 0;
+		$sum_hb = 0;
+		for($i=0;$i<sizeof($kq);$i++){
+			$sum_kq += $kq[$i];
+			$kq2[] = $sum_kq;
+			$sum_mb += $mb[$i];
+			$mb2[] = $sum_mb;
+			$sum_xm +=$xm[$i];
+			$xm2[] = $sum_xm;
+			$sum_ofo +=$ofo[$i];
+			$ofo2[] = $sum_ofo;
+			$sum_hb +=$hb[$i];
+			$hb2[] = $sum_hb;
 		}
-		$j_kq = json_encode($kq);
+		$sum = 0;
+		for($i=0;$i<sizeof($mb);$i++){
+			$sum += $kq[$i] + $mb[$i] + $xm[$i]+ $ofo[$i]+ $hb[$i];
+			$sum2[] = $sum;
+		}
+		$j_kq = json_encode($kq2);
 		$j_kq_color = json_encode($kq_color);
-		$j_mb = json_encode($mb);
+//		var_dump($kq_color);
+		$j_mb = json_encode($mb2);
 		$j_mb_color = json_encode($mb_color);
-		$j_xm = json_encode($xm);
+		$j_xm = json_encode($xm2);
 		$j_xm_color = json_encode($xm_color);
-		$j_ofo = json_encode($ofo);
+		$j_ofo = json_encode($ofo2);
 		$j_ofo_color = json_encode($ofo_color);
-		$j_hb = json_encode($hb);
+		$j_hb = json_encode($hb2);
 		$j_hb_color = json_encode($hb_color);
 		$j_ts = json_encode($ts);
-		$j_sum = json_encode($sum);
+		$j_sum = json_encode($sum2);
 		$this->assign("j_kq",$j_kq);
 		$this->assign("j_kq_color",$j_kq_color);
 		$this->assign("j_mb",$j_mb);
@@ -267,7 +289,6 @@ class ChangebikesController extends CommonController {
 		$this->assign("j_hb_color",$j_hb_color);
 		$this->assign("j_ts",$j_ts);
 		$this->assign("j_sum",$j_sum);
-
 		$this->display();
 	}
 	//总的车辆增长数据
@@ -313,7 +334,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_last"
+              "query": "dbs_realtime_first"
             }
           }
         },
@@ -359,7 +380,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_last"
+                    "query": "dbs_realtime_first"
                   }
                 }
               },
@@ -391,7 +412,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_last',
+				'type' => 'dbs_realtime_first',
 				'body' => $json
 		];
 
@@ -444,7 +465,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_last"
+              "query": "dbs_realtime_one_first"
             }
           }
         },
@@ -497,7 +518,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_last"
+                    "query": "dbs_realtime_one_first"
                   }
                 }
               },
@@ -536,7 +557,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_last',
+				'type' => 'dbs_realtime_one_first',
 				'body' => $json
 		];
 
@@ -562,7 +583,7 @@ class ChangebikesController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "1d",
+        "interval": "12h",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
       },
@@ -570,9 +591,9 @@ class ChangebikesController extends CommonController {
         "3": {
           "terms": {
             "field": "company",
-            "size": 10,
+            "size": 6,
             "order": {
-              "_term": "desc"
+              "_count": "desc"
             }
           }
         }
@@ -589,14 +610,14 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_last"
+              "query": "dbs_realtime_first"
             }
           }
         },
         {
           "match_phrase": {
             "area": {
-              "query": "'.$area.'"
+              "query": "滨江区"
             }
           }
         },
@@ -604,7 +625,7 @@ class ChangebikesController extends CommonController {
           "range": {
             "timestamp": {
               "gte": "'.$start.'",
-              "lte":"'.$end.'" ,
+              "lte": "'.$end.'",
               "format": "epoch_millis"
             }
           }
@@ -642,14 +663,14 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_last"
+                    "query": "dbs_realtime_first"
                   }
                 }
               },
               {
                 "match_phrase": {
                   "area": {
-                    "query": "'.$area.'"
+                    "query": "滨江区"
                   }
                 }
               },
@@ -681,7 +702,140 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_last',
+				'type' => 'dbs_realtime_first',
+				'body' => $json
+		];
+
+		$results = $client->search($params);
+		//$ts = $results['hits']['hits'][0]['_source']['ts'];
+		//var_dump($results);
+		//var_dump($ts);
+		return $results;
+	}
+	//单个车位最后50次测到的车辆总量数据
+	private function realtime_bikes50($dwz_info_id,$start,$end){
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		$hosts = [
+				'http://116.62.171.54:8081',         // IP + Port
+		];
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+
+		$json = '{
+  "version": true,
+  "size":50,
+  "sort": [
+    {
+      "timestamp": {
+        "order": "desc",
+        "unmapped_type": "boolean"
+      }
+    }
+  ],
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match_phrase": {
+            "_type": {
+              "query": "dbs_realtime"
+            }
+          }
+        },
+        {
+          "match_phrase": {
+            "dwz_info_id": {
+              "query": "5889"
+            }
+          }
+        },
+        {
+          "range": {
+            "timestamp": {
+              "gte": 1508658920478,
+              "lte": 1511250920478,
+              "format": "epoch_millis"
+            }
+          }
+        }
+      ],
+      "must_not": []
+    }
+  },
+  "_source": {
+    "excludes": []
+  },
+  "aggs": {
+    "2": {
+      "date_histogram": {
+        "field": "timestamp",
+        "interval": "12h",
+        "time_zone": "Asia/Shanghai",
+        "min_doc_count": 1
+      }
+    }
+  },
+  "stored_fields": [
+    "*"
+  ],
+  "script_fields": {},
+  "docvalue_fields": [
+    "timestamp"
+  ],
+  "highlight": {
+    "pre_tags": [
+      "@kibana-highlighted-field@"
+    ],
+    "post_tags": [
+      "@/kibana-highlighted-field@"
+    ],
+    "fields": {
+      "*": {
+        "highlight_query": {
+          "bool": {
+            "must": [
+              {
+                "match_all": {}
+              },
+              {
+                "match_phrase": {
+                  "_type": {
+                    "query": "dbs_realtime"
+                  }
+                }
+              },
+              {
+                "match_phrase": {
+                  "dwz_info_id": {
+                    "query": "5889"
+                  }
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": 1508658920478,
+                    "lte": 1511250920478,
+                    "format": "epoch_millis"
+                  }
+                }
+              }
+            ],
+            "must_not": []
+          }
+        }
+      }
+    },
+    "fragment_size": 2147483647
+  }
+}';
+		$params = [
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
 				'body' => $json
 		];
 

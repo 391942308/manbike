@@ -347,7 +347,6 @@
                 name:'车辆总量',
                 type:'line',
                 stack: 'sum',
-//                barCategoryGap: '50%',
                 itemStyle: {
                     normal: {
                         color: '#8FBC8F',

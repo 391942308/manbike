@@ -127,160 +127,284 @@
                             </table>
                         </form>
                     </div>
+                    <div class="over" style="z-index: 50;position:relative;">
+                        <div class="allbike" style="position:absolute;right:183px;margin-top: 5px;">
+                            <a><img class="allbike12" src="__PUBLIC__/images/allbike.png"/></a>
+                        </div>
+
+                    </div>
+                    <div class="over2" style="z-index: 50;position:relative;">
+                        <div class="allbike2" style="position:absolute;right:210px;margin-top: 5px;">
+                            <a><img class="allbike34" src="__PUBLIC__/images/allbike4.png"/></a>
+                        </div>
+                    </div>
+
                     <div id="main" style="width: 100%;height:610px;"></div>
                     <input id="iid" type="hidden" value="{$dwz_info_id}" />
                 </div>
             </div>
         </div>
     </div>
-<script type="text/javascript">
-    // 基于准备好的dom，初始化echarts实例
-    var myChart = echarts.init(document.getElementById('main'));
-    //var test = genData(50);
-//    app.title = '坐标轴刻度与标签对齐';
-    var j_kq = $.parseJSON('{$j_kq}');
-    var j_mb = $.parseJSON('{$j_mb}');
-    var j_xm = $.parseJSON('{$j_xm}');
-    var j_ofo = $.parseJSON('{$j_ofo}');
-    var j_hb = $.parseJSON('{$j_hb}');
-    var j_ts = $.parseJSON('{$j_ts}');
-    option = {
-        tooltip : {
-            trigger: 'axis',
-            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
-                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-            },
-            formatter: function (params){
-                var str = '';
-                var sum = 0;
-                var size = params.length;
-                str+=params[0].name + '<br/>';
-                for(var i=0;i<size;i++){
-                    sum+=params[i].value;
-                    str+=params[i].seriesName + ':' + params[i].value + '<br/>';
+    <script type="text/javascript">
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+        //var test = genData(50);
+        //    app.title = '坐标轴刻度与标签对齐';
+        var j_kq = $.parseJSON('{$j_kq}');
+        var j_kq_color = $.parseJSON('{$j_kq_color}');
+        var j_mb = $.parseJSON('{$j_mb}');
+        var j_mb_color = $.parseJSON('{$j_mb_color}');
+        var j_xm = $.parseJSON('{$j_xm}');
+        var j_xm_color = $.parseJSON('{$j_xm_color}');
+        var j_ofo = $.parseJSON('{$j_ofo}');
+        var j_ofo_color = $.parseJSON('{$j_ofo_color}');
+        var j_hb = $.parseJSON('{$j_hb}');
+        var j_hb_color = $.parseJSON('{$j_hb_color}');
+        var j_ts = $.parseJSON('{$j_ts}');
+        var j_sum = $.parseJSON('{$j_sum}');
+        option = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                },
+                formatter: function (params){
+                    var str = '';
+                    var sum = 0;
+                    var size = params.length;
+                    str+=params[0].name + '<br/>';
+                    for(var i=0;i<size;i++){
+                        sum+=params[i].value;
+                        str+=params[i].seriesName + ':' + params[i].value + '<br/>';
+                    }
+                    str+='总量:'+sum;
+                    return str
                 }
-                str+='总量:'+sum;
-                return str
-            }
-        },
-        legend: {
-            selectedMode:false,
-            data:['酷骑', '摩拜','小鸣单车','ofo','HelloBike']
-        },
-        toolbox: {
-            show : true,
-            feature : {
-                mark : {show: true},
-                dataView : {show: true, readOnly: false},
-                restore : {show: true},
-                saveAsImage : {show: true}
-            }
-        },
-        calculable : true,
-        xAxis : [
-            {
-                type : 'category',
-                data : j_ts
-            }
-        ],
-        yAxis : [
-            {
-                type : 'value',
-                boundaryGap: [0, 0.1]
-            }
-        ],
-        series : [
-            {
-                name:'酷骑',
-                type:'bar',
-                stack: 'sum',
+            },
+            legend: {
+                data:['酷骑', '摩拜','小鸣单车','ofo','HelloBike']
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    data : j_ts
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    boundaryGap: [0, 0.1]
+                }
+            ],
+            series : [
+                {
+                    name:'酷骑',
+                    type:'line',
+                    stack: 'sum',
 //                barCategoryGap: '50%',
-                itemStyle: {
-                    normal: {
-                        color: '#669933',
-                        barBorderColor: '#669933',
-                        barBorderWidth: 6,
-                        barBorderRadius:0,
+                    itemStyle: {
+                        normal: {
+                            color: j_kq_color,
+                            barBorderColor: j_kq_color,
+                            barBorderWidth: 6,
+                            barBorderRadius:0,
 //                        label : {
 //                            show: false, position: 'insideTop'
 //                        }
-                    }
+                        }
+                    },
+                    data:j_kq
                 },
-                data:j_kq
-            },
-            {
-                name:'摩拜',
-                type:'bar',
-                stack: 'sum',
-                itemStyle: {
-                    normal: {
-                        color: '#CC9933',
-                        barBorderColor: '#CC9933',
-                        barBorderWidth: 6,
-                        barBorderRadius:0,
+                {
+                    name:'摩拜',
+                    type:'line',
+                    stack: 'sum',
+                    itemStyle: {
+                        normal: {
+                            color: j_mb_color,
+                            barBorderColor: j_mb_color,
+                            barBorderWidth: 6,
+                            barBorderRadius:0,
 //                        label : {
 //                            show: true, position: 'insideTop'
 //                        }
-                    }
+                        }
+                    },
+                    data:j_mb
                 },
-                data:j_mb
-            },
-            {
-                name:'小鸣单车',
-                type:'bar',
-                stack: 'sum',
-                itemStyle: {
-                    normal: {
-                        color: '#6699CC',
-                        barBorderColor: '#6699CC',
-                        barBorderWidth: 6,
-                        barBorderRadius:0,
+                {
+                    name:'小鸣单车',
+                    type:'line',
+                    stack: 'sum',
+                    itemStyle: {
+                        normal: {
+                            color: j_xm_color,
+                            barBorderColor: j_xm_color,
+                            barBorderWidth: 6,
+                            barBorderRadius:0,
 //                        label : {
 //                            show: true, position: 'insideTop'
 //                        }
-                    }
+                        }
+                    },
+                    data:j_xm
                 },
-                data:j_xm
-            },
-            {
-                name:'ofo',
-                type:'bar',
-                stack: 'sum',
-                itemStyle: {
-                    normal: {
-                        color: '#CCCC66',
-                        barBorderColor: '#CCCC66',
-                        barBorderWidth: 6,
-                        barBorderRadius:0,
+                {
+                    name:'ofo',
+                    type:'line',
+                    stack: 'sum',
+                    itemStyle: {
+                        normal: {
+                            color: j_ofo_color,
+                            barBorderColor: j_ofo_color,
+                            barBorderWidth: 6,
+                            barBorderRadius:0,
 //                        label : {
 //                            show: true, position: 'insideTop'
 //                        }
-                    }
+                        }
+                    },
+                    data:j_ofo
                 },
-                data:j_ofo
-            },
-            {
-                name:'HelloBike',
-                type:'bar',
-                stack: 'sum',
-                itemStyle: {
-                    normal: {
-                        color: '#999999',
-                        barBorderColor: '#999999',
-                        barBorderWidth: 1,
-                        barBorderRadius:0,
+                {
+                    name:'HelloBike',
+                    type:'line',
+                    stack: 'sum',
+                    itemStyle: {
+                        normal: {
+                            color:j_hb_color ,
+                            barBorderColor:j_hb_color ,
+                            barBorderWidth: 1,
+                            barBorderRadius:0,
 //                        label : {
 //                            show: true, position: 'insideTop'
 //                        }
-                    }
+                        }
+                    },
+                    data:j_hb
                 },
-                data:j_hb
+            ]
+        };
+        option2 = {
+            tooltip : {
+                trigger: 'axis',
+                axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                    type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                },
+                formatter: function (params){
+                    var str = '';
+                    var sum = 0;
+                    var size = params.length;
+                    str+=params[0].name + '<br/>';
+                    for(var i=0;i<size;i++){
+                        sum+=params[i].value;
+                        str+=params[i].seriesName + ':' + params[i].value + '<br/>';
+                    }
+                    str+='总量:'+sum;
+                    return str
+                }
             },
-        ]
-    };
-    // 使用刚指定的配置项和数据显示图表。
-    myChart.setOption(option);
-</script>
+            legend: {
+                data:['车辆总量']
+            },
+            toolbox: {
+                show : true,
+                feature : {
+                    mark : {show: true},
+                    dataView : {show: true, readOnly: false},
+                    magicType : {show: true, type: ['line', 'bar', 'stack', 'tiled']},
+                    restore : {show: true},
+                    saveAsImage : {show: true}
+                }
+            },
+            calculable : true,
+            xAxis : [
+                {
+                    type : 'category',
+                    data : j_ts
+                }
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    boundaryGap: [0, 0.1]
+                }
+            ],
+            series : [
+                {
+                    name:'车辆总量',
+                    type:'line',
+                    stack: 'sum',
+                    itemStyle: {
+                        normal: {
+                            color: '#8FBC8F',
+                            barBorderColor: '#8FBC8F',
+                            barBorderWidth: 6,
+                            barBorderRadius:0,
+//                        label : {
+//                            show: false, position: 'insideTop'
+//                        }
+                        }
+                    },
+                    data:j_sum
+                }
+            ]
+        };
+        // 使用刚指定的配置项和数据显示图表。
+        $(function(){
+            $(".over").mouseover(
+                function(){
+                    $(".allbike12").css("padding-left","10px");
+                    $(".allbike12").attr("src","__PUBLIC__/images/allbike2.png");
+                }
+            );
+            $(".over").mouseout(
+                function(){
+                    $(".allbike12").attr("src","__PUBLIC__/images/allbike.png");
+                }
+            );
+            $(".over2").mouseover(
+                function(){
+                    $(".allbike34").css("padding-left","10px");
+                    $(".allbike34").attr("src","__PUBLIC__/images/allbike3.png");
+                }
+            );
+            $(".over2").mouseout(
+                function(){
+                    $(".allbike34").attr("src","__PUBLIC__/images/allbike4.png");
+                }
+            );
+            $(".allbike34").attr("src","__PUBLIC__/images/allbike6.png");
+            myChart.clear();
+            myChart.setOption(option);
+        });
+        $(".allbike12").click(function(){
+            $(this).attr("src","__PUBLIC__/images/allbike5.png");
+            $(".allbike34").attr("src","__PUBLIC__/images/allbike4.png");
+            myChart.clear();
+            myChart.setOption(option2);
+
+        });
+        $(".allbike34").click(function(){
+            $(this).attr("src","__PUBLIC__/images/allbike6.png");
+            $(".allbike12").attr("src","__PUBLIC__/images/allbike.png");
+            myChart.clear();
+            myChart.setOption(option);
+        });
+
+    </script>
+
     <script src="__PUBLIC__/JS/distpicker.js"></script>
     <script>
         var area = $("#h_area").val();
@@ -290,7 +414,6 @@
             district: area,
         };
         $('#target').distpicker(options);
-
     </script>
 
     <script>
@@ -329,7 +452,6 @@
             forceParse: 0,
             showMeridian: 1
         });
-
     </script>
-<!-- /page content -->
+    <!-- /page content -->
 </block>

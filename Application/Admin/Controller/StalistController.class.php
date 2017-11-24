@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class StalistController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
     public function index()
     {
 		$dwz_info_id="";

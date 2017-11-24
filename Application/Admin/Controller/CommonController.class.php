@@ -35,19 +35,19 @@ class CommonController extends BaseController {
             );
             $map_aga['uid']=array('eq',$uid);
             $aga = M("auth_group_access")->where($map_aga)->select();//查询出该uid对应的组的信息
-			
-			//将群组信息放到session里面，方便后面根据区域进行统计和显示
-			//var_dump($aga[0]['group_id']);
-			$map_pri['id']=$aga[0]['group_id'];
-			$mag = M("auth_group")->where($map_pri)->find();
-			//var_dump($mag);
-			$_SESSION['auth']['class']=$mag['class'];
-			$_SESSION['auth']['province']=$mag['province'];
-			$_SESSION['auth']['city']=$mag['city'];
-			$_SESSION['auth']['area']=$mag['area'];
-			
-			//var_dump($_SESSION['auth']);
-			
+
+            //将群组信息放到session里面，方便后面根据区域进行统计和显示
+            //var_dump($aga[0]['group_id']);
+            $map_pri['id']=$aga[0]['group_id'];
+            $mag = M("auth_group")->where($map_pri)->find();
+            //var_dump($mag);
+            $_SESSION['auth']['class']=$mag['class'];
+            $_SESSION['auth']['province']=$mag['province'];
+            $_SESSION['auth']['city']=$mag['city'];
+            $_SESSION['auth']['area']=$mag['area'];
+
+            //var_dump($_SESSION['auth']);
+
             $ags = array();
             //获取用户对应的所有用户组
             foreach($aga as $k=>$v){
@@ -96,16 +96,16 @@ class CommonController extends BaseController {
             foreach($arr4 as $k=>$v){
                 $map_m2['id']=array('eq',$v);
                 $blocklist[]=M('info_block')->where($map_m2)->find();
-               // var_dump($blocklist);
+                // var_dump($blocklist);
             }
         }
         $this->assign("blocklist",$blocklist);
         $list=$this->list_to_tree($list); //详细参数见手册
-		//var_dump($list);
+        //var_dump($list);
         $this->assign("list",$list);
     }
-	
-	//$list排序
+
+    //$list排序
     function my_sort($arrays,$sort_key,$sort_order=SORT_DESC,$sort_type=SORT_NUMERIC ){
         foreach( $arrays as $k=>$v){
             if( !$v )
@@ -128,7 +128,7 @@ class CommonController extends BaseController {
         array_multisort($key_arrays,$sort_order,$sort_type,$arrays);
         return $arrays;
     }
-	
+
     function list_to_tree($list, $pk='id',$pid = 'pid',$child = '_child',$root=0) {
         // 创建Tree
         $tree = array();

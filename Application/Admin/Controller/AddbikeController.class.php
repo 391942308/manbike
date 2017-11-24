@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class AddbikeController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
 	public function index()
 	{
 		if(IS_POST){

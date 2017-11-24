@@ -6,7 +6,7 @@ return array(
 	'DB_PORT' => '3306',
 	'DB_NAME' => 'dwz',
 	'DB_USER' => 'root',
-	'DB_PWD' => '',
+	'DB_PWD' => 'root',
 	'DB_PREFIX' => 'dwz_',
 	'agent_version' => 1,
 	'AUTH_CONFIG' => array(
@@ -18,4 +18,8 @@ return array(
 		'AUTH_USER' => 'dwz_auth_user' //用户信息表
 	),
 		'TMPL_TEMPLATE_SUFFIX'=>'.php',
+//		//默认错误跳转对应的模板文件
+//		'TMPL_ACTION_ERROR' => 'Public:error',
+//		//默认成功跳转对应的模板文件
+//		'TMPL_ACTION_SUCCESS' => 'Public:success',
 );

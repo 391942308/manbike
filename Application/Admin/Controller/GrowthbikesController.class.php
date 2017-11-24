@@ -242,7 +242,10 @@ class GrowthbikesController extends CommonController {
 				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
 		}
-//		var_dump($kq);
+		for($i=0;$i<sizeof($mb);$i++){
+			$sum[] = $kq[$i] + $mb[$i] + $xm[$i]+ $ofo[$i]+ $hb[$i];
+		}
+//		var_dump($sum);
 //		var_dump("<br>");
 //		var_dump($hb);var_dump("<br>");
 //		var_dump($xm);var_dump("<br>");
@@ -260,6 +263,7 @@ class GrowthbikesController extends CommonController {
 		$j_hb = json_encode($hb);
 		$j_hb_color = json_encode($hb_color);
 		$j_ts = json_encode($ts);
+		$j_sum = json_encode($sum);
 		$this->assign("j_kq",$j_kq);
 		$this->assign("j_kq_color",$j_kq_color);
 		$this->assign("j_mb",$j_mb);
@@ -271,6 +275,7 @@ class GrowthbikesController extends CommonController {
 		$this->assign("j_hb",$j_hb);
 		$this->assign("j_hb_color",$j_hb_color);
 		$this->assign("j_ts",$j_ts);
+		$this->assign("j_sum",$j_sum);
 		$this->display();
 	}
 	//总的车辆增长数据
@@ -693,5 +698,154 @@ class GrowthbikesController extends CommonController {
 		//var_dump($results);
 		//var_dump($ts);
 		return $results;
+	}
+	//单个车位最后50次测到的车辆总量数据
+	private function realtime_bikes50($dwz_info_id,$start,$end){
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		$hosts = [
+				'http://116.62.171.54:8081',         // IP + Port
+		];
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+
+		$json = '{
+  "version": true,
+  "size":50,
+  "sort": [
+    {
+      "timestamp": {
+        "order": "desc",
+        "unmapped_type": "boolean"
+      }
+    }
+  ],
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match_phrase": {
+            "_type": {
+              "query": "dbs_realtime"
+            }
+          }
+        },
+        {
+          "match_phrase": {
+            "dwz_info_id": {
+              "query": "5889"
+            }
+          }
+        },
+        {
+          "range": {
+            "timestamp": {
+              "gte": 1508658920478,
+              "lte": 1511250920478,
+              "format": "epoch_millis"
+            }
+          }
+        }
+      ],
+      "must_not": []
+    }
+  },
+  "_source": {
+    "excludes": []
+  },
+  "aggs": {
+    "2": {
+      "date_histogram": {
+        "field": "timestamp",
+        "interval": "12h",
+        "time_zone": "Asia/Shanghai",
+        "min_doc_count": 1
+      }
+    }
+  },
+  "stored_fields": [
+    "*"
+  ],
+  "script_fields": {},
+  "docvalue_fields": [
+    "timestamp"
+  ],
+  "highlight": {
+    "pre_tags": [
+      "@kibana-highlighted-field@"
+    ],
+    "post_tags": [
+      "@/kibana-highlighted-field@"
+    ],
+    "fields": {
+      "*": {
+        "highlight_query": {
+          "bool": {
+            "must": [
+              {
+                "match_all": {}
+              },
+              {
+                "match_phrase": {
+                  "_type": {
+                    "query": "dbs_realtime"
+                  }
+                }
+              },
+              {
+                "match_phrase": {
+                  "dwz_info_id": {
+                    "query": "5889"
+                  }
+                }
+              },
+              {
+                "range": {
+                  "timestamp": {
+                    "gte": 1508658920478,
+                    "lte": 1511250920478,
+                    "format": "epoch_millis"
+                  }
+                }
+              }
+            ],
+            "must_not": []
+          }
+        }
+      }
+    },
+    "fragment_size": 2147483647
+  }
+}';
+		$params = [
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
+				'body' => $json
+		];
+
+		$results = $client->search($params);
+		//$ts = $results['hits']['hits'][0]['_source']['ts'];
+		//var_dump($results);
+		//var_dump($ts);
+		return $results;
+	}
+	public function oneinfo(){
+		if($_GET){
+			$dwz_info_id = $_GET["dwz_info_id"];
+			$this->assign("dwz_info_id",$dwz_info_id);
+			$start = $_GET["start"];
+			$this->assign("start",$start);
+			$end = $_GET["end"];
+			$this->assign("end",$end);
+			$bikes = $this->realtime_bikes50($dwz_info_id,$start,$end);
+			$hits = $bikes["hits"]["hits"];
+			var_dump($hits);
+		}
+		$infolist = M('info')->select();
+		$this->assign("infolist",$infolist);
+		$this->display();
 	}
 }

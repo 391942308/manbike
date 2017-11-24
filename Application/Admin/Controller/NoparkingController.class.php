@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class NoparkingController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
 	public function index() {
 		//连接本地的 Redis 服务
 		$redis = new\ Redis();
@@ -116,14 +113,6 @@ class NoparkingController extends CommonController {
 		}else{
 			$this->error('删除失败');
 		}
-	}
-	public function clear(){
-		$redis = new \Redis();
-		$redis->connect('116.62.171.54', 8085);
-		//删除键
-		//$list = $redis->keys("infobikes:*");
-		$list = $redis->keys("bikesrssi:*");
-		var_dump(sizeof($list));
 	}
 
 

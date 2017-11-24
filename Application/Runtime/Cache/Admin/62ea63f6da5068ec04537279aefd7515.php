@@ -7,18 +7,18 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title><?php echo ($title); ?> | 后台管理</title>
+	<title>后台管理 | </title>
 
 	<!-- Bootstrap -->
-	<link href="/manbike0.3/Public/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
-	<link href="/manbike0.3/Public/gentelella/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<!-- NProgress -->
-	<link href="/manbike0.3/Public/gentelella/vendors/nprogress/nprogress.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/nprogress/nprogress.css" rel="stylesheet">
 
 	<!-- Custom Theme Style -->
-	<link href="/manbike0.3/Public/gentelella/build/css/custom.min.css" rel="stylesheet">
-	<link id="artDialogSkin" href="/manbike0.3/Public/artDialog/skins/default.css" rel="stylesheet" type="text/css" />
+	<link href="/Public/gentelella/build/css/custom.min.css" rel="stylesheet">
+	<link id="artDialogSkin" href="/Public/artDialog/skins/default.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="nav-md">
@@ -28,9 +28,9 @@
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
 					<a href="index.html" class="site_title">
-<!--						<i class="fa fa-paw"></i> -->
-<img src="/manbike0.3/Public/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 8px;"/>
-						<!--<img src="/manbike0.3/Public/images/bike_logo.png" style="width: 15%;margin-bottom: 5px"/>-->
+<!--						<i class="fa fa-bicycle"></i>-->
+<!--						<i class="fa fa-paw"></i>-->
+						<img src="/Public/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 5px;"/>
 						<span style="font-size: smaller">共享单车泊位管理</span>
 					</a>
 				</div>
@@ -40,7 +40,7 @@
 				<!-- menu profile quick info -->
 				<div class="profile clearfix">
 					<div class="profile_pic">
-						<img src="/manbike0.3/Public/images/img.jpg" alt="..." class="img-circle profile_img">
+						<img src="/Public/images/img.jpg" alt="..." class="img-circle profile_img">
 					</div>
 					<div class="profile_info">
 						<span>欢迎您：</span>
@@ -67,7 +67,7 @@
 				</div>
 				<!-- /sidebar menu -->
 
-				<!-- /menu footer buttons 
+				<!-- /menu footer buttons -->
 				<div class="sidebar-footer hidden-small">
 					<a data-toggle="tooltip" data-placement="top" title="Settings">
 						<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
@@ -81,7 +81,7 @@
 					<a data-toggle="tooltip" data-placement="top" title="Logout" href="<?php echo U('Login/logout');?>">
 						<span class="glyphicon glyphicon-off" aria-hidden="true"></span>
 					</a>
-				</div>-->
+				</div>
 				<!-- /menu footer buttons -->
 			</div>
 		</div>
@@ -97,7 +97,7 @@
 					<ul class="nav navbar-nav navbar-right">
 						<li class="">
 							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-								<img src="/manbike0.3/Public/images/img.jpg" alt=""><?php echo ($_SESSION['auth']['username']); ?>
+								<img src="/Public/images/img.jpg" alt=""><?php echo ($_SESSION['auth']['username']); ?>
 								<span class=" fa fa-angle-down"></span>
 							</a>
 							<ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -111,7 +111,7 @@
 							<ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -123,7 +123,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -135,7 +135,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -147,7 +147,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -177,7 +177,7 @@
 		<div class="right_col" role="main">
 			
     <script src="https://cdn.bootcss.com/jquery/2.1.2/jquery.js"></script>
-    <script src="/manbike0.3/Public/JS/distpicker.js"></script>
+    <script src="/Public/JS/distpicker.js"></script>
     <!-- page content -->
         <div class="">
             <div class="page-title">
@@ -302,7 +302,7 @@
                                                    <a href="javascript:;" navId="<?php echo ($vo['id']); ?>" navTitle="<?php echo ($vo['title']); ?>" navUsable_num="<?php echo ($vo['usable_num']); ?>" navStorage_num="<?php echo ($vo['storage_num']); ?>" navOverflow_num="<?php echo ($vo['overflow_num']); ?>" navNo="<?php echo ($vo['no']); ?>" navBlock_no="<?php echo ($vo['block_no']); ?>" navLng_Lat="<?php echo ($vo['lng']); ?>,<?php echo ($vo['lat']); ?>" navStatus="<?php echo ($vo['status']); ?>" la="<?php echo ($vo['la']); ?>" lb="<?php echo ($vo['lb']); ?>" lc="<?php echo ($vo['lc']); ?>" onclick="edit(this)">修改</a>
                                                     | <a href="javascript:if(confirm('确定删除？'))location='<?php echo U('Admin/Bparking/delete',array('id'=>$vo['id']));?>'">删除</a>
                                                     | <a id="<?php echo ($vo['id']); ?>" class="xiangqing" href="javascript:void(0);">实时停放</a>
-                                                    | <a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/<?php echo ($vo["id"]); ?>">历史总停放</a>
+                                                    | <a href="http://localhost/index.php/Admin/Bparking/infobikesall1/id/<?php echo ($vo["id"]); ?>">历史总停放</a>
 													<?php if($uid == '1'): ?>| <a href="<?php echo U('Admin/Bparking/fssj',array('id'=>$vo['id']));?>">变化趋势和实时数据</a><?php endif; ?>
 													<?php if($uid == '1'): ?>| <a href="<?php echo U('Admin/Bparking/history',array('id'=>$vo['id']));?>">总量变化趋势</a><?php endif; ?>
                                                    <!-- | <a id="<?php echo ($vo['id']); ?>" class="trend" href="javascript:void(0);">变化趋势</a>
@@ -732,7 +732,8 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+            var url = 'http://localhost/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
             location.href=url;
         })
         $(".xiangqing1").click(function(){
@@ -740,7 +741,8 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
+//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
+            var url = 'http://localhost/index.php/Admin/Bparking/infobikesall1/id/'+ id;
             location.href=url;
         })
 		
@@ -779,29 +781,28 @@
 		<!-- footer content -->
 		<footer>
 			<div class="pull-right">
-				共享单车泊位管理 powered by <a href="#">云岛科技</a>
+				共享单车泊位管理 powered by 云岛科技
 			</div>
 			<div class="clearfix"></div>
 		</footer>
 		<!-- /footer content -->
 	</div>
 </div>
-
 <!-- jQuery -->
-<script src="/manbike0.3/Public/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+<script src="/Public/gentelella/vendors/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap -->
-<script src="/manbike0.3/Public/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/Public/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- FastClick -->
-<script src="/manbike0.3/Public/gentelella/vendors/fastclick/lib/fastclick.js"></script>
+<script src="/Public/gentelella/vendors/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
-<script src="/manbike0.3/Public/gentelella/vendors/nprogress/nprogress.js"></script>
+<script src="/Public/gentelella/vendors/nprogress/nprogress.js"></script>
 <!-- validator -->
-<script src="/manbike0.3/Public/gentelella/vendors/validator/validator.js"></script>
-<script type="text/JavaScript" src="/manbike0.3/Public/artDialog/artDialog.js"></script>
-<script type="text/javascript" src="/manbike0.3/Public/artDialog/plugins/iframeTools.js"></script> <!-- 对iframe的新工具 -->
+<script src="/Public/gentelella/vendors/validator/validator.js"></script>
+<script type="text/JavaScript" src="/Public/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="/Public/artDialog/plugins/iframeTools.js"></script> <!-- 对iframe的新工具 -->
 
 <!-- Custom Theme Scripts -->
-<script src="/manbike0.3/Public/gentelella/build/js/custom.min.js"></script>
+<script src="/Public/gentelella/build/js/custom.min.js"></script>
 <script type="text/javascript">
 	$(function(){
 		$(".m_child_menu").css('display','none');

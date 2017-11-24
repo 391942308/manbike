@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class BstalistController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
     public function index()
     {
         $block_list=M("info_block")->select();

@@ -7,18 +7,18 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title><?php echo ($title); ?> | 后台管理</title>
+	<title>后台管理 | </title>
 
 	<!-- Bootstrap -->
-	<link href="/manbike0.3/Public/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
-	<link href="/manbike0.3/Public/gentelella/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
 	<!-- NProgress -->
-	<link href="/manbike0.3/Public/gentelella/vendors/nprogress/nprogress.css" rel="stylesheet">
+	<link href="/Public/gentelella/vendors/nprogress/nprogress.css" rel="stylesheet">
 
 	<!-- Custom Theme Style -->
-	<link href="/manbike0.3/Public/gentelella/build/css/custom.min.css" rel="stylesheet">
-	<link id="artDialogSkin" href="/manbike0.3/Public/artDialog/skins/default.css" rel="stylesheet" type="text/css" />
+	<link href="/Public/gentelella/build/css/custom.min.css" rel="stylesheet">
+	<link id="artDialogSkin" href="/Public/artDialog/skins/default.css" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="nav-md">
@@ -28,9 +28,9 @@
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
 					<a href="index.html" class="site_title">
-<!--						<i class="fa fa-paw"></i> -->
-<img src="/manbike0.3/Public/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 8px;"/>
-						<!--<img src="/manbike0.3/Public/images/bike_logo.png" style="width: 15%;margin-bottom: 5px"/>-->
+<!--						<i class="fa fa-bicycle"></i>-->
+<!--						<i class="fa fa-paw"></i>-->
+						<img src="/Public/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 5px;"/>
 						<span style="font-size: smaller">共享单车泊位管理</span>
 					</a>
 				</div>
@@ -40,7 +40,7 @@
 				<!-- menu profile quick info -->
 				<div class="profile clearfix">
 					<div class="profile_pic">
-						<img src="/manbike0.3/Public/images/img.jpg" alt="..." class="img-circle profile_img">
+						<img src="/Public/images/img.jpg" alt="..." class="img-circle profile_img">
 					</div>
 					<div class="profile_info">
 						<span>欢迎您：</span>
@@ -67,7 +67,7 @@
 				</div>
 				<!-- /sidebar menu -->
 
-				<!-- /menu footer buttons 
+				<!-- /menu footer buttons -->
 				<div class="sidebar-footer hidden-small">
 					<a data-toggle="tooltip" data-placement="top" title="Settings">
 						<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
@@ -81,7 +81,7 @@
 					<a data-toggle="tooltip" data-placement="top" title="Logout" href="<?php echo U('Login/logout');?>">
 						<span class="glyphicon glyphicon-off" aria-hidden="true"></span>
 					</a>
-				</div>-->
+				</div>
 				<!-- /menu footer buttons -->
 			</div>
 		</div>
@@ -97,7 +97,7 @@
 					<ul class="nav navbar-nav navbar-right">
 						<li class="">
 							<a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-								<img src="/manbike0.3/Public/images/img.jpg" alt=""><?php echo ($_SESSION['auth']['username']); ?>
+								<img src="/Public/images/img.jpg" alt=""><?php echo ($_SESSION['auth']['username']); ?>
 								<span class=" fa fa-angle-down"></span>
 							</a>
 							<ul class="dropdown-menu dropdown-usermenu pull-right">
@@ -111,7 +111,7 @@
 							<ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -123,7 +123,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -135,7 +135,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -147,7 +147,7 @@
 								</li>
 								<li>
 									<a>
-										<span class="image"><img src="/manbike0.3/Public/images/img.jpg" alt="Profile Image" /></span>
+										<span class="image"><img src="/Public/images/img.jpg" alt="Profile Image" /></span>
                         <span>
                           <span>John Smith</span>
                           <span class="time">3 mins ago</span>
@@ -232,14 +232,14 @@
                                 <form method="GET" action="<?php echo U('Admin/Bike/index');?>">
                                     <?php if($uid == 1): ?><input id="name" type="text" class="form-control" style="width: 350px" placeholder="车辆名称" name="name" value="<?php echo ($name); ?>"/>
                                         <input id="mac" type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="<?php echo ($mac); ?>"/>
-                                        <input id="dwz_info_id" type="hidden" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="<?php echo ($dwz_info_id); ?>"/>
+                                        <input id="dwz_info_id" type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="<?php echo ($dwz_info_id); ?>"/>
                                         <input type="submit" value="查询" class="btn btn-default"/><br />
 
-                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["keyword"]); ?>" href="javascript:void(0);"  type="button" class="btn btn-primary xx" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; ?>
+                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["keyword"]); ?>" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; ?>
                                         <?php else: ?>
                                         <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="<?php echo ($company); ?>"/>
                                         <input type="submit" value="查询" class="btn btn-default"/><br />
-                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["title"]); ?>" href="javascript:void(0);"  type="button" class="btn btn-primary xx2" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; endif; ?>
+                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["title"]); ?>" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; endif; ?>
                                 </form>
                             </div>
                             <input type="hidden" name="uid" value="<?php echo ($uid); ?>" id="uid"/>
@@ -279,10 +279,9 @@
                                                 <td class="a-right a-right "><?php echo ($vo["area"]); ?></td><?php endif; ?>
                                             <td class=" last">
                                                 <a href="#">
-                                                    <!--<a href="javascript:;" navName="<?php echo ($vo['name']); ?>" navMac="<?php echo ($vo['mac']); ?>" navRssi="<?php echo ($vo['rssi']); ?>" navInfoid="<?php echo ($vo['dwz_info_id']); ?>" navLng_Lat="<?php echo ($vo['lng']); ?>,<?php echo ($vo['lat']); ?>" onclick="edit(this)">修改</a>
-                                                    | <a href="javascript:if(confirm('确定删除？'))location='<?php echo U('Admin/Bike/delete',array('mac'=>$vo['mac']));?>'">删除</a>-->
-                                                    <!--| <a id="<?php echo ($vo["mac"]); ?>" class="xq" href="javascript:void(0)">详情</a>-->
-													 <?php if($uid == '1'): ?><a id="<?php echo ($vo["mac"]); ?>" href="<?php echo U('Admin/bike/bikedetails',array('mac'=>$vo['mac']));?>">详情</a><?php endif; ?>
+                                                    <a href="javascript:;" navName="<?php echo ($vo['name']); ?>" navMac="<?php echo ($vo['mac']); ?>" navRssi="<?php echo ($vo['rssi']); ?>" navInfoid="<?php echo ($vo['dwz_info_id']); ?>" navLng_Lat="<?php echo ($vo['lng']); ?>,<?php echo ($vo['lat']); ?>" onclick="edit(this)">修改</a>
+                                                    | <a href="javascript:if(confirm('确定删除？'))location='<?php echo U('Admin/Bike/delete',array('mac'=>$vo['mac']));?>'">删除</a>
+                                                    <?php if($uid == '1'): ?>| <a id="<?php echo ($vo["mac"]); ?>" href="<?php echo U('Admin/bike/bikedetails',array('mac'=>$vo['mac']));?>">详情</a><?php endif; ?>
                                                 </a>
                                             </td>
                                         </tr><?php endforeach; endif; else: echo "" ;endif; ?>
@@ -409,7 +408,7 @@
                 var aValue = document.getElementById('aInput').value;
                 art.dialog.data('aValue', aValue);// 存储数据
 
-                var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || './';
 
 
                 art.dialog.open(path + 'iframeB.html?fd', {
@@ -428,7 +427,7 @@
                 art.dialog.data('aValue', aValue);// 存储数据
 
 //                var path = art.dialog.data('homeDemoPath') || './';
-                var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || 'http://localhost/index.php/Admin/Bike/';
                 art.dialog.open(path + 'iframeB.html?fd', {
                     id: 'AAA',
                     width:500,
@@ -520,13 +519,13 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-		location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
+		location.href="http://localhost/index.php/Admin/Bike/index"+"/name/"+id;
 	});
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);
         //location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-        location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/company/"+id;
+        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
     });
 	</script>
 
@@ -536,29 +535,28 @@
 		<!-- footer content -->
 		<footer>
 			<div class="pull-right">
-				共享单车泊位管理 powered by <a href="#">云岛科技</a>
+				共享单车泊位管理 powered by 云岛科技
 			</div>
 			<div class="clearfix"></div>
 		</footer>
 		<!-- /footer content -->
 	</div>
 </div>
-
 <!-- jQuery -->
-<script src="/manbike0.3/Public/gentelella/vendors/jquery/dist/jquery.min.js"></script>
+<script src="/Public/gentelella/vendors/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap -->
-<script src="/manbike0.3/Public/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="/Public/gentelella/vendors/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- FastClick -->
-<script src="/manbike0.3/Public/gentelella/vendors/fastclick/lib/fastclick.js"></script>
+<script src="/Public/gentelella/vendors/fastclick/lib/fastclick.js"></script>
 <!-- NProgress -->
-<script src="/manbike0.3/Public/gentelella/vendors/nprogress/nprogress.js"></script>
+<script src="/Public/gentelella/vendors/nprogress/nprogress.js"></script>
 <!-- validator -->
-<script src="/manbike0.3/Public/gentelella/vendors/validator/validator.js"></script>
-<script type="text/JavaScript" src="/manbike0.3/Public/artDialog/artDialog.js"></script>
-<script type="text/javascript" src="/manbike0.3/Public/artDialog/plugins/iframeTools.js"></script> <!-- 对iframe的新工具 -->
+<script src="/Public/gentelella/vendors/validator/validator.js"></script>
+<script type="text/JavaScript" src="/Public/artDialog/artDialog.js"></script>
+<script type="text/javascript" src="/Public/artDialog/plugins/iframeTools.js"></script> <!-- 对iframe的新工具 -->
 
 <!-- Custom Theme Scripts -->
-<script src="/manbike0.3/Public/gentelella/build/js/custom.min.js"></script>
+<script src="/Public/gentelella/build/js/custom.min.js"></script>
 <script type="text/javascript">
 	$(function(){
 		$(".m_child_menu").css('display','none');

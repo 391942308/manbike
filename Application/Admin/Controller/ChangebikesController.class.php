@@ -205,21 +205,6 @@ class ChangebikesController extends CommonController {
 		//exit;
 
 		foreach($buckets as $k=>$v){
-			//要追加的数组
-			$arr1["key"] = "酷骑";
-			$arr1["doc_count"] = 0;
-			$arr2["key"] = "摩拜";
-			$arr2["doc_count"] = 0;
-			$arr3["key"] = "小鸣单车";
-			$arr3["doc_count"] = 0;
-			$arr4["key"] = "ofo";
-			$arr4["doc_count"] = 0;
-			$arr5["key"] = "HelloBike";
-			$arr5["doc_count"] = 0;
-//			var_dump($v[3]["buckets"]);
-//			var_dump("<br>");
-//			var_dump("<br>");
-//			var_dump("<br>");
 			foreach($v[3]["buckets"] as $k2=>$v2){
 				if($v2["key"]=='酷骑'){
 					$kq[] = $v2["doc_count"];

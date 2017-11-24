@@ -2,9 +2,6 @@
 namespace Admin\Controller;
 use Think\Controller;
 class BikesubController extends CommonController {
-	public function _initialize(){
-		parent::_initialize();
-	}
 	public function index() {
 		 $data = M('bike_sub');
 		 $count = $data->count();

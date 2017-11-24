@@ -7,8 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>登陆 | 共享单车管理平台</title>
-
+	<title>Gentelella Alela! | </title>
 	<!-- Bootstrap -->
 	<link href="__PUBLIC__/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
 	<!-- Font Awesome -->
@@ -23,7 +22,7 @@
 	<link rel="stylesheet" type="text/css" href="__PUBLIC__/CSS/jquery.dialogbox.css">
 	<style>
 		html{
-			background:url('/manbike0.3/Public/images/1b810006ebaa9327a9c81.jpg') no-repeat top left scroll;
+			background:url('http://localhost/Public/images/1b810006ebaa9327a9c81.jpg') no-repeat top left scroll;
 			background-size:100%,100%;
 		}
 	</style>
@@ -31,8 +30,6 @@
 </head>
 <script src="__PUBLIC__/JS/jquery.dialogBox.js"></script>
 <script type="text/javascript">
-
-/*
 	$(function(){
 		if($('#username').val() == ''){
 			$('#username').focus();
@@ -40,17 +37,18 @@
 			$('#password').focus();
 		}
 		$('#form').submit(function(){
-				$.post("http://116.62.171.54:8080/manbike0.3/index.php/Admin/Login/dologin",$("#form").serialize(),function(data){
-					if(data==1){
+				$.post("http://localhost/index.php/Admin/Login/dologin",$("#form").serialize(),function(data){
+						if(data==1){
 						$('#stantard-dialogBox1').dialogBox({
 							hasMask: true,
 							autoHide: true,
 							content: '登录成功！',
 							time:1500,
 						});
-						setTimeout(function(){
-							window.location.href = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Index/index';
-						},1000);
+
+								setTimeout(function(){
+									window.location.href = 'http://localhost/index.php/Admin/Index/index';
+								},1000);
 					}else{
 						if(data==-2){
 							$('#username').focus();
@@ -92,7 +90,7 @@
 				});
 			return false;
 		});
-	});*/
+	});
 </script>
 <body class="login" >
 <div>
@@ -102,7 +100,7 @@
 	<div class="login_wrapper">
 		<div class="animate form login_form">
 			<section class="login_content">
-				<form method="post" id="form" action="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Login/dologin">
+				<form method="post" id="form">
 					<h1 style="color: black">登录后台</h1>
 					<div>
 						<input type="text" name="username" id="username" class="form-control" placeholder="Username" required="" />
@@ -111,8 +109,8 @@
 						<input type="password" name="password" id="password" class="form-control" placeholder="Password" required="" />
 					</div>
 					<div>
-						<input  class="btn btn-default submit" type="submit"  value="登陆">
-						<a class="reset_pass" href="#">欢迎使用</a>
+						<input  class="btn btn-default submit" type="submit"  value="Log in">
+						<a class="reset_pass" href="#">Lost your password?</a>
 					</div>
 
 					<div class="clearfix"></div>

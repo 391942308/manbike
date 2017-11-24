@@ -57,17 +57,17 @@
                                     <if condition="$uid eq 1">
                                         <input id="name" type="text" class="form-control" style="width: 350px" placeholder="车辆名称" name="name" value="{$name}"/>
                                         <input id="mac" type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="{$mac}"/>
-                                        <input id="dwz_info_id" type="hidden" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
+                                        <input id="dwz_info_id" type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
                                         <input type="submit" value="查询" class="btn btn-default"/><br />
 
                                         <volist name="list1" id="vo">
-                                        <a id="{$vo.keyword}" href="javascript:void(0);"  type="button" class="btn btn-primary xx" >{$vo.title}</a>
+                                        <a id="{$vo.keyword}" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx" >{$vo.title}</a>
                                         </volist>
                                         <else/>
                                         <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="{$company}"/>
                                         <input type="submit" value="查询" class="btn btn-default"/><br />
                                         <volist name="list1" id="vo">
-                                            <a id="{$vo.title}" href="javascript:void(0);"  type="button" class="btn btn-primary xx2" >{$vo.title}</a>
+                                            <a id="{$vo.title}" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" >{$vo.title}</a>
                                         </volist>
 
                                     </if>
@@ -115,11 +115,10 @@
                                             </if>
                                             <td class=" last">
                                                 <a href="#">
-                                                    <!--<a href="javascript:;" navName="{$vo['name']}" navMac="{$vo['mac']}" navRssi="{$vo['rssi']}" navInfoid="{$vo['dwz_info_id']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" onclick="edit(this)">修改</a>
-                                                    | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bike/delete',array('mac'=>$vo['mac']))}'">删除</a>-->
-                                                    <!--| <a id="{$vo.mac}" class="xq" href="javascript:void(0)">详情</a>-->
-													 <if condition="$uid eq '1'">
-                                                        <a id="{$vo.mac}" href="{:U('Admin/bike/bikedetails',array('mac'=>$vo['mac']))}">详情</a>
+                                                    <a href="javascript:;" navName="{$vo['name']}" navMac="{$vo['mac']}" navRssi="{$vo['rssi']}" navInfoid="{$vo['dwz_info_id']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" onclick="edit(this)">修改</a>
+                                                    | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bike/delete',array('mac'=>$vo['mac']))}'">删除</a>
+                                                    <if condition="$uid eq '1'">
+                                                        | <a id="{$vo.mac}" href="{:U('Admin/bike/bikedetails',array('mac'=>$vo['mac']))}">详情</a>
 													</if>
                                                 </a>
                                             </td>
@@ -248,7 +247,7 @@
                 var aValue = document.getElementById('aInput').value;
                 art.dialog.data('aValue', aValue);// 存储数据
 
-                var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || './';
 
 
                 art.dialog.open(path + 'iframeB.html?fd', {
@@ -267,7 +266,7 @@
                 art.dialog.data('aValue', aValue);// 存储数据
 
 //                var path = art.dialog.data('homeDemoPath') || './';
-                var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || 'http://localhost/index.php/Admin/Bike/';
                 art.dialog.open(path + 'iframeB.html?fd', {
                     id: 'AAA',
                     width:500,
@@ -359,13 +358,13 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-		location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
+		location.href="http://localhost/index.php/Admin/Bike/index"+"/name/"+id;
 	});
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);
         //location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-        location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/company/"+id;
+        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
     });
 	</script>
 </block>

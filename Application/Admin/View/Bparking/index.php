@@ -127,7 +127,7 @@
                                                    <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navUsable_num="{$vo['usable_num']}" navStorage_num="{$vo['storage_num']}" navOverflow_num="{$vo['overflow_num']}" navNo="{$vo['no']}" navBlock_no="{$vo['block_no']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" navStatus="{$vo['status']}" la="{$vo['la']}" lb="{$vo['lb']}" lc="{$vo['lc']}" onclick="edit(this)">修改</a>
                                                     | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bparking/delete',array('id'=>$vo['id']))}'">删除</a>
                                                     | <a id="{$vo['id']}" class="xiangqing" href="javascript:void(0);">实时停放</a>
-                                                    | <a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">历史总停放</a>
+                                                    | <a href="http://localhost/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">历史总停放</a>
 													<if condition="$uid eq '1'">
                                                         | <a href="{:U('Admin/Bparking/fssj',array('id'=>$vo['id']))}">变化趋势和实时数据</a>
                                                     </if>
@@ -562,7 +562,8 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+            var url = 'http://localhost/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
             location.href=url;
         })
         $(".xiangqing1").click(function(){
@@ -570,7 +571,8 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
+//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
+            var url = 'http://localhost/index.php/Admin/Bparking/infobikesall1/id/'+ id;
             location.href=url;
         })
 		

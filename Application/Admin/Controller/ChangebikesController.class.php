@@ -583,7 +583,7 @@ class ChangebikesController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1d",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
       },
@@ -617,7 +617,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "area": {
-              "query": "滨江区"
+              "query": "'.$area.'"
             }
           }
         },
@@ -670,7 +670,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "area": {
-                    "query": "滨江区"
+                    "query": "'.$area.'"
                   }
                 }
               },
@@ -703,139 +703,6 @@ class ChangebikesController extends CommonController {
 		$params = [
 				'index' => 'bike_index_v6',
 				'type' => 'dbs_realtime_first',
-				'body' => $json
-		];
-
-		$results = $client->search($params);
-		//$ts = $results['hits']['hits'][0]['_source']['ts'];
-		//var_dump($results);
-		//var_dump($ts);
-		return $results;
-	}
-	//单个车位最后50次测到的车辆总量数据
-	private function realtime_bikes50($dwz_info_id,$start,$end){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		$hosts = [
-				'http://116.62.171.54:8081',         // IP + Port
-		];
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-
-		$json = '{
-  "version": true,
-  "size":50,
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dbs_realtime"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "dwz_info_id": {
-              "query": "5889"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 1508658920478,
-              "lte": 1511250920478,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": []
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dbs_realtime"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "dwz_info_id": {
-                    "query": "5889"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                    "gte": 1508658920478,
-                    "lte": 1511250920478,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": []
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
-		$params = [
-				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime',
 				'body' => $json
 		];
 

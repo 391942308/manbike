@@ -15,6 +15,11 @@ class ChangebikesController extends CommonController {
 			$data["city"]=$city2;
 			$area2 = $_SESSION['auth']['area'];
 			$data["area"]=$area2;
+			$did_arr = M('info')->where($data)->select();
+			$did_str = '';
+			foreach($did_arr as $k=>$v){
+				$did_str .="dwz_info_id:".$v["id"]." ";
+			}
 			$this->assign("province2",$province2);
 			$this->assign("city2",$city2);
 			$this->assign("area2",$area2);
@@ -63,7 +68,7 @@ class ChangebikesController extends CommonController {
 						if($uid==1){
 							$allbikes_trend = $this->getbikes_all($start,$end);
 						}else{
-							$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+							$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 						}
 					}else{
 						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
@@ -104,13 +109,19 @@ class ChangebikesController extends CommonController {
 					if($uid==1){
 						$allbikes_trend = $this->getbikes_all($start,$end);
 					}else{
-						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+						$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 					}
 				}
 			}else if($tj==2){
 				if(isset($_REQUEST["area"]) && $_REQUEST["area"]!=''){
 					$area = $_REQUEST["area"];
+					$data33["area"] = $area;
 					$this->assign("area",$area);
+					$did_arr2 = M('info')->where($data33)->select();
+					$did_str33 = '';
+					foreach($did_arr2 as $k=>$v){
+						$did_str33 .="dwz_info_id:".$v["id"]." ";
+					}
 				}
 				if(isset($_REQUEST["start"]) && $_REQUEST["start"]!=''){
 					$start = strtotime($_REQUEST["start"]) * 1000;
@@ -123,13 +134,13 @@ class ChangebikesController extends CommonController {
 				if($_REQUEST["area"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
 					$start = 0;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]==''){
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
@@ -139,14 +150,14 @@ class ChangebikesController extends CommonController {
 					$end = 9507697943118;
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
 					if($uid==1){
 						$allbikes_trend = $this->getbikes_all($start,$end);
 					}else{
-						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+						$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 					}
 				}
 			}
@@ -156,7 +167,7 @@ class ChangebikesController extends CommonController {
 			if($uid==1){
 				$allbikes_trend = $this->getbikes_all($start,$end);
 			}else{
-				$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+				$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 			}
 
 		}
@@ -568,7 +579,7 @@ class ChangebikesController extends CommonController {
 		return $results;
 	}
 	//单个行政区车辆增长数据
-	private function getbikes_one_all_area($area,$start,$end){
+	private function getbikes_one_all_area($did_str,$start,$end){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		$hosts = [
@@ -591,9 +602,9 @@ class ChangebikesController extends CommonController {
         "3": {
           "terms": {
             "field": "company",
-            "size": 6,
+            "size": 10,
             "order": {
-              "_count": "desc"
+              "_term": "desc"
             }
           }
         }
@@ -615,12 +626,12 @@ class ChangebikesController extends CommonController {
           }
         },
         {
-          "match_phrase": {
-            "area": {
-              "query": "'.$area.'"
-            }
+          "query_string": {
+            "query": "'.$did_str.'",
+            "analyze_wildcard": true
           }
         },
+
         {
           "range": {
             "timestamp": {
@@ -668,12 +679,11 @@ class ChangebikesController extends CommonController {
                 }
               },
               {
-                "match_phrase": {
-                  "area": {
-                    "query": "'.$area.'"
-                  }
-                }
-              },
+          "query_string": {
+            "query": "'.$did_str.'",
+            "analyze_wildcard": true
+          }
+        },
               {
                 "range": {
                   "timestamp": {

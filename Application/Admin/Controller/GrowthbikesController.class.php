@@ -15,6 +15,11 @@ class GrowthbikesController extends CommonController {
 			$data["city"]=$city2;
 			$area2 = $_SESSION['auth']['area'];
 			$data["area"]=$area2;
+			$did_arr = M('info')->where($data)->select();
+			$did_str = '';
+			foreach($did_arr as $k=>$v){
+				$did_str .="dwz_info_id:".$v["id"]." ";
+			}
 			$this->assign("province2",$province2);
 			$this->assign("city2",$city2);
 			$this->assign("area2",$area2);
@@ -63,7 +68,7 @@ class GrowthbikesController extends CommonController {
 						if($uid==1){
 							$allbikes_trend = $this->getbikes_all($start,$end);
 						}else{
-							$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+							$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 						}
 					}else{
 						$allbikes_trend = $this->getbikes_one_all($dwz_info_id,$start,$end);
@@ -104,13 +109,19 @@ class GrowthbikesController extends CommonController {
 					if($uid==1){
 						$allbikes_trend = $this->getbikes_all($start,$end);
 					}else{
-						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+						$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 					}
 				}
 			}else if($tj==2){
 				if(isset($_REQUEST["area"]) && $_REQUEST["area"]!=''){
 					$area = $_REQUEST["area"];
+					$data33["area"] = $area;
 					$this->assign("area",$area);
+					$did_arr2 = M('info')->where($data33)->select();
+					$did_str33 = '';
+					foreach($did_arr2 as $k=>$v){
+						$did_str33 .="dwz_info_id:".$v["id"]." ";
+					}
 				}
 				if(isset($_REQUEST["start"]) && $_REQUEST["start"]!=''){
 					$start = strtotime($_REQUEST["start"]) * 1000;
@@ -123,13 +134,13 @@ class GrowthbikesController extends CommonController {
 				if($_REQUEST["area"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
 					$start = 0;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]==''){
 					$end = 9507697943118;
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]!=''){
@@ -139,14 +150,14 @@ class GrowthbikesController extends CommonController {
 					$end = 9507697943118;
 					$allbikes_trend = $this->getbikes_all($start,$end);
 				}else if($_REQUEST["area"]!=''&& $_REQUEST["start"]!='' && $_REQUEST["end"]!=''){
-					$allbikes_trend = $this->getbikes_one_all_area($area,$start,$end);
+					$allbikes_trend = $this->getbikes_one_all_area($did_str33,$start,$end);
 				}else if($_REQUEST["area"]==''&& $_REQUEST["start"]=='' && $_REQUEST["end"]==''){
 					$start = 0;
 					$end = 9507697943118;
 					if($uid==1){
 						$allbikes_trend = $this->getbikes_all($start,$end);
 					}else{
-						$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+						$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 					}
 				}
 			}
@@ -156,7 +167,7 @@ class GrowthbikesController extends CommonController {
 			if($uid==1){
 				$allbikes_trend = $this->getbikes_all($start,$end);
 			}else{
-				$allbikes_trend = $this->getbikes_one_all_area($area2,$start,$end);
+				$allbikes_trend = $this->getbikes_one_all_area($did_str,$start,$end);
 			}
 
 		}
@@ -549,7 +560,7 @@ class GrowthbikesController extends CommonController {
 		return $results;
 	}
 	//单个行政区车辆增长数据
-	private function getbikes_one_all_area($area,$start,$end){
+	private function getbikes_one_all_area($did_str,$start,$end){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		$hosts = [
@@ -591,22 +602,22 @@ class GrowthbikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_first"
+              "query": "dbs_realtime_first"
             }
           }
         },
         {
-          "match_phrase": {
-            "area": {
-              "query": "'.$area.'"
-            }
+          "query_string": {
+            "query": "'.$did_str.'",
+            "analyze_wildcard": true
           }
         },
+
         {
           "range": {
             "timestamp": {
               "gte": "'.$start.'",
-              "lte":"'.$end.'" ,
+              "lte": "'.$end.'",
               "format": "epoch_millis"
             }
           }
@@ -644,17 +655,16 @@ class GrowthbikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_first"
+                    "query": "dbs_realtime_first"
                   }
                 }
               },
               {
-                "match_phrase": {
-                  "area": {
-                    "query": "'.$area.'"
-                  }
-                }
-              },
+          "query_string": {
+            "query": "'.$did_str.'",
+            "analyze_wildcard": true
+          }
+        },
               {
                 "range": {
                   "timestamp": {
@@ -683,7 +693,7 @@ class GrowthbikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_first',
+				'type' => 'dbs_realtime_first',
 				'body' => $json
 		];
 
@@ -692,154 +702,5 @@ class GrowthbikesController extends CommonController {
 		//var_dump($results);
 		//var_dump($ts);
 		return $results;
-	}
-	//单个车位最后50次测到的车辆总量数据
-	private function realtime_bikes50($dwz_info_id,$start,$end){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		$hosts = [
-				'http://116.62.171.54:8081',         // IP + Port
-		];
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-
-		$json = '{
-  "version": true,
-  "size":50,
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dbs_realtime"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "dwz_info_id": {
-              "query": "5889"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 1508658920478,
-              "lte": 1511250920478,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": []
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dbs_realtime"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "dwz_info_id": {
-                    "query": "5889"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                    "gte": 1508658920478,
-                    "lte": 1511250920478,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": []
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
-		$params = [
-				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime',
-				'body' => $json
-		];
-
-		$results = $client->search($params);
-		//$ts = $results['hits']['hits'][0]['_source']['ts'];
-		//var_dump($results);
-		//var_dump($ts);
-		return $results;
-	}
-	public function oneinfo(){
-		if($_GET){
-			$dwz_info_id = $_GET["dwz_info_id"];
-			$this->assign("dwz_info_id",$dwz_info_id);
-			$start = $_GET["start"];
-			$this->assign("start",$start);
-			$end = $_GET["end"];
-			$this->assign("end",$end);
-			$bikes = $this->realtime_bikes50($dwz_info_id,$start,$end);
-			$hits = $bikes["hits"]["hits"];
-			var_dump($hits);
-		}
-		$infolist = M('info')->select();
-		$this->assign("infolist",$infolist);
-		$this->display();
 	}
 }

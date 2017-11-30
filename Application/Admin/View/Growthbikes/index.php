@@ -212,7 +212,7 @@
             {
                 name:'酷骑',
                 type:'line',
-                stack: 'sum',
+                tiled: 'sum',
 //                barCategoryGap: '50%',
                 itemStyle: {
                     normal: {
@@ -230,7 +230,7 @@
             {
                 name:'摩拜',
                 type:'line',
-                stack: 'sum',
+                tiled: 'sum',
                 itemStyle: {
                     normal: {
                         color: j_mb_color,
@@ -247,7 +247,7 @@
             {
                 name:'小鸣单车',
                 type:'line',
-                stack: 'sum',
+                tiled: 'sum',
                 itemStyle: {
                     normal: {
                         color: j_xm_color,
@@ -264,7 +264,7 @@
             {
                 name:'ofo',
                 type:'line',
-                stack: 'sum',
+                tiled: 'sum',
                 itemStyle: {
                     normal: {
                         color: j_ofo_color,
@@ -281,7 +281,7 @@
             {
                 name:'HelloBike',
                 type:'line',
-                stack: 'sum',
+                tiled: 'sum',
                 itemStyle: {
                     normal: {
                         color:j_hb_color ,

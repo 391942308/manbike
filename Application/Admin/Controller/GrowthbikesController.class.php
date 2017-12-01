@@ -285,6 +285,11 @@ class GrowthbikesController extends CommonController {
 	}
 	//总的车辆增长数据
 	private function getbikes_all($start,$end){
+		$infolist = M('info')->select();
+		$did_str2 = '';
+		foreach($infolist as $k=>$v){
+			$did_str2 .="dwz_info_id:".$v["id"]." ";
+		}
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		$hosts = [
@@ -331,6 +336,13 @@ class GrowthbikesController extends CommonController {
           }
         },
         {
+          "query_string": {
+            "query": "'.$did_str2.'",
+            "analyze_wildcard": true
+          }
+        },
+
+        {
           "range": {
             "timestamp": {
               "gte": "'.$start.'",
@@ -376,6 +388,12 @@ class GrowthbikesController extends CommonController {
                   }
                 }
               },
+              {
+          "query_string": {
+            "query": "'.$did_str2.'",
+            "analyze_wildcard": true
+          }
+        },
               {
                 "range": {
                   "timestamp": {

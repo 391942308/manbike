@@ -54,23 +54,11 @@
                             <!--<p><a class="btn btn-primary" href="javascript:;" onclick="add()">添加车辆信息</a></p>-->
                             <div style="margin-bottom: 10px" class="input-group">
                                 <form method="GET" action="{:U('Admin/Bike/index')}">
-                                    <if condition="$uid eq 1">
-                                        <input id="name" type="text" class="form-control" style="width: 350px" placeholder="车辆名称" name="name" value="{$name}"/>
-                                        <input id="mac" type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="{$mac}"/>
-                                        <input id="dwz_info_id" type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
-                                        <input type="submit" value="查询" class="btn btn-default"/><br />
-
-                                        <volist name="list1" id="vo">
-                                        <a id="{$vo.keyword}" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx" >{$vo.title}</a>
-                                        </volist>
-                                        <else/>
-                                        <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="{$company}"/>
-                                        <input type="submit" value="查询" class="btn btn-default"/><br />
-                                        <volist name="list1" id="vo">
-                                            <a id="{$vo.title}" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" >{$vo.title}</a>
-                                        </volist>
-
-                                    </if>
+                                    <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="{$company}"/>
+                                    <input type="submit" value="查询" class="btn btn-default"/><br />
+                                    <volist name="list1" id="vo">
+                                        <a id="{$vo.title}" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" >{$vo.title}</a>
+                                    </volist>
                                 </form>
                             </div>
                             <input type="hidden" name="uid" value="{$uid}" id="uid"/>
@@ -85,11 +73,9 @@
                                         <th class="column-title">mac地址 </th>
                                         <th class="column-title">信号强度 </th>
                                         <th class="column-title">车位ID </th>
-                                        <if condition="$uid neq 1">
-                                            <th class="column-title">省 </th>
-                                            <th class="column-title">市 </th>
-                                            <th class="column-title">区 </th>
-                                        </if>
+                                        <th class="column-title">省 </th>
+                                        <th class="column-title">市 </th>
+                                        <th class="column-title">区 </th>
                                         <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
@@ -108,11 +94,9 @@
                                             <td class=" ">{$vo.mac} </td>
                                             <td class=" ">{$vo.rssi} </td>
                                             <td class=" ">{$vo.dwz_info_id} </td>
-                                            <if condition="$uid neq 1">
-                                                <td class=" ">{$vo.province} </td>
-                                                <td class=" ">{$vo.city} </td>
-                                                <td class="a-right a-right ">{$vo.area}</td>
-                                            </if>
+                                            <td class=" ">{$vo.province} </td>
+                                            <td class=" ">{$vo.city} </td>
+                                            <td class="a-right a-right ">{$vo.area}</td>
                                             <td class=" last">
                                                 <a href="#">
                                                     <a href="javascript:;" navName="{$vo['name']}" navMac="{$vo['mac']}" navRssi="{$vo['rssi']}" navInfoid="{$vo['dwz_info_id']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" onclick="edit(this)">修改</a>
@@ -354,12 +338,6 @@
 	</script>
 	
 	<script>
-	$(".xx").click(function(){
-		var id = $(this).attr("id");
-		//alert(id);
-		//location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-		location.href="http://localhost/index.php/Admin/Bike/index"+"/name/"+id;
-	});
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);

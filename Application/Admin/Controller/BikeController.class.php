@@ -9,184 +9,72 @@ class BikeController extends CommonController {
 		//获取每家公司的单车数量
 		$list = M("bike_company")->select();
 		$this->assign('list1', $list);
+		$company="";
+		if(!empty($_GET["company"]) || $_GET["company"] === '0'){
+			$company=trim($_REQUEST["company"]);
+			$this->assign("company",$company);
+		}
+		$from=0;
+		$size=20;
 		if($uid!=1){
 			//非管理员，根据行政级别进行过滤
 			//echo "x";
-			$company="";
-			if(!empty($_GET["company"]) || $_GET["company"] === '0'){
-				$company=trim($_REQUEST["company"]);
-				if($company=="小鸣单车"){
-					$company="小明单车";
-					$this->assign("company","小鸣单车");
-				}else{
-					$this->assign("company",$company);	
-				}
-				
-			}
 			//根据行政级别，做相应的过滤
-			$province = $_SESSION['auth']['province'];
-			$city = $_SESSION['auth']['city'];
 			$area = $_SESSION['auth']['area'];
-			$from=0;
-			$size=15;
-			if($_SESSION['auth']['class']=='省级'){
-				$res_es = $this->getbikes_p($province,$company,$from,$size);
-				$count=$res_es['hits']['total'];
-				$page = new \Component\Page($count, $size); //这里的分页类和Home模块的目录一致，可自行修改
-				if(isset($_REQUEST["page"])){
-					$page2=$_REQUEST["page"];
-					$from=($page2-1)*$size;
-					$res_es = $this->getbikes_p($province,$company,$from,$size);
-				}
-			}
-			if($_SESSION['auth']['class']=='市级'){
-				$res_es = $this->getbikes_pc($province,$city,$company,$from,$size);
-				$count=$res_es['hits']['total'];
-				$page = new \Component\Page($count, $size); //这里的分页类和Home模块的目录一致，可自行修改
-				if(isset($_REQUEST["page"])){
-					$page2=$_REQUEST["page"];
-					$from=($page2-1)*$size;
-					$res_es = $this->getbikes_pc($province,$city,$company,$from,$size);
-				}
-			}
-			if($_SESSION['auth']['class']=='区级'){
-				$res_es = $this->getbikes_pca($province,$city,$area,$company,$from,$size);
-				$count=$res_es['hits']['total'];
-				$page = new \Component\Page($count, $size); //这里的分页类和Home模块的目录一致，可自行修改
-				if(isset($_REQUEST["page"])){
-					$page2=$_REQUEST["page"];
-					$from=($page2-1)*$size;
-					$res_es = $this->getbikes_pca($province,$city,$area,$company,$from,$size);
-				}
-			}
-			$pagelist = $page->fpage();
-			$this->assign('show', $pagelist);
-			$buckets = $res_es['hits']['hits'];
-//				var_dump($buckets);
-			foreach($buckets as $k=>$v){
-				$allbikes[$k]["name"]=$v["_source"]["name"];;
-				$allbikes[$k]["mac"]=$v["_source"]["mac"];;
-				$allbikes[$k]["rssi"]=$v["_source"]["rssi"];;
-				$allbikes[$k]["dwz_info_id"]=$v["_source"]["dwz_info_id"];;
-				$allbikes[$k]["company"]=$v["_source"]["company"];;
-				$allbikes[$k]["province"]=$v["_source"]["province"];;
-				$allbikes[$k]["city"]=$v["_source"]["city"];;
-				$allbikes[$k]["area"]=$v["_source"]["area"];;
-			}
-			//var_dump($allbikes);
-			$this->assign("a_menu_list",$allbikes);
+			$data66["province"] = $_SESSION['auth']['province'];
+			$data66["city"] = $_SESSION['auth']['city'];
+			$data66["area"] = $area;
+			$did_arr = M('info')->where($data66)->select();
 		}else {
-			$name = "";
-			$mac = "";
-			$dwz_info_id = "";
-			$data = M('bike');
-			$sql = "SELECT * FROM dwz_bike where 1=1 and name!='0' and name is not null and name<>'' ";
-			$wherecount = "SELECT count(*) wc FROM dwz_bike where 1=1 and name!='0' and name is not null and name<>'' ";
-			
-			$company_list = M('bike_company')->select();
-			foreach($company_list as $k=>$v){
-				$arr_com[] = $v["keyword"];
-			}
-			$str4 = "";
-			foreach($arr_com as $k=>$v){
-				$str4=$v."|".$str4;
-			}
-			$str5 = trim($str4,"|");
-			$arr_str5 = explode("|",$str5);
-			$str6="";
-			foreach($arr_str5 as $k=>$v){
-				$str6.= " name like '$v%' or";
-			}
-			$str7 = rtrim($str6,"or");
-			$sql.=" and ($str7) ";
-			$wherecount.=" and ($str7) ";
-//			var_dump($sql);
-
-			
-			if (!empty($_GET["name"]) || $_GET["name"] === '0') {
-				if ($_GET["name"] == 'NULL' || $_GET["name"] == 'null' || $_GET["name"] == 'Null') {
-					//var_dump("aa");exit;
-					$name = trim($_REQUEST["name"]);
-					$sql .= " and name = ' '";
-					$wherecount .= " and name = ' '";
-					//$where['name']='';
-					$this->assign("name", $name);
-				} else {
-					$name = trim($_REQUEST["name"]);
-					$pos = strpos($name, '|');
-					if ($pos === false) {
-						$sql .= " and name like '$name%' ";
-						$wherecount .= " and name like '$name%' ";
-						//$where["name"] = array('like', "$name%");
-						$this->assign('name', $name);
-					} else {
-						//存在
-						$arr = explode('|', $name);
-						$str = "";
-						foreach ($arr as $k => $v) {
-							if ($v == 'NULL' || $v == 'null' || $v == 'Null') {
-								$str .= " name = ' ' or ";
-							} else if ($v == '0') {
-								$str .= " name = '0' or ";
-							} else {
-								$str .= " name like '$v%' or ";
-							}
-						}
-						$str2 = rtrim($str, 'or ');
-						$str3 = " and " . "(" . $str2 . ")";
-						$sql .= $str3;
-						$wherecount .= $str3;
-						//var_dump($sql);exit;
-						$this->assign('name', $name);
-					}
-
-
-				}
-			}
-			if (!empty($_GET["mac"]) || $_GET["mac"] === '0') {
-				$mac = trim($_REQUEST["mac"]);
-				$sql .= " and mac like '%$mac%' ";
-				$wherecount .= " and mac like '%$mac%' ";
-				//$where["mac"] = array('like', "%$mac%");
-				$this->assign('mac', $mac);
-			}
-			if (!empty($_GET["dwz_info_id"]) || $_GET["dwz_info_id"] === '0') {
-				$dwz_info_id = trim($_REQUEST["dwz_info_id"]);
-				$sql .= " and dwz_info_id = '$dwz_info_id' ";
-				$wherecount .= " and dwz_info_id = '$dwz_info_id' ";
-				//$where["dwz_info_id"] = $dwz_info_id;
-				$this->assign('dwz_info_id', $dwz_info_id);
-			}
-			$res = $data->query($wherecount);
-			$count = $res[0]["wc"];
-			$pageSize = 20;
-			$page = new \Component\Page($count, $pageSize); //这里的分页类和Home模块的目录一致，可自行修改
-			$sql .= $page->limit;
-			$info = $data->query($sql);
-			$pagelist = $page->fpage();
-			$this->assign('show', $pagelist);
-			$this->assign("a_menu_list", $info);
+			$did_arr = M('info')->select();
 		}
+		$did_str = '';
+		foreach($did_arr as $k=>$v){
+			$did_str .="dwz_info_id:".$v["id"]." ";
+		}
+		$res_es = $this->getarea($company,$from,$size,$did_str);
+		$count=$res_es['hits']['total'];
+		$page = new \Component\Page($count, $size); //这里的分页类和Home模块的目录一致，可自行修改
+		if(isset($_REQUEST["page"])){
+			$page2=$_REQUEST["page"];
+			$from2=($page2-1)*$size;
+			$res_es = $this->getarea($company,$from2,$size,$did_str);
+		}
+//		var_dump($res_es);
+		$pagelist = $page->fpage();
+		$this->assign('show', $pagelist);
+		$buckets = $res_es['hits']['hits'];
+		foreach($buckets as $k=>$v){
+			$allbikes[$k]["name"]=$v["_source"]["name"];
+			$allbikes[$k]["mac"]=$v["_source"]["mac"];
+			$allbikes[$k]["rssi"]=$v["_source"]["rssi"];
+			$allbikes[$k]["dwz_info_id"]=$v["_source"]["dwz_info_id"];
+			$allbikes[$k]["company"]=$v["_source"]["company"];
+			$allbikes[$k]["province"]=M('info')->where("id=".$v["_source"]["dwz_info_id"])->getField('province');
+			$allbikes[$k]["city"]=M('info')->where("id=".$v["_source"]["dwz_info_id"])->getField('city');
+			$allbikes[$k]["area"]=M('info')->where("id=".$v["_source"]["dwz_info_id"])->getField('area');
+		}
+		//var_dump($allbikes);
+		$this->assign("a_menu_list",$allbikes);
 		$this->display();
 	}
-	//根据省获取
-	private function getbikes_p($province,$company,$from,$size){
+	//获取区域车辆数据
+	private function getarea($company,$from,$size,$did_str){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		//$hosts = [
-			//	'dododo.shop:9200',         // IP + Port
+		//	'dododo.shop:9200',         // IP + Port
 		//];
 		$hosts = [
-		'116.62.171.54:8081',         // IP + Port
+				'116.62.171.54:8081',         // IP + Port
 		];
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-		if($company!=""){
+		if($company==''){
 			$json = '
-				{
+			{
   "version": true,
   "from":"'.$from.'",
-  "size": "'.$size.'",
+  "size":"'.$size.'",
   "sort": [
     {
       "timestamp": {
@@ -199,19 +87,16 @@ class BikeController extends CommonController {
     "bool": {
       "must": [
         {
-          "match_all": {}
+                "query_string": {
+                  "query": "'.$did_str.'",
+                  "analyze_wildcard": true,
+                  "all_fields": true
+                }
         },
         {
           "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "company": {
-              "query": "'.$company.'"
+            "_type": {
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -219,13 +104,21 @@ class BikeController extends CommonController {
           "range": {
             "timestamp": {
               "gte": 0,
-				"lte": 9507697943118,
+              "lte": 9507697943118,
               "format": "epoch_millis"
             }
           }
         }
       ],
-      "must_not": []
+      "must_not": [
+        {
+          "match_phrase": {
+            "company": {
+              "query": "其他"
+            }
+          }
+        }
+      ]
     }
   },
   "_source": {
@@ -235,7 +128,7 @@ class BikeController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1w",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
       }
@@ -265,15 +158,8 @@ class BikeController extends CommonController {
               },
               {
                 "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "'.$company.'"
+                  "_type": {
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -281,27 +167,33 @@ class BikeController extends CommonController {
                 "range": {
                   "timestamp": {
                     "gte": 0,
-						"lte": 9507697943118,
+                    "lte": 9507697943118,
                     "format": "epoch_millis"
                   }
                 }
               }
             ],
-            "must_not": []
+            "must_not": [
+        {
+          "match_phrase": {
+            "company": {
+              "query": "其他"
+            }
+          }
+        }
+      ]
           }
         }
       }
     },
     "fragment_size": 2147483647
   }
-}
-			';
-		}else{
-			$json = '
-			{
+}';}else{
+
+			$json = '{
   "version": true,
   "from":"'.$from.'",
-  "size": "'.$size.'",
+  "size":"'.$size.'",
   "sort": [
     {
       "timestamp": {
@@ -314,7 +206,11 @@ class BikeController extends CommonController {
     "bool": {
       "must": [
         {
-          "match_all": {}
+                "query_string": {
+                  "query": "'.$did_str.'",
+                  "analyze_wildcard": true,
+                  "all_fields": true
+                }
         },
         {
           "match_phrase": {
@@ -325,8 +221,8 @@ class BikeController extends CommonController {
         },
         {
           "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
+            "company": {
+              "query": "'.$company.'"
             }
           }
         },
@@ -334,21 +230,13 @@ class BikeController extends CommonController {
           "range": {
             "timestamp": {
               "gte": 0,
-				"lte": 9507697943118,
+              "lte": 9507697943118,
               "format": "epoch_millis"
             }
           }
         }
       ],
-      "must_not": [
-        {
-          "match_phrase": {
-            "company": {
-              "query": "其他"
-            }
-          }
-        }
-      ]
+      "must_not": []
     }
   },
   "_source": {
@@ -358,7 +246,7 @@ class BikeController extends CommonController {
     "2": {
       "date_histogram": {
         "field": "timestamp",
-        "interval": "12h",
+        "interval": "1w",
         "time_zone": "Asia/Shanghai",
         "min_doc_count": 1
       }
@@ -395,169 +283,6 @@ class BikeController extends CommonController {
               },
               {
                 "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                   "gte": 0,
-						"lte": 9507697943118,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": [
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "其他"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
-		}
-
-		$params = [
-				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_last',
-				'body' => $json
-		];
-
-		$results = $client->search($params);
-		//$ts = $results['hits']['hits'][0]['_source']['ts'];
-		//var_dump($results);
-		//var_dump($ts);
-		return $results;
-	}
-
-	//根据省市获取
-	private function getbikes_pc($province,$city,$company,$from,$size){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		//$hosts = [
-			//	'dododo.shop:9200',         // IP + Port
-		//];
-		$hosts = [
-		'116.62.171.54:8081',         // IP + Port
-		];
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-		if($company!=""){
-			$json = '
-				{
-  "version": true,
-  "from":"'.$from.'",
-  "size": "'.$size.'",
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "city": {
-              "query": "'.$city.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "company": {
-              "query": "'.$company.'"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 0,
-				"lte": 9507697943118,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": []
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "city": {
-                    "query": "'.$city.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
                   "company": {
                     "query": "'.$company.'"
                   }
@@ -567,7 +292,7 @@ class BikeController extends CommonController {
                 "range": {
                   "timestamp": {
                     "gte": 0,
-						"lte": 9507697943118,
+                    "lte": 9507697943118,
                     "format": "epoch_millis"
                   }
                 }
@@ -580,539 +305,17 @@ class BikeController extends CommonController {
     },
     "fragment_size": 2147483647
   }
-}
-			';
-		}else{
-			$json = '
-			{
-  "version": true,
-  "from":"'.$from.'",
-  "size": "'.$size.'",
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dbs_realtime_last"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "city": {
-              "query": "'.$city.'"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 0,
-				"lte": 9507697943118,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": [
-        {
-          "match_phrase": {
-            "company": {
-              "query": "其他"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dbs_realtime_last"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "city": {
-                    "query": "'.$city.'"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                   "gte": 0,
-						"lte": 9507697943118,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": [
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "其他"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
-		}
+}';}
 
 		$params = [
+				"scroll" => "1m",
 				'index' => 'bike_index_v6',
 				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
-
 		$results = $client->search($params);
-		//$ts = $results['hits']['hits'][0]['_source']['ts'];
-		//var_dump($results);
-		//var_dump($ts);
 		return $results;
 	}
-	//根据省市区获取
-	private function getbikes_pca($province,$city,$area,$company,$from,$size){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		//$hosts = [
-			//	'dododo.shop:9200',         // IP + Port
-		//];
-		$hosts = [
-		'116.62.171.54:8081',         // IP + Port
-		];
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
-		if($company!=""){
-			$json = '
-				{
-  "version": true,
-  "from":"'.$from.'",
-  "size": "'.$size.'",
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "city": {
-              "query": "'.$city.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "area": {
-              "query": "'.$area.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "company": {
-              "query": "'.$company.'"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 0,
-				"lte": 9507697943118,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": []
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "city": {
-                    "query": "'.$city.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "area": {
-                    "query": "'.$area.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "'.$company.'"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                    "gte": 0,
-						"lte": 9507697943118,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": []
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}
-			';
-		}else{
-			$json = '
-			{
-  "version": true,
-  "from":"'.$from.'",
-  "size": "'.$size.'",
-  "sort": [
-    {
-      "timestamp": {
-        "order": "desc",
-        "unmapped_type": "boolean"
-      }
-    }
-  ],
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "match_all": {}
-        },
-        {
-          "match_phrase": {
-            "_type": {
-              "query": "dbs_realtime_last"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "province": {
-              "query": "'.$province.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "city": {
-              "query": "'.$city.'"
-            }
-          }
-        },
-        {
-          "match_phrase": {
-            "area": {
-              "query": "'.$area.'"
-            }
-          }
-        },
-        {
-          "range": {
-            "timestamp": {
-              "gte": 0,
-				"lte": 9507697943118,
-              "format": "epoch_millis"
-            }
-          }
-        }
-      ],
-      "must_not": [
-        {
-          "match_phrase": {
-            "company": {
-              "query": "其他"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "_source": {
-    "excludes": []
-  },
-  "aggs": {
-    "2": {
-      "date_histogram": {
-        "field": "timestamp",
-        "interval": "12h",
-        "time_zone": "Asia/Shanghai",
-        "min_doc_count": 1
-      }
-    }
-  },
-  "stored_fields": [
-    "*"
-  ],
-  "script_fields": {},
-  "docvalue_fields": [
-    "timestamp"
-  ],
-  "highlight": {
-    "pre_tags": [
-      "@kibana-highlighted-field@"
-    ],
-    "post_tags": [
-      "@/kibana-highlighted-field@"
-    ],
-    "fields": {
-      "*": {
-        "highlight_query": {
-          "bool": {
-            "must": [
-              {
-                "match_all": {}
-              },
-              {
-                "match_phrase": {
-                  "_type": {
-                    "query": "dbs_realtime_last"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "province": {
-                    "query": "'.$province.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "city": {
-                    "query": "'.$city.'"
-                  }
-                }
-              },
-              {
-                "match_phrase": {
-                  "area": {
-                    "query": "'.$area.'"
-                  }
-                }
-              },
-              {
-                "range": {
-                  "timestamp": {
-                   "gte": 0,
-						"lte": 9507697943118,
-                    "format": "epoch_millis"
-                  }
-                }
-              }
-            ],
-            "must_not": [
-              {
-                "match_phrase": {
-                  "company": {
-                    "query": "其他"
-                  }
-                }
-              }
-            ]
-          }
-        }
-      }
-    },
-    "fragment_size": 2147483647
-  }
-}';
-		}
-
-		$params = [
-				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_last',
-				'body' => $json
-		];
-
-		$results = $client->search($params);
-		//$ts = $results['hits']['hits'][0]['_source']['ts'];
-		//var_dump($results);
-		//var_dump($ts);
-		return $results;
-	}
-//	public function index() {
-//		$data = M('bike');
-//		if(IS_POST){
-//			$name=$_REQUEST["name"];
-//			$mac=$_REQUEST["mac"];
-//			$dwz_info_id=$_REQUEST["dwz_info_id"];
-//			$sql="SELECT * FROM dwz_bike where 1=1";
-//			if($name!=""){
-//				$sql.=" and name like '%$name%' ";
-//				$where["name"]=array('like',"%$name%");
-//				$this->assign('name', $name);
-//			}
-//			if($mac!=""){
-//				$sql.=" and mac like '%$mac%' ";
-//				$where["mac"]=array('like',"%$mac%");
-//				$this->assign('mac', $mac);
-//			}
-//			if($dwz_info_id!=""){
-//				$sql.=" and dwz_info_id = '$dwz_info_id' ";
-//				$where["dwz_info_id"]=$dwz_info_id;
-//				$this->assign('dwz_info_id', $dwz_info_id);
-//			}
-//			$count=$data->where($where)->count();
-//			//var_dump($count);exit;
-//			$pageSize = 20;
-//			$page = new \Component\Page($count, $pageSize); //这里的分页类和Home模块的目录一致，可自行修改
-//			$info = $data -> query($sql);
-//			$pagelist = $page -> fpage();
-//			$this->assign('show', $pagelist);
-//			$this->assign("a_menu_list", $info);
-//		}else {
-//			$count = $data->count();
-//			$pageSize = 20;
-//			$page = new \Component\Page($count, $pageSize); //这里的分页类和Home模块的目录一致，可自行修改
-//			//3. 拼装sql语句获得每页信息
-//			$sql = "SELECT * FROM dwz_bike " . $page->limit;
-//			$info = $data->query($sql);
-//			$pagelist = $page->fpage();
-//			$this->assign('show', $pagelist);
-//			$this->assign("a_menu_list", $info);
-//		}
-//		$this->display();
-//	}
-	/**
-	 * 添加菜单
-	 */
 	public function add(){
 		$data['name'] = $_POST['name'];
 		$data['mac'] = $_POST['mac'];

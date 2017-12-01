@@ -304,6 +304,11 @@ class ChangebikesController extends CommonController {
 	}
 	//总的车辆增长数据
 	private function getbikes_all($start,$end){
+		$infolist = M('info')->select();
+		$did_str2 = '';
+		foreach($infolist as $k=>$v){
+			$did_str2 .="dwz_info_id:".$v["id"]." ";
+		}
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		$hosts = [
@@ -345,10 +350,17 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_first"
+              "query": "dbs_realtime_last"
             }
           }
         },
+        {
+          "query_string": {
+            "query": "'.$did_str2.'",
+            "analyze_wildcard": true
+          }
+        },
+
         {
           "range": {
             "timestamp": {
@@ -391,10 +403,16 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_first"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
+              {
+          "query_string": {
+            "query": "'.$did_str2.'",
+            "analyze_wildcard": true
+          }
+        },
               {
                 "range": {
                   "timestamp": {
@@ -423,7 +441,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_first',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 
@@ -476,7 +494,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_first"
+              "query": "dbs_realtime_one_last"
             }
           }
         },
@@ -529,7 +547,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_first"
+                    "query": "dbs_realtime_one_last"
                   }
                 }
               },
@@ -568,7 +586,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_first',
+				'type' => 'dbs_realtime_one_last',
 				'body' => $json
 		];
 
@@ -621,7 +639,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_first"
+              "query": "dbs_realtime_last"
             }
           }
         },
@@ -674,7 +692,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_first"
+                    "query": "dbs_realtime_last"
                   }
                 }
               },
@@ -712,7 +730,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_first',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 		];
 

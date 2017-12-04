@@ -250,7 +250,7 @@
                 art.dialog.data('aValue', aValue);// 存储数据
 
 //                var path = art.dialog.data('homeDemoPath') || './';
-                var path = art.dialog.data('homeDemoPath') || 'http://localhost/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/';
                 art.dialog.open(path + 'iframeB.html?fd', {
                     id: 'AAA',
                     width:500,
@@ -329,7 +329,7 @@
     <!-- /page content -->
 	<script>
 	$(".xq").click(function(){
-		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/allcw";
+		var url = "http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/allcw";
 		var mac = $(this).attr("id");
 		//var iid = '{$iid}';
 		url=url + '/mac/'+mac;
@@ -341,8 +341,8 @@
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);
-        //location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
+        location.href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
+//        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
     });
 	</script>
 </block>

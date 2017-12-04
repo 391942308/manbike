@@ -341,7 +341,7 @@
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);
-        location.href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
+        location.href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/index"+"/company/"+id;
 //        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
     });
 	</script>

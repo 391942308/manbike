@@ -182,7 +182,7 @@ module.exports = function(Chart) {
 				minSize.height = this.maxHeight; // fill all the height
 			}
 
-			// Increase sizes here
+			// Increasebikes sizes here
 			if (display) {
 				if (isHorizontal) {
 					// Labels

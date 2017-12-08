@@ -230,16 +230,9 @@
                             <!--<p><a class="btn btn-primary" href="javascript:;" onclick="add()">添加车辆信息</a></p>-->
                             <div style="margin-bottom: 10px" class="input-group">
                                 <form method="GET" action="<?php echo U('Admin/Bike/index');?>">
-                                    <?php if($uid == 1): ?><input id="name" type="text" class="form-control" style="width: 350px" placeholder="车辆名称" name="name" value="<?php echo ($name); ?>"/>
-                                        <input id="mac" type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="<?php echo ($mac); ?>"/>
-                                        <input id="dwz_info_id" type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="<?php echo ($dwz_info_id); ?>"/>
-                                        <input type="submit" value="查询" class="btn btn-default"/><br />
-
-                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["keyword"]); ?>" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; ?>
-                                        <?php else: ?>
-                                        <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="<?php echo ($company); ?>"/>
-                                        <input type="submit" value="查询" class="btn btn-default"/><br />
-                                        <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["title"]); ?>" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; endif; ?>
+                                    <input type="text" id="company" name="company" class="form-control" style="width: 350px" placeholder="车企" value="<?php echo ($company); ?>"/>
+                                    <input type="submit" value="查询" class="btn btn-default"/><br />
+                                    <?php if(is_array($list1)): $i = 0; $__LIST__ = $list1;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$vo): $mod = ($i % 2 );++$i;?><a id="<?php echo ($vo["title"]); ?>" href="javascript:void(0);" target="_blank" type="button" class="btn btn-primary xx2" ><?php echo ($vo["title"]); ?></a><?php endforeach; endif; else: echo "" ;endif; ?>
                                 </form>
                             </div>
                             <input type="hidden" name="uid" value="<?php echo ($uid); ?>" id="uid"/>
@@ -254,9 +247,9 @@
                                         <th class="column-title">mac地址 </th>
                                         <th class="column-title">信号强度 </th>
                                         <th class="column-title">车位ID </th>
-                                        <?php if($uid != 1): ?><th class="column-title">省 </th>
-                                            <th class="column-title">市 </th>
-                                            <th class="column-title">区 </th><?php endif; ?>
+                                        <th class="column-title">省 </th>
+                                        <th class="column-title">市 </th>
+                                        <th class="column-title">区 </th>
                                         <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
@@ -274,9 +267,9 @@
                                             <td class=" "><?php echo ($vo["mac"]); ?> </td>
                                             <td class=" "><?php echo ($vo["rssi"]); ?> </td>
                                             <td class=" "><?php echo ($vo["dwz_info_id"]); ?> </td>
-                                            <?php if($uid != 1): ?><td class=" "><?php echo ($vo["province"]); ?> </td>
-                                                <td class=" "><?php echo ($vo["city"]); ?> </td>
-                                                <td class="a-right a-right "><?php echo ($vo["area"]); ?></td><?php endif; ?>
+                                            <td class=" "><?php echo ($vo["province"]); ?> </td>
+                                            <td class=" "><?php echo ($vo["city"]); ?> </td>
+                                            <td class="a-right a-right "><?php echo ($vo["area"]); ?></td>
                                             <td class=" last">
                                                 <a href="#">
                                                     <a href="javascript:;" navName="<?php echo ($vo['name']); ?>" navMac="<?php echo ($vo['mac']); ?>" navRssi="<?php echo ($vo['rssi']); ?>" navInfoid="<?php echo ($vo['dwz_info_id']); ?>" navLng_Lat="<?php echo ($vo['lng']); ?>,<?php echo ($vo['lat']); ?>" onclick="edit(this)">修改</a>
@@ -427,7 +420,7 @@
                 art.dialog.data('aValue', aValue);// 存储数据
 
 //                var path = art.dialog.data('homeDemoPath') || './';
-                var path = art.dialog.data('homeDemoPath') || 'http://localhost/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/';
                 art.dialog.open(path + 'iframeB.html?fd', {
                     id: 'AAA',
                     width:500,
@@ -506,7 +499,7 @@
     <!-- /page content -->
 	<script>
 	$(".xq").click(function(){
-		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/allcw";
+		var url = "http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/allcw";
 		var mac = $(this).attr("id");
 		//var iid = '<?php echo ($iid); ?>';
 		url=url + '/mac/'+mac;
@@ -515,17 +508,11 @@
 	</script>
 	
 	<script>
-	$(".xx").click(function(){
-		var id = $(this).attr("id");
-		//alert(id);
-		//location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-		location.href="http://localhost/index.php/Admin/Bike/index"+"/name/"+id;
-	});
     $(".xx2").click(function(){
         var id = $(this).attr("id");
         //alert(id);
-        //location.href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id;
-        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
+        location.href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/index"+"/company/"+id;
+//        location.href="http://localhost/index.php/Admin/Bike/index"+"/company/"+id;
     });
 	</script>
 

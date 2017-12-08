@@ -95,7 +95,7 @@
                                             <td class=" last">
                                                 <a href="#">
 <!--                                                    <a href="{:U('Admin/Bparking/index',array('id'=>$vo['dwz_info_id'],'mac'=>$vo['mac']))}">删除</a>-->
-                                                    <a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail/id/{$vo.dwz_info_id}/mac/{$vo.mac}">查看详情</a>
+                                                    <a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail/id/{$vo.dwz_info_id}/mac/{$vo.mac}">查看详情</a>
                                                 </a>
                                             </td>
                                         </tr>

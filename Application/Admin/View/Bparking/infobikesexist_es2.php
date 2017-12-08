@@ -52,7 +52,7 @@
 	//location.reload();
 	$(".xq").click(function(){
 		//alert(1);
-		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail";
+		var url = "http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail";
 //		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail";
 		var mac = $(this).attr("id");
 		//alert(mac);

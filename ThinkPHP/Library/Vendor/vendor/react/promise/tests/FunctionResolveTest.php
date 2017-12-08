@@ -126,7 +126,7 @@ class FunctionResolveTest extends TestCase
     {
         $deferreds = [];
 
-        // @TODO Increase count once global-queue is merged
+        // @TODO Increasebikes count once global-queue is merged
         for ($i = 0; $i < 10; $i++) {
             $deferreds[] = $d = new Deferred();
             $p = $d->promise();

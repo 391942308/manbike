@@ -27247,7 +27247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        function increaseInterval(interval) {
 	            var exp10 = Math.pow(10, Math.floor(Math.log(interval) / Math.LN10));
-	            // Increase interval
+	            // Increasebikes interval
 	            var f = interval / exp10;
 	            if (f === 2) {
 	                f = 5;

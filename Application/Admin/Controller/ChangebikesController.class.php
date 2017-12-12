@@ -605,7 +605,6 @@ class ChangebikesController extends CommonController {
 		];
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 		//获取es最后更新的时间,在更新的时候使用
-
 		$json = '{
   "size": 0,
   "aggs": {

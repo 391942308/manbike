@@ -494,7 +494,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_first"
+              "query": "dbs_realtime_first"
             }
           }
         },
@@ -547,7 +547,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_first"
+                    "query": "dbs_realtime_first"
                   }
                 }
               },
@@ -586,7 +586,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_first',
+				'type' => 'dbs_realtime_first',
 				'body' => $json
 		];
 

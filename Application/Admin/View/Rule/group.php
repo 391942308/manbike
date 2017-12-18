@@ -62,7 +62,6 @@
 
                                 </th>
                                 <th class="column-title">用户组名称 </th>
-                                <th class="column-title">级别 </th>
                                 <th class="column-title">省 </th>
                                 <th class="column-title">市 </th>
                                 <th class="column-title">区 </th>
@@ -82,7 +81,6 @@
 
                                     </td>
                                     <td class=" ">{$vo.title} </td>
-                                    <td class=" ">{$vo.class} </td>
                                     <td class=" ">{$vo.province} </td>
                                     <td class=" ">{$vo.city} </td>
                                     <td class=" ">{$vo.area} </td>

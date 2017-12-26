@@ -238,10 +238,10 @@
 
                                 </th>
                                 <th class="column-title">用户组名称 </th>
-                                <th class="column-title">级别 </th>
                                 <th class="column-title">省 </th>
                                 <th class="column-title">市 </th>
                                 <th class="column-title">区 </th>
+                                <th class="column-title">行政级别 </th>
                                 <th class="column-title no-link last"><span class="nobr">操作</span>
                                 </th>
                                 <th class="bulk-actions" colspan="7">
@@ -256,13 +256,13 @@
 
                                     </td>
                                     <td class=" "><?php echo ($vo["title"]); ?> </td>
-                                    <td class=" "><?php echo ($vo["class"]); ?> </td>
                                     <td class=" "><?php echo ($vo["province"]); ?> </td>
                                     <td class=" "><?php echo ($vo["city"]); ?> </td>
                                     <td class=" "><?php echo ($vo["area"]); ?> </td>
+                                    <td class=" "><?php echo ($vo["class"]); ?> </td>
                                     <td class=" last">
                                         <a href="#">
-                                             <a href="javascript:;" navId="<?php echo ($vo['id']); ?>" navTitle="<?php echo ($vo['title']); ?>" onclick="edit(this)">修改</a>
+                                             <a href="javascript:;" navId="<?php echo ($vo['id']); ?>" navTitle="<?php echo ($vo['title']); ?>" navProvince="<?php echo ($vo['province']); ?>" navCity="<?php echo ($vo['city']); ?>" navArea="<?php echo ($vo['area']); ?>" navClass="<?php echo ($vo['class']); ?>" onclick="edit(this)">修改</a>
                                             | <a href="javascript:if(confirm('确定删除？'))location='<?php echo U('Admin/Rule/delete_group',array('id'=>$vo['id']));?>'">删除</a>
                                             | <a href="<?php echo U('Admin/Rule/rule_group',array('id'=>$vo['id']));?>">分配权限</a>
                                             | <a href="<?php echo U('Admin/Rule/check_user',array('group_id'=>$vo['id']));?>">添加成员</a>
@@ -295,17 +295,20 @@
                             <tr>
                                 <th width="18%">用户组名：</th>
                                 <td>
-                                    <input class="input-medium" type="text" name="title">
+                                    <input class="input-medium" type="text" name="title" >
                                 </td>
                             </tr>
                             <tr>
                                 <th width="18%">地区：</th>
                                 <td>
-                                    <div data-toggle="distpicker" data-autoselect="3" data-province="浙江省">
-                                        <select name="province" class="province1"></select>
-                                        <select name="city"></select>
-                                        <select name="area"></select>
-                                    </div>
+<!--                                    <div data-toggle="distpicker" data-autoselect="3" data-province="浙江省">-->
+<!--                                        <select name="province" class="province1"></select>-->
+<!--                                        <select name="city"></select>-->
+<!--                                        <select name="area"></select>-->
+<!--                                    </div>-->
+                                    <input type="text" name="province" placeholder="省" class="form-control"/>
+                                    <input type="text" name="city" placeholder="市" class="form-control"/>
+                                    <input type="text" name="area" placeholder="区" style="margin-top: 5px;" class="form-control"/>
                                 </td>
                             </tr>
                             <tr>
@@ -352,11 +355,14 @@
                             <tr>
                                 <th width="18%">地区：</th>
                                 <td>
-                                    <div data-toggle="distpicker" >
-                                        <select name="province" class="province2"></select>
-                                        <select name="city"></select>
-                                        <select name="area"></select>
-                                    </div>
+<!--                                    <div data-toggle="distpicker" >-->
+<!--                                        <select name="province" class="province2"></select>-->
+<!--                                        <select name="city"></select>-->
+<!--                                        <select name="area"></select>-->
+<!--                                    </div>-->
+                                    <input type="text" name="province" placeholder="省" class="form-control" value="<?php echo ($province); ?>"/>
+                                    <input type="text" name="city" placeholder="市" class="form-control" value="<?php echo ($city); ?>"/>
+                               <input type="text" name="area" placeholder="区" style="margin-top: 5px;" class="form-control" value="<?php echo ($area); ?>"/>
                                 </td>
                             </tr>
                             <tr>
@@ -364,9 +370,9 @@
                                 <td>
                                     <div>
                                         <select name="class">
-                                            <option value="省级">省级</option>
-                                            <option value="市级">市级</option>
-                                            <option value="区级">区级</option>
+                                            <option value="省级" <?php if($class == '省级'): ?>selected<?php endif; ?>>省级</option>
+                                            <option value="市级" <?php if($class == '市级'): ?>selected<?php endif; ?>>市级</option>
+                                            <option value="区级" <?php if($class == '区级'): ?>selected<?php endif; ?>>区级</option>
                                         </select>
                                     </div>
                                 </td>
@@ -405,11 +411,19 @@
         function edit(obj){
             var navId=$(obj).attr('navId');
             var navTitle=$(obj).attr('navTitle');
+            var navProvince=$(obj).attr('navProvince');
+            var navCity=$(obj).attr('navCity');
+            var navArea=$(obj).attr('navArea');
+            var navClass=$(obj).attr('navClass');
 //            var navProvince=$(obj).attr('navProvince');
 //            var navCity=$(obj).attr('navCity');
 //            var navArea=$(obj).attr('navArea');
             $("input[name='id']").val(navId);
             $("input[name='title']").val(navTitle);
+            $("input[name='province']").val(navProvince);
+            $("input[name='city']").val(navCity);
+            $("input[name='area']").val(navArea);
+            $("select[name='class']").val(navClass);
 //            $("select[name='province']").val(navProvince);
 //            $("select[name='city']").val(navCity);
 //            $("select[name='area']").val(navArea);

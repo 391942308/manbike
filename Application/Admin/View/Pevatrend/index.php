@@ -100,7 +100,19 @@
             text: '车位峰谷值趋势图'
         },
         tooltip : {
-            trigger: 'axis'
+            trigger: 'axis',
+            formatter: function (params){
+                var str = '';
+                var diff = 0;
+                var size = params.length;
+                str+=params[0].name + '<br/>';
+                for(var i=0;i<size;i++){
+                    diff=params[0].value-params[1].value;
+                    str+=params[i].seriesName + ':' + params[i].value + '<br/>';
+                }
+                str+='差值:'+diff;
+                return str
+            }
         },
         legend: {
             data:['最大值','最小值']
@@ -110,7 +122,7 @@
             feature : {
                 mark : {show: true},
                 dataView : {show: true, readOnly: false},
-                magicType : {show: true, type: ['line', 'bar']},
+                magicType : {show: true,type:['line', 'bar', 'stack', 'tiled']},
                 restore : {show: true},
                 saveAsImage : {show: true}
             }

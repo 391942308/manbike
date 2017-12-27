@@ -25,6 +25,7 @@ class PevatrendController extends CommonController {
 			$ts = array();
 			$max = array();
 			$min = array();
+			$diff = array();
 			for ($i=$start; $i < $end ; $i+=$j) {
 				$time1 = date('Y-m-d',$i);//格式化
 				$time2 = date('Y-m-d',$i+$j);
@@ -43,18 +44,21 @@ class PevatrendController extends CommonController {
 //				var_dump($minnum);
 //				var_dump("<br>");
 				$ts[] = $time2;
-				$max[] = $this->chewei_sort($id,$ts1,$ts2,$sort1);
+//				$max[] = $this->chewei_sort($id,$ts1,$ts2,$sort1);
 				$min[] = $this->chewei_sort($id,$ts1,$ts2,$sort2);
+				$diff[] = $this->chewei_sort($id,$ts1,$ts2,$sort1) - $this->chewei_sort($id,$ts1,$ts2,$sort2);
 			}
 			$j_ts = json_encode($ts);
-			$j_max = json_encode($max);
+//			$j_max = json_encode($max);
 			$j_min = json_encode($min);
+			$j_diff = json_encode($diff);
 //			var_dump($ts);
 //			var_dump($max);
 //			var_dump($min);
 			$this->assign("j_ts",$j_ts);
-			$this->assign("j_max",$j_max);
+//			$this->assign("j_max",$j_max);
 			$this->assign("j_min",$j_min);
+			$this->assign("j_diff",$j_diff);
 		}
 		$this->display();
 	}

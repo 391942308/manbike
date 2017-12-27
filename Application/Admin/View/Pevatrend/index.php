@@ -29,7 +29,7 @@
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>车位峰谷值管理&nbsp;&nbsp;&nbsp; <small>车位峰谷值趋势图</small></h3>
+                <h3>车位供需管理&nbsp;&nbsp;&nbsp; <small>车位供需趋势图</small></h3>
             </div>
         </div>
         <div class="row">
@@ -40,6 +40,9 @@
         <div class="col-md-12 col-sm-12 col-xs-12">
             <div class="x_panel">
                 <div class="x_title">
+                     <span style="color: red">
+                        提示：闲置车辆根据每天最小峰谷值计算。需求曲线是最大峰谷值减去最小峰谷值。
+                    </span>
                     <ul class="nav navbar-right panel_toolbox">
                     </ul>
                     <div class="clearfix"></div>
@@ -93,29 +96,18 @@
     //var test = genData(50);
 //    app.title = '坐标轴刻度与标签对齐';
     var j_ts = $.parseJSON('{$j_ts}');
-    var j_max = $.parseJSON('{$j_max}');
+//    var j_max = $.parseJSON('{$j_max}');
     var j_min = $.parseJSON('{$j_min}');
+    var j_diff = $.parseJSON('{$j_diff}');
     option = {
         title : {
-            text: '车位峰谷值趋势图'
+            text: '车位供需趋势图'
         },
         tooltip : {
-            trigger: 'axis',
-            formatter: function (params){
-                var str = '';
-                var diff = 0;
-                var size = params.length;
-                str+=params[0].name + '<br/>';
-                for(var i=0;i<size;i++){
-                    diff=params[0].value-params[1].value;
-                    str+=params[i].seriesName + ':' + params[i].value + '<br/>';
-                }
-                str+='差值:'+diff;
-                return str
-            }
+            trigger: 'axis'
         },
         legend: {
-            data:['最大值','最小值']
+            data:[,'闲置车辆','需求曲线']
         },
         toolbox: {
             show : true,
@@ -141,14 +133,14 @@
         ],
         series : [
             {
-                name:'最大值',
-                type:'line',
-                data:j_max
-            },
-            {
-                name:'最小值',
+                name:'闲置车辆',
                 type:'line',
                 data:j_min
+            },
+            {
+                name:'需求曲线',
+                type:'line',
+                data:j_diff
             }
         ]
     };

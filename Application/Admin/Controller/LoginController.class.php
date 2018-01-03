@@ -10,19 +10,22 @@ class LoginController extends Controller {
 		$username = $condition_admin['username'] = $_POST['username'];
 		$now_admin = $database_admin->field(true)->where($condition_admin)->find();
 		if(empty($now_admin)){
-			exit('-2');
+			$this->error("登陆失败");
+			//exit('-2');
 		}
 		$password = md5($_POST['password']);
 		if($password != $now_admin['password']){
-			exit('-3');
+			$this->error("登陆失败");
+			//exit('-3');
 		}
 		if($password == $now_admin['password']){
 			session_start();
 			session('auth',$now_admin);
-			session('username',$username);
-			exit('1');
+			$this->success('登陆成功',"http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Index");
+			//exit('1');
 		}else{
-			exit('-5');
+			$this->error("登陆失败");
+			//exit('-5');
 		}
 	}
 	public function logout()

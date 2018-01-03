@@ -2,6 +2,9 @@
 namespace Admin\Controller;
 use Think\Controller;
 class RuleController extends CommonController {
+	public function _initialize(){
+		parent::_initialize();
+	}
 	function list_to_tree($list, $pk='id',$pid = 'pid',$child = '_child',$root=0) {
 		// 创建Tree
 		$tree = array();
@@ -158,8 +161,8 @@ class RuleController extends CommonController {
 	public function rule_group(){
 		if(IS_POST){
 			$id=$_GET['id'];
-//			$data['rule_ids']=$_POST['rule_ids'];
-			$data['rules']=implode(',', $_POST['rule_ids']);
+			$data['rule_ids']=$_POST['rule_ids'];
+			$data['rules']=implode(',', $data['rule_ids']);
 			$result=M('auth_group')->where("id=$id")->save($data);
 			if ($result) {
 				$this->success('操作成功',U('Admin/Rule/group'));

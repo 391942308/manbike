@@ -2,6 +2,9 @@
 namespace Admin\Controller;
 use Think\Controller;
 class BikesubController extends CommonController {
+	public function _initialize(){
+		parent::_initialize();
+	}
 	public function index() {
 		 $data = M('bike_sub');
 		 $count = $data->count();
@@ -66,6 +69,10 @@ class BikesubController extends CommonController {
 			$this->error('删除失败');
 		}
 	}
+	/*public function testlog(){
+		echo "testlog";
+		\Think\Log::write(json_encode($_REQUEST),'WARN');
+	}*/
 
 
 }

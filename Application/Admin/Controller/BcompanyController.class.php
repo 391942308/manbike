@@ -4,6 +4,11 @@ use Think\Controller;
 class BcompanyController extends CommonController {
 	public function index()
 	{
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		$allcompany = M('bike_company')->select();
+		$redis->set('allcompany',json_encode($allcompany));
+		
 		$title = "";
 		$data = M('bike_company');
 		$sql = "SELECT  *  FROM dwz_bike_company where 1=1 ";

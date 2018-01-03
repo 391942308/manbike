@@ -20,7 +20,6 @@ class ChangebikesController extends CommonController {
 			foreach($did_arr as $k=>$v){
 				$did_str .="dwz_info_id:".$v["id"]." ";
 			}
-
 			$this->assign("province2",$province2);
 			$this->assign("city2",$city2);
 			$this->assign("area2",$area2);
@@ -28,7 +27,6 @@ class ChangebikesController extends CommonController {
 		}else{
 			$arr_id = M('info')->select();
 		}
-//		var_dump($did_str);
 		$this->assign("arr_id",$arr_id);
 		if($_GET){
 			$tj = $_GET["tj"];
@@ -496,7 +494,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_first"
+              "query": "dbs_realtime_one_first"
             }
           }
         },
@@ -549,7 +547,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_first"
+                    "query": "dbs_realtime_one_first"
                   }
                 }
               },
@@ -588,7 +586,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_first',
+				'type' => 'dbs_realtime_one_first',
 				'body' => $json
 		];
 
@@ -607,6 +605,7 @@ class ChangebikesController extends CommonController {
 		];
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 		//获取es最后更新的时间,在更新的时候使用
+
 		$json = '{
   "size": 0,
   "aggs": {

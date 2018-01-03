@@ -6,6 +6,11 @@ class BparkingController extends CommonController {
 		parent::_initialize();
 	}
 	public function index() {
+		
+		//$redis = new \Redis();
+		//$redis->connect('127.0.0.1', 6379);
+		//$allinfo = M('info')->field('id,title,province,city,area,usable_num,storage_num,status,la,lb,lc')->select();
+		//$redis->set('allinfo',json_encode($allinfo));
 		//var_dump($_SESSION['auth']);
 		
 		$uid = $_SESSION["auth"]["id"];
@@ -21,8 +26,8 @@ class BparkingController extends CommonController {
 		$this->assign("starttime2",$starttime);
 		$data = M('info');
 		$sql="SELECT * FROM dwz_info where 1=1 ";
-		if (!empty($_GET["title"]) || $_GET["title"]==='0') {
-			$title = $_REQUEST["title"];
+		if (!empty($_GET["ntitle"]) || $_GET["ntitle"]==='0') {
+			$title = $_REQUEST["ntitle"];
 			$sql .= " and title like '%$title%' ";
 			$where["title"] = array('like', "%$title%");
 			$this->assign('title', $title);
@@ -39,11 +44,17 @@ class BparkingController extends CommonController {
 			$where["storage_num"] = '$storage_num';
 			$this->assign('storage_num', $storage_num);
 		}
-		if (!empty($_GET["no"]) || $_GET["no"]==='0') {
-			$no = $_REQUEST["no"];
+		if (!empty($_GET["nno"]) || $_GET["nno"]==='0') {
+			$no = $_REQUEST["nno"];
 			$sql .= " and id = '$no' ";
 			$where["id"] = '$no';
 			$this->assign('no', $no);
+		}
+		if (!empty($_GET["area"]) || $_GET["area"]==='0') {
+			$area = $_REQUEST["area"];
+			$sql .= " and area like '%$area%' ";
+			$where["area"] = array('like', "%$area%");
+			$this->assign('area', $area);
 		}
 		//根据行政级别，做相应的过滤
 		$province = $_SESSION['auth']['province'];
@@ -1109,7 +1120,34 @@ class BparkingController extends CommonController {
 		$data['status'] = $status;
 		$id = $_POST['id'];
 		$result=M('info')->where("id=$id")->save($data);
-		$redis->hset("dwz_info:$id",'status',$cstatus);
+		$redis->hset("dwz_info:$id",'status',$status);
+		$res = array('id'=>$id,'status'=>$status,'text'=>$text);
+		exit(json_encode(array('error_code'=>0,'error_reason'=>'修改成功','res'=>$res)));
+	}
+	
+	public function bstatus(){
+		
+		//var_dump($_REQUEST);
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+	
+		$id = $_REQUEST['id'];
+		if($_REQUEST['id']=='' || $_REQUEST['status']==''){
+			exit(json_encode(array('error_code'=>1,'error_reason'=>'参数不正确')));
+		}
+		
+		if($_REQUEST['status']==0){
+			$status = 1;
+			$text='黑名单';
+		}
+		if($_REQUEST['status']==1){
+			$status = 0;
+			$text='正常';
+		}
+		$data['isblack'] = $status;
+		$id = $_POST['id'];
+		$result=M('info')->where("id=$id")->save($data);
+		$redis->hset("dwz_info:$id",'isblack',$status);
 		$res = array('id'=>$id,'status'=>$status,'text'=>$text);
 		exit(json_encode(array('error_code'=>0,'error_reason'=>'修改成功','res'=>$res)));
 	}
@@ -1217,6 +1255,7 @@ class BparkingController extends CommonController {
 			  }
 			}';
 
+			echo $json;
 			
 			$params = [
 				'index' => 'bike_index_v6',

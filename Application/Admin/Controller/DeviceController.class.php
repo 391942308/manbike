@@ -2,7 +2,16 @@
 namespace Admin\Controller;
 use Think\Controller;
 class DeviceController extends CommonController {
+	public function _initialize(){
+		parent::_initialize();
+	}
 	public function index() {
+		
+		//$redis = new \Redis();
+		//$redis->connect('127.0.0.1', 6379);
+		//$alldevice = M('device_manage')->field('id,mac,info_id')->select();
+		//$redis->set('alldevice',json_encode($alldevice));
+		
 		$type="";
 		$mac="";
 		$info_id="";
@@ -53,9 +62,11 @@ class DeviceController extends CommonController {
 		$data['info_id'] = $info_id;
 		$redis = new \Redis();
 		$redis->connect('116.62.171.54', 8085);
+		
 		if($type=="Gateway"){
-			$redis->delete("gatewayiid:".$mac);
+			//$redis->delete("gatewayiid:".$mac);
 			$redis->set("gatewayiid:".$mac,$info_id);   //结果：bool(true)
+			echo $redis->get("gatewayiid:".$mac);   //结果：bool(true)
 		}
 		$result=M('device_manage')->add($data);
 		if ($result) {
@@ -69,13 +80,21 @@ class DeviceController extends CommonController {
 	 */
 	public function edit(){
 		$data['timestamp'] = $_POST['timestamp'];
-		$data['type'] = $_POST['type'];
-		$data['mac'] = $_POST['mac'];
+		$type = $data['type'] = $_POST['type'];
+		$mac = $data['mac'] = $_POST['mac'];
 		$data['gatewayFree'] = $_POST['gatewayFree'];
 		$data['gatewayLoad'] = $_POST['gatewayLoad'];
-		$data['info_id'] = $_POST['info_id'];
+		$info_id = $data['info_id'] = $_POST['info_id'];
 		$id = $_POST['id'];
 		$result=M('device_manage')->where("id=$id")->save($data);
+		
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		if($type=="Gateway"){
+			//$redis->delete("gatewayiid:".$mac);
+			$redis->set("gatewayiid:".$mac,$info_id);   //结果：bool(true)
+			//echo $redis->get("gatewayiid:".$mac); 
+		}
 		if ($result) {
 			$this->success('修改成功',U('Admin/Device/index'));
 		}else{
@@ -88,7 +107,14 @@ class DeviceController extends CommonController {
 	 */
 	public function delete(){
 		$id=$_GET["id"];
-		$result=M('device_manage')->where("id=$id")->delete();
+		$result=M('device_manage')->where("id=$id")->find();
+		M('device_manage')->where("id=$id")->delete();
+		if($result['type']=="Gateway"){
+			$redis = new \Redis();
+			$redis->connect('116.62.171.54', 8085);
+			$redis->delete("gatewayiid:".$result['mac']);
+		}
+		
 		if($result){
 			$this->success('删除成功',U('Admin/Device/index'));
 		}else{
@@ -96,5 +122,17 @@ class DeviceController extends CommonController {
 		}
 	}
 
+	public function getall(){
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		$list = $redis->keys("gatewayiid:*");   //结果：bool(true)
+		//var_dump($list);
+		
+		foreach($list as $k=>$v){
+			echo $v.":".$redis->get($v);
+			echo "<br />";
+		}
+		//$redis->set("gatewayiid:".$mac,$info_id);   //结果：bool(true)
+	}
 
 }

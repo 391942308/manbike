@@ -4,27 +4,13 @@ use Think\Controller;
 class IndexController extends CommonController {
     public function _initialize(){
 		parent::_initialize();
-		//session id
-		//check auth
-        /*$Auth = new \Think\Auth();
-		$ruleName = MODULE_NAME . '/' . ACTION_NAME; //规则唯一标识
-		//var_dump($ruleName);
-		$userId = 1; //用户ID
-		$type = 1; //分类-具体是什么没搞懂，默认为1
-		$mode='url'; //执行check的模式
-		$relation = 'and'; //'or' 表示满足任一条规则即通过验证; 'and'则表示需满足所有规则才能通过验证
-		if($Auth->check($ruleName,$userId,$type,$mode,$relation)){
-		$dietxt = '认证：通过';
-		}else{
-		$dietxt = '认证：失败';
-		}*/
-		//var_dump($dietxt);
    }
 	
 	public function db(){
         $list = M("info")->select();
 		//var_dump($list);
     }
+	
 	public function index(){
 		date_default_timezone_set('Asia/Shanghai'); 
 		//var_dump($res_es);
@@ -43,8 +29,6 @@ class IndexController extends CommonController {
 		
 		
 		$uid = $_SESSION['auth']['id'];
-		//暂时先将超级管理员区别开
-		if($uid!=1){
 			//获取每家公司的单车数量
 			$list = M("bike_company")->select();
 			$this->assign('list1',$list);
@@ -56,6 +40,10 @@ class IndexController extends CommonController {
 			$province = $_SESSION['auth']['province'];
 			$city = $_SESSION['auth']['city'];
 			$area = $_SESSION['auth']['area'];
+			
+			$sql_area_count = 'SELECT COUNT(DISTINCT area) as count FROM dwz_info';
+				$count = M()->query($sql_area_count);
+				$this->assign('ibno',$count[0]['count']);
 				
 			if($_SESSION['auth']['class']=='省级'){
 				$sql .= " and province = '$province' ";
@@ -84,7 +72,7 @@ class IndexController extends CommonController {
 				$where["area"] = $_SESSION['auth']['area'];
 			}
 			
-			$res_es = $this->getbikes_pca($province,$city,$area);
+			$res_es = $this->getbikes_ids($province,$city,$area);
 			$buckets = $res_es['aggregations'][3]['buckets'];
 			
 			//var_dump($res_es['hits']['total']);
@@ -123,177 +111,17 @@ class IndexController extends CommonController {
 			}
 			$this->assign('day',$day);
 			//var_dump($day);
-			$end = $t0 = strtotime(date('Y-m-d'));
-			$seconds=3600*24*$day;
-			$start=$t0 - $seconds;
-			$start=$start*1000;
-			$end=$end*1000;
-			
-			$buckets = $this->oneweek_1($start,$end,$area);
-			//var_dump($buckets);
-			$arr11=array();
-			$arr22=array();
-			$j = 0;
-			foreach($buckets as $k=>$v){
-				$arr11[$j]=$v['key'].'('.$v['doc_count'].')';
-				//$arr22[$j]['name']=$v['key'].'('.$v['doc_count'].')';
-				//$arr22[$j]['value']=$v['doc_count'];
-				$arr22[$j]=$v['doc_count'];
-				$arr33[]=$v['key'];
-				$j++;
-			}
-			foreach($arr33 as $k=>$v){
-//				var_dump($v);
-				if(trim($v) == "其他"){
-					$arr_color33[] = 'rgba(193,35,43,1)';
-				}else{
-					$data33["title"] = trim($v);
-					$arr_color33[] = M('bike_company')->where($data33)->getField('color');
-
-				}
-			}
-			$str_color33 = json_encode($arr_color33);
-			$this->assign('str_color33',$str_color33);
-			$str11 = json_encode($arr11);
-			$str22 = json_encode($arr22);
-			//$this->assign('length',$length);
-			$this->assign('str11',$str11);
-			$this->assign('str22',$str22);
-			
-			$this->display();
-        }else{
-			
-			$sql_area_count = 'SELECT COUNT(DISTINCT area) as count FROM dwz_info';
-			$count = M()->query($sql_area_count);
-			$this->assign('ibno',$count[0]['count']);
-			//超级管理员暂时去数据库获取
-			//echo "xx";
-			
-			$data=array();
-			//获取每家公司的单车数量
-			$list = M("bike_company")->select();
-			$this->assign('list1',$list);
-			//var_dump($list);
-			foreach($list as $k=>$v){
-				$nm = $v['title'];
-				//var_dump($nm);
-				//模糊查询相关的记录情况
-				//查询的同时，将当前时刻的数据记录到数据库表
-				$arr = explode('|',$v['keyword']);
-				//var_dump($arr);
-				//echo sizeof($arr);
-				$condition = '' ;
-				foreach($arr as $k=>$v){
-					if($k < sizeof($arr)-1)
-						{
-							
-							if($v=='ofo'){
-								$condition .= " name like '$v%' or ";	
-							}else{
-								$condition .= " name like '$v%' or ";
-							}
-							
-							/*if($v=='' or $v=='NULL' or $v=='null'){
-								$condition .= " name like '' or ";
-							}else{
-								$condition .= " name like '$v%' or ";	
-							}*/
-							
-						}
-					else
-						{
-							if($v=='ofo'){
-								$condition .= " name like '$v%' ";	
-							}else{
-								$condition .= " name like '$v%' ";	
-							}
-							/*
-							if($v=='' or $v=='NULL' or $v=='null'){
-								$condition .= " name like '' ";
-							}else{
-								$condition .= " name like '$v%' ";	
-							}*/
-							
-						}
-				}
-				//var_dump($condition);
-				//$name = $v['title'];
-				$sql="select count(*) as numbers ,' $nm ' AS name  from dwz_bike where ".$condition;
-				$Model = M();
-				$res = $Model->query($sql);
-				//var_dump($res);
-				$data[]=$res;
-			}	
-			//一定的时间记录一次,做数量变化统计图表
-			
-			
-			//var_dump($data);
-			$arr1=array();
-			$arr2=array();
-			$length=sizeof($data);
-			$bnoo=0;
-			foreach($data as $k => $v){
-//				var_dump($v[0]['name']);
-				if(trim($v[0]['name']) == "其他"){
-					$arr_color[] = 'rgba(193,35,43,1)';
-				}else{
-					$map["title"] = trim($v[0]['name']);
-					$arr_color[] = M('bike_company')->where($map)->getField('color');
-				}
-				$arr1[]=$v[0]['name'].'('.$v[0]['numbers'].')';
-				$temp['name']=$v[0]['name'].'('.$v[0]['numbers'].')';
-				$temp['value']=$v[0]['numbers'];
-				$arr2[]=(object)$temp;
-				$bnoo+=$v[0]['numbers'];
-			}
-			//$arr1[]='其他';
-			
-			//$temp['value']=$bno - $bnoo;
-			//$temp['name']='其他'.'('.$temp['value'].')';
-			//$arr2[]=(object)$temp;
-			$bno = 0;
-			//var_dump($arr2);
-			foreach($arr2 as $k=>$v){
-				$bno = $bno + $v->value;
-			}
-			$this->assign('bno',$bno);
-			//var_dump($arr1);
-			//var_dump($arr2);
-			$str_color = json_encode($arr_color);
-			$this->assign('str_color',$str_color);
-			$str1 = json_encode($arr1);
-			$str2 = json_encode($arr2);
-			$this->assign('length',$length);
-			$this->assign('str1',$str1);
-			$this->assign('str2',$str2);
-		//	var_dump($str1);
-			//var_dump($str2);
-			$this->assign('title','首页');
-			
-			
-			//一个星期 新增单车数量 默认为7天
-			$day=$_REQUEST['day'];
-			
-			if($day==''){
-				$day=7;
-			}
-			$this->assign('day',$day);
-			//var_dump($day);
-			$end = $t0 = strtotime(date('Y-m-d'));
-			$seconds=3600*24*$day;
-			$start=$t0 - $seconds;
-			$start=$start*1000;
-			$end=$end*1000;
-			//var_dump($start);
+			//$end = $t0 = strtotime(date('Y-m-d'));
+			$end = $t0 = time();
 			//var_dump($end);
-			//$start = strtotime("last Monday")*1000;
-			//$end = strtotime("Monday")*1000;
-			//$this->assign('start',date("Y/m/d",strtotime("last Monday")));
-			//$this->assign('end',date("Y/m/d",strtotime("Monday")));
-			//var_dump(date("Y-m-d H:i:s",strtotime("last Monday")));
-			//var_dump(date("Y-m-d H:i:s",strtotime("Monday")));
+			$seconds=3600*24*$day;
+			$start=$t0 - $seconds;
+			$start=$start*1000;
+			$end=$end*1000;
 			
-			$buckets = $this->oneweek($start,$end);
+			$buckets = $this->oneweek_2($start,$end,$province,$city,$area);	
+			//$buckets = $this->new_add($start,$end,$province,$city,$area);
+			
 			//var_dump($buckets);
 			$arr11=array();
 			$arr22=array();
@@ -307,8 +135,10 @@ class IndexController extends CommonController {
 				$arr33[]=$v['key'];
 				$j++;
 			}
+			$arr_color33=array();
+			//var_dump($arr33);
 			foreach($arr33 as $k=>$v){
-//				var_dump($v);
+				//var_dump($v);
 				if(trim($v) == "其他"){
 					$arr_color33[] = 'rgba(193,35,43,1)';
 				}else{
@@ -317,18 +147,37 @@ class IndexController extends CommonController {
 
 				}
 			}
+			//var_dump($arr_color33);
+			$str_color33 = json_encode($arr_color33);
+			$this->assign('str_color33',$str_color33);
 			$str11 = json_encode($arr11);
 			$str22 = json_encode($arr22);
-			$str_color33 = json_encode($arr_color33);
-//			var_dump($str_color33);
-			$this->assign('str_color33',$str_color33);
+			$str33 = json_encode($arr33);
+			//$this->assign('length',$length);
 			$this->assign('str11',$str11);
 			$this->assign('str22',$str22);
 			
+			
 			$this->display();
-		}
     }
-	private function oneweek($start,$end){
+
+	
+	//将区域改成 使用id查询
+	private function oneweek_2($start,$end,$province="",$city="",$area=""){
+		
+		//根据省市区查询ids，然后es获取相关数据
+		if($province!='') $map['province']=array('eq',$province);
+		if($city!='') $map['city']=array('eq',$city);
+		if($area!='') $map['area']=array('eq',$area);
+		$list = M("info")->where($map)->select();
+		//var_dump($list);
+		$arr_ids = array();
+		foreach($list as $k=>$v){
+			$arr_ids[]='dwz_info_id:'.$v['id'];
+		}
+		$ids = implode(" ",$arr_ids);
+		
+		
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		//$hosts = [
@@ -348,63 +197,52 @@ class IndexController extends CommonController {
 		//var_dump($end);
 	
 		$json = '{
-		  "size": 0,
-		  "query": {
-			"bool": {
-			  "must": [
-				{
-				  "match_all": {}
-				},
-				{
-				  "match_phrase": {
-					"_type": {
-					  "query": "dbs_realtime_first"
+			  "size": 0,
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "query_string": {
+						"analyze_wildcard": true,
+						"query": "'.$ids.'"
+					  }
+					},
+					{
+					  "range": {
+						"timestamp": {
+						  "gte": '.$start.',
+						  "lte": '.$end.',
+						  "format": "epoch_millis"
+						}
+					  }
 					}
-				  }
-				},
-				{
-				  "range": {
-					"timestamp": {
-					  "gte": '.$start.',
-					  "lte": '.$end.',
-					  "format": "epoch_millis"
+				  ],
+				  "must_not": [
+					{
+					  "match_phrase": {
+						"company": {
+						  "query": "其他"
+						}
+					  }
 					}
-				  }
+				  ]
 				}
-			  ],
-			  "must_not": [
-				{
-				  "match_phrase": {
-					"_type": {
-					  "query": "dbs_realtime_last"
+			  },
+			  "_source": {
+				"excludes": []
+			  },
+			  "aggs": {
+				"3": {
+				  "terms": {
+					"field": "company",
+					"size": 20,
+					"order": {
+					  "_count": "desc"
 					}
 				  }
-				},
-				{
-				  "match_phrase": {
-					"company": {
-					  "query": "其他"
-					}
-				  }
-				}
-			  ]
-			}
-		  },
-		  "_source": {
-			"excludes": []
-		  },
-		  "aggs": {
-			"3": {
-			  "terms": {
-				"field": "company",
-				"size": 20,
-				"order": {
-				  "_count": "desc"
 				}
 			  }
-			}
-		  }
-		}';
+			}';
 
 		
 		$params = [
@@ -418,102 +256,28 @@ class IndexController extends CommonController {
 		//var_dump($buckets);
 		return $buckets;
 	}
-	private function oneweek_1($start,$end,$area){
-		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
-		require $lpath;
-		//$hosts = [
-		//'dododo.shop:9200',         // IP + Port
-		//];
-		$hosts = [
-		'116.62.171.54:8081',      // IP + Port
-		];
+	private function new_add($start,$end,$province="",$city="",$area=""){
 		
-		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-		//获取es最后更新的时间,在更新的时候使用
+		//到前一天
+		$buckets_1 = $this->oneweek_2(0,$start,$province,$city,$area);
 		
-		//获取当前一星期的时间
-		//$start = strtotime("last Monday")*1000;
-		//$end = strtotime("Monday")*1000;
-		//var_dump($start);
-		//var_dump($end);
-	
-		$json = '{
-		  "size": 0,
-		  "query": {
-			"bool": {
-			  "must": [
-				{
-				  "match_all": {}
-				},
-				{
-				  "match_phrase": {
-					"_type": {
-					  "query": "dbs_realtime_first"
-					}
-				  }
-				},
-				{
-				  "range": {
-					"timestamp": {
-					  "gte": '.$start.',
-					  "lte": '.$end.',
-					  "format": "epoch_millis"
-					}
-				  }
-				},
-				{
-				  "match_phrase": {
-					"area": {
-					  "query": "'.$area.'"
-					}
-				  }
+		//全部
+		$start_2 = 0;
+		$end_2 = $start;
+		$buckets_2 = $this->oneweek_2(0,9512114950000,$province,$city,$area);
+		
+		//var_dump($buckets_1);
+		//var_dump($buckets_2);
+		foreach($buckets_1 as $k=>$v){
+			//var_dump($v);
+			foreach($buckets_2 as $kk=>$vv){
+				if($v['key']==$vv['key']){
+					$buckets_1[$k]['doc_count']=$vv['doc_count']-$v['doc_count'];
 				}
-			  ],
-			  "must_not": [
-				{
-				  "match_phrase": {
-					"_type": {
-					  "query": "dbs_realtime_last"
-					}
-				  }
-				},
-				{
-				  "match_phrase": {
-					"company": {
-					  "query": "其他"
-					}
-				  }
-				}
-			  ]
 			}
-		  },
-		  "_source": {
-			"excludes": []
-		  },
-		  "aggs": {
-			"3": {
-			  "terms": {
-				"field": "company",
-				"size": 20,
-				"order": {
-				  "_count": "desc"
-				}
-			  }
-			}
-		  }
-		}';
-
+		}
+		return $buckets_1;
 		
-		$params = [
-			'index' => 'bike_index_v6',
-			'type' => 'dbs_realtime_first',
-			'body' => $json
-		];
-
-		$results = $client->search($params);
-		$buckets = $results['aggregations'][3]['buckets'];
-		//var_dump($buckets);
-		return $buckets;
 	}
 	
 	public function clear(){
@@ -595,8 +359,26 @@ class IndexController extends CommonController {
 		$this->display();
 	}
 	
-	//根据省市区获取
-	private function getbikes_pca($province,$city,$area){
+	//根据省市区获取到对应的id  然后使用id
+	private function getbikes_ids($province='',$city='',$area=''){
+		//$province = '浙江省';
+		//$city = '杭州市';
+		//$area = '滨江区';
+		
+		//根据省市区获取到ids 字符串 ，然后查es 获取到数量
+		if($province!='') $map['province']=array('eq',$province);
+		if($city!='') $map['city']=array('eq',$city);
+		if($area!='') $map['area']=array('eq',$area);
+		$list = M("info")->where($map)->select();
+		//var_dump($list);
+		$arr_ids = array();
+		foreach($list as $k=>$v){
+			$arr_ids[]='dwz_info_id:'.$v['id'];
+		}
+		$ids = implode(" ",$arr_ids);
+		//var_dump($ids);
+		//exit;
+		
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		//$hosts = [
@@ -611,70 +393,43 @@ class IndexController extends CommonController {
 		//获取es最后更新的时间,在更新的时候使用
 		
 		$json = '{
-				  "size": 0,
-				  "query": {
-					"bool": {
-					  "must": [
-						{
-						  "match_all": {}
-						},
-						{
-						  "match_phrase": {
-							"province": {
-							  "query": "'.$province.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"city": {
-							  "query": "'.$city.'"
-							}
-						  }
-						},
-						{
-						  "match_phrase": {
-							"area": {
-							  "query": "'.$area.'"
-							}
-						  }
-						},
-						{
-						  "range": {
-							"timestamp": {
-							  "gte": 0,
-							  "lte": 9507697943118,
-							  "format": "epoch_millis"
-							}
-						  }
-						}
-					  ],
-					  "must_not": [
-						{
-						  "match_phrase": {
-							"company": {
-							  "query": "其他"
-							}
-						  }
-						}
-					  ]
+			  "size": 0,
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "query_string": {
+						"analyze_wildcard": true,
+						"query": "'.$ids.'"
+					  }
 					}
-				  },
-				  "_source": {
-					"excludes": []
-				  },
-				  "aggs": {
-					"3": {
-					  "terms": {
-						"field": "company",
-						"size": 20,
-						"order": {
-						  "_count": "desc"
+				  ],
+				  "must_not": [
+					{
+					  "match_phrase": {
+						"company": {
+						  "query": "其他"
 						}
 					  }
 					}
+				  ]
+				}
+			  },
+			  "_source": {
+				"excludes": []
+			  },
+			  "aggs": {
+				"3": {
+				  "terms": {
+					"field": "company",
+					"size": 20,
+					"order": {
+					  "_count": "desc"
+					}
 				  }
-				}';
+				}
+			  }
+			}';
 
 			$params = [
 				'index' => 'bike_index_v6',
@@ -688,4 +443,5 @@ class IndexController extends CommonController {
 			//var_dump($ts);
 			return $results;
 	}
+	
 }

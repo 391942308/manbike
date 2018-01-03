@@ -2,6 +2,9 @@
 namespace Admin\Controller;
 use Think\Controller;
 class BsrController extends CommonController {
+	public function _initialize(){
+		parent::_initialize();
+	}
 	public function index() {
 		 $data = M('bike_sub_realtime');
 		 $count = $data->count();

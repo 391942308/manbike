@@ -7,11 +7,12 @@
             <div class="page-title">
                 <div class="title_left">
                     <h3>车位设置&nbsp;&nbsp;&nbsp; <small>车位列表</small></h3>
-					<img src="http://116.62.171.54:8080/manbike0.3/Public/myimages/green.png" />&nbsp;<span>正常状态</span><br />
-					<img src="http://116.62.171.54:8080/manbike0.3/Public/myimages/light.png" />&nbsp;<span>通知阈值：当车位数量小于该值时为通知状态</span><br />
-					<img src="http://116.62.171.54:8080/manbike0.3/Public/myimages/yellow.png" />&nbsp;<span>紧急阈值：当车位数量大于该值时为紧急状态</span><br />
-					<img src="http://116.62.171.54:8080/manbike0.3/Public/myimages/red.png" />&nbsp;<span>报警阈值：当车位数量大于该值时为报警状态</span><br />
-					<span>当阈值设置为0时为不启用,使用默认配置</span>
+					<img src="http://baohe.toalls.com:8080/manbike0.3/Public/myimages/alive.png" />&nbsp;<span>异常状态</span>
+					<img src="http://baohe.toalls.com:8080/manbike0.3/Public/myimages/green.png" />&nbsp;<span>正常状态</span><br />
+					<img src="http://baohe.toalls.com:8080/manbike0.3/Public/myimages/light.png" />&nbsp;<span>通知阈值：当车位数量小于该值时为通知状态</span><br />
+					<img src="http://baohe.toalls.com:8080/manbike0.3/Public/myimages/yellow.png" />&nbsp;<span>紧急阈值：当车位数量大于该值时为紧急状态</span><br />
+					<img src="http://baohe.toalls.com:8080/manbike0.3/Public/myimages/red.png" />&nbsp;<span>报警阈值：当车位数量大于该值时为报警状态</span><br />
+					<span>提示：1,当阈值设置为0时为使用默认配置 2,单击可以更改图标是否显示</span>
                 </div>
 <!--
                 <div class="title_right">
@@ -62,8 +63,9 @@
                             </p>
                             <div style="margin-bottom: 10px" class="input-group">
                                 <form method="get" action="{:U('Admin/Bparking/index')}">
-                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位编号" name="no" value="{$no}" id="no"/>&nbsp;&nbsp;&nbsp;&nbsp;
-									<input type="text" class="form-control" style="width: 150px" placeholder="车位名称" name="title" value="{$title}" id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位编号" name="nno" value="{$no}" id="nno"/>&nbsp;&nbsp;&nbsp;&nbsp;
+									<input type="text" class="form-control" style="width: 150px" placeholder="车位名称" name="ntitle" value="{$title}" id="ntitle"/>&nbsp;&nbsp;&nbsp;&nbsp;
+									<input type="text" class="form-control" style="width: 150px" placeholder="区域" name="area" value="{$area}" id="area"/>&nbsp;&nbsp;&nbsp;&nbsp;
                                     <input type="hidden" class="form-control" style="width: 150px" placeholder="可容纳车辆" name="usable_num" value="{$usable_num}" id="usable_num"/>&nbsp;&nbsp;&nbsp;&nbsp;
                                     <input type="hidden" class="form-control" style="width: 150px" placeholder="已存储车辆" name="storage_num" value="{$storage_num}" id="storage_num"/>&nbsp;&nbsp;&nbsp;&nbsp;
                                     <input type="submit" value="查询" class="btn btn-default"/>
@@ -93,6 +95,7 @@
                                         <th class="column-title">经度 </th>
                                         <th class="column-title">纬度 </th>
 										<th class="column-title">状态</th>
+										<th class="column-title">是否为黑名单</th>
                                         <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
@@ -109,8 +112,8 @@
                                             </td>
                                             <td class=" "> <i id="i{$vo.id}" class="fa fa-circle"  aria-hidden="true"></i>
                                             </td>
-                                            <td class=" "><a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/{$vo.id}">{$vo.id}</a></td>
-                                            <td class=" "><a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">{$vo.title}</a></td>
+                                            <td class=" "><a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/{$vo.id}">{$vo.id}</a></td>
+                                            <td class=" "><a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">{$vo.title}</a></td>
                                             <td class=" ">{$vo.usable_num} </td>
                                             <td class=" ">{$vo.la} </td>
                                             <td class=" ">{$vo.lb} </td>
@@ -122,22 +125,24 @@
                                             <td class="a-right a-right ">{$vo.lng}</td>
                                             <td class="a-right a-right ">{$vo.lat}</td>
 											<td class="a-right a-right "><span id="cs{$vo.id}" data-id="{$vo.id}" data-status="{$vo.status}" class="cstatus"><if condition="$vo.status eq 1 ">隐藏中<else /> 显示中</if></span></td>
-                                            <td class=" last">
+                                            <td class="a-right a-right "><span id="bs{$vo.id}" data-id="{$vo.id}" data-status="{$vo.isblack}" class="bstatus"><if condition="$vo.isblack eq 0 ">正常<else />黑名单</if></span></td>
+											<td class=" last">
                                                 <a href="#">
-                                                   <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navUsable_num="{$vo['usable_num']}" navStorage_num="{$vo['storage_num']}" navOverflow_num="{$vo['overflow_num']}" navNo="{$vo['no']}" navBlock_no="{$vo['block_no']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" navStatus="{$vo['status']}" la="{$vo['la']}" lb="{$vo['lb']}" lc="{$vo['lc']}" onclick="edit(this)">修改</a>
+                                                   <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navUsable_num="{$vo['usable_num']}" navStorage_num="{$vo['storage_num']}" navOverflow_num="{$vo['overflow_num']}" navNo="{$vo['no']}" navBlock_no="{$vo['block_no']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" navStatus="{$vo['status']}" la="{$vo['la']}" lb="{$vo['lb']}" lc="{$vo['lc']}" province="{$vo['province']}" city="{$vo['city']}" area="{$vo['area']}" onclick="edit(this)">修改</a>
                                                     | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bparking/delete',array('id'=>$vo['id']))}'">删除</a>
                                                     | <a id="{$vo['id']}" class="xiangqing" href="javascript:void(0);">实时停放</a>
-                                                    | <a href="http://localhost/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">历史总停放</a>
-													<if condition="$uid eq '1'">
+                                                    | <a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/{$vo.id}">历史总停放</a>
+													<!--<if condition="$uid eq '1'">
                                                         | <a href="{:U('Admin/Bparking/fssj',array('id'=>$vo['id']))}">变化趋势和实时数据</a>
-                                                    </if>
+                                                    </if>-->
 													<if condition="$uid eq '1'">
                                                         | <a href="{:U('Admin/Bparking/history',array('id'=>$vo['id']))}">总量变化趋势</a>
+                                                       <!-- | <a href="{:U('Admin/Bparking/update_info',array('id'=>$vo['id']))}">更新当天数据</a>-->
                                                     </if>
                                                    <!-- | <a id="{$vo['id']}" class="trend" href="javascript:void(0);">变化趋势</a>
                                                     | <a id="{$vo['id']}" class="fenxi" href="javascript:void(0);">分时数据</a>
                                                     | <a id="{$vo['id']}" class="liudong" href="javascript:void(0);">流动情况</a>-->
-                                                    | <a id="{$vo['id']}" class="clear" href="javascript:void(0);">清除数据</a>
+                                                    <!--| <a id="{$vo['id']}" class="clear" href="javascript:void(0);">清除数据</a>-->
                                                 </a>
                                             </td>
                                         </tr>
@@ -212,11 +217,11 @@
 								<th>
 								区域：
 								</th>
-								<td data-toggle="distpicker" data-autoselect="3" data-province="浙江省">
-									<select name="province" class="form-control"></select>
-									<select name="city" class="form-control"></select>
-									<select name="area" class="form-control"></select>
-								</td>	
+								<td>
+									<input type="text" name="province" class="form-control" placeholder="省" value="" />
+									<input type="text" name="city" class="form-control" placeholder="市" value="" />
+									<input type="text" name="area" class="form-control" placeholder="区" value="" />
+								</td>
 							</tr>
 							<tr>
                                 <th>状态（0正常）：</th>
@@ -317,11 +322,11 @@
 								<th>
 								区域：
 								</th>
-								<td data-toggle="distpicker" data-autoselect="3" data-province="浙江省" >
-									<select name="province" class="form-control" value=""></select>
-									<select name="city" class="form-control" value=""></select>
-									<select name="area" class="form-control" value=""></select>
-								</td>	
+								<td>
+									<input id="pro" type="text" name="province" class="form-control" value="" />
+									<input id="ci" type="text" name="city" class="form-control" value="" />
+									<input id="ar" type="text" name="area" class="form-control" value="" />
+								</td>
 							</tr>
 							<tr>
                                 <th>状态（0正常）：</th>
@@ -369,7 +374,7 @@
                 var aValue = document.getElementById('aInput').value;
                 art.dialog.data('aValue', aValue);// 存储数据
 
-                var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+                var path = art.dialog.data('homeDemoPath') || 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/';
 
                 art.dialog.open(path + 'iframeB.html?fd', {
                     id: 'AAA',
@@ -388,7 +393,7 @@
 
                 //var path = art.dialog.data('homeDemoPath') || './';//
 
-				var path = art.dialog.data('homeDemoPath') || 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/';
+				var path = art.dialog.data('homeDemoPath') || 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/';
 
 				
                 art.dialog.open(path + 'iframeB.html?fd', {
@@ -435,6 +440,10 @@
 			var la=$(obj).attr('la');
 			var lb=$(obj).attr('lb');
 			var lc=$(obj).attr('lc');
+			var province=$(obj).attr('province');
+			console.log(province);
+			var city=$(obj).attr('city');
+			var area=$(obj).attr('area');
             $("input[name='id']").val(navId);
             $("input[name='title']").val(navTitle);
             $("input[name='usable_num']").val(navUsable_num);
@@ -447,6 +456,9 @@
 			$("input[name='la']").val(la);
 			$("input[name='lb']").val(lb);
 			$("input[name='lc']").val(lc);
+			$("input[name='province']").val(province);
+			$("input[name='city']").val(city);
+			$("input[name='area']").val(area);
             $('#bjy-edit').modal('show');
         }
     </script>
@@ -482,7 +494,7 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//去后台获取数据
-		var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+		var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
 		location.href=url;
 	})
 	$(".xiangqing1").click(function(){
@@ -492,7 +504,7 @@
 		var url = "http://115.29.238.250:5601/app/kibana#/visualize/create?type=pie&savedSearchId=AV7R9wvkuWTBJ8LcyXE4&_g=(refreshInterval:(display:Off,pause:!f,value:0),time:(from:now-30d,mode:quick,to:now))&_a=(filters:!((%27$state%27:(store:appState),meta:(alias:!n,disabled:!f,index:AV7HWv9wqeodvWtZMBvt,key:dwz_info_id,negate:!f,type:phrase,value:%27"+id+"%27),query:(match:(dwz_info_id:(query:%27"+id+"%27,type:phrase))))),linked:!t,query:(match_all:()),uiState:(spy:(mode:(fill:!f,name:table))),vis:(aggs:!((enabled:!t,id:%271%27,params:(field:mac),schema:metric,type:cardinality),(enabled:!t,id:%272%27,params:(field:company,order:desc,orderBy:%271%27,size:5),schema:segment,type:terms)),listeners:(),params:(addLegend:!t,addTooltip:!t,isDonut:!f,legendPosition:right,type:pie),title:%27New%20Visualization%27,type:pie))";
 		//alert(id);
 		//去后台获取数据
-		//var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall/id/'+ id;
+		//var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesall/id/'+ id;
 		location.href=url;
 	})
 	$(".fenxi").click(function(){
@@ -500,7 +512,7 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//去后台获取数据
-		var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Stalist/index/dwz_info_id/'+ id;
+		var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Stalist/index/dwz_info_id/'+ id;
 		location.href=url;
 	})
 	$(".liudong").click(function(){
@@ -508,7 +520,7 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//去后台获取数据
-		var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Blast/oneinfo/iid/'+ id;
+		var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Blast/oneinfo/iid/'+ id;
 		location.href=url;
 	})
 	$(".trend").click(function(){
@@ -516,7 +528,7 @@
 		var id = $(this).attr("id");
 		//alert(id);
 		//去后台获取数据
-		var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/trend/iid/'+ id;
+		var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/trend/iid/'+ id;
 		location.href=url;
 	})
 	$(".clear").click(function(){
@@ -525,7 +537,7 @@
                  var id = $(this).attr("id");
 				//alert(id);
 				//去后台获取数据
-				var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/clear/id/'+ id;
+				var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/clear/id/'+ id;
 				location.href=url;
                  return true;
               }else{
@@ -536,7 +548,7 @@
 		//var id = $(this).attr("id");
 		//alert(id);
 		//去后台获取数据
-		//var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/clear/id/'+ id;
+		//var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/clear/id/'+ id;
 		//location.href=url;
 	})
 	
@@ -562,8 +574,7 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
-            var url = 'http://localhost/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
+            var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesexist_es1/id/'+ id;
             location.href=url;
         })
         $(".xiangqing1").click(function(){
@@ -571,8 +582,7 @@
             var id = $(this).attr("id");
             //alert(id);
             //去后台获取数据
-//            var url = 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
-            var url = 'http://localhost/index.php/Admin/Bparking/infobikesall1/id/'+ id;
+            var url = 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/infobikesall1/id/'+ id;
             location.href=url;
         })
 		
@@ -595,6 +605,35 @@
 						$(id).text(data.res.text);
 						console.log(data.res.id);
 						console.log(data.res.text);
+						
+					}
+					//if(data.error_code == 0 and arr[1]==0)  $(this).text("隐藏中");
+					//if(data.error_code == 0 and arr[1]==1)  $(this).text("显示中");
+            },"json");//这里返回的类型有：json,html,xml,text
+			
+		})
+		
+		$(".bstatus").click(function(){
+			var id = $(this).attr("data-id");
+			var status = $(this).attr("data-status");
+			
+			//console.log(arr);
+			//alert(id);
+			//alert(status);
+			$.post("{:U('Admin/Bparking/bstatus')}",
+				{
+					id:id,
+					status:status,
+				},
+                function(data){
+                    //console.log(data);
+					if(data.error_code == 0){
+						var id = '#bs'+ data.res.id;
+						$(id).attr('data-status',data.res.status);
+						$(id).text(data.res.text);
+						console.log(data.res.id);
+						console.log(data.res.text);
+						console.log(data.res.status);
 						
 					}
 					//if(data.error_code == 0 and arr[1]==0)  $(this).text("隐藏中");

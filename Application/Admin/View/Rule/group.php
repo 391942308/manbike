@@ -87,7 +87,8 @@
                                     <td class=" ">{$vo.class} </td>
                                     <td class=" last">
                                         <a href="#">
-                                                | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Rule/delete_group',array('id'=>$vo['id']))}'">删除</a>
+                                             <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navProvince="{$vo['province']}" navCity="{$vo['city']}" navArea="{$vo['area']}" navClass="{$vo['class']}" onclick="edit(this)">修改</a>
+                                            | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Rule/delete_group',array('id'=>$vo['id']))}'">删除</a>
                                             | <a href="{:U('Admin/Rule/rule_group',array('id'=>$vo['id']))}">分配权限</a>
                                             | <a href="{:U('Admin/Rule/check_user',array('group_id'=>$vo['id']))}">添加成员</a>
                                             | <a href="{:U('Admin/Rule/check_block',array('group_id'=>$vo['id']))}">分配区块权限</a>

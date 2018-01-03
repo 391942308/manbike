@@ -7,7 +7,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-	<title>后台管理 | </title>
+	<title>{$title} | 共享单车智慧管理后台</title>
 
 	<!-- Bootstrap -->
 	<link href="__PUBLIC__/gentelella/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,10 +28,10 @@
 			<div class="left_col scroll-view">
 				<div class="navbar nav_title" style="border: 0;">
 					<a href="index.html" class="site_title">
-<!--						<i class="fa fa-bicycle"></i>-->
-<!--						<i class="fa fa-paw"></i>-->
-						<img src="__PUBLIC__/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 5px;"/>
-						<span style="font-size: smaller">共享单车泊位管理</span>
+<!--						<i class="fa fa-paw"></i> -->
+<img src="__PUBLIC__/images/bike_logo.png" style="width: 33px;margin-bottom: 5px;margin-left: 8px;"/>
+						<!--<img src="__PUBLIC__/images/bike_logo.png" style="width: 15%;margin-bottom: 5px"/>-->
+						<span style="font-size: smaller">共享单车智慧管理</span>
 					</a>
 				</div>
 
@@ -60,11 +60,11 @@
 									<ul class="nav child_menu">
 										<volist name="vo['_child']" id="voo">
 											<?php
-											if(strpos($voo['name'],'http')===0){
-												?><li><a href="{$voo.name}">{$voo.title}</a></li><?php
-											}else{
-												?><li><a href="{:U($voo['name'])}">{$voo.title}</a></li><?php
-											}
+												if(strpos($voo['name'],'http')===0){
+													?><li><a href="{$voo.name}">{$voo.title}</a></li><?php
+												}else{
+													?><li><a href="{:U($voo['name'])}">{$voo.title}</a></li><?php
+												}
 											?>
 										</volist>
 									</ul>
@@ -75,7 +75,7 @@
 				</div>
 				<!-- /sidebar menu -->
 
-				<!-- /menu footer buttons -->
+				<!-- /menu footer buttons 
 				<div class="sidebar-footer hidden-small">
 					<a data-toggle="tooltip" data-placement="top" title="Settings">
 						<span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
@@ -89,7 +89,7 @@
 					<a data-toggle="tooltip" data-placement="top" title="Logout" href="{:U('Login/logout')}">
 						<span class="glyphicon glyphicon-off" aria-hidden="true"></span>
 					</a>
-				</div>
+				</div>-->
 				<!-- /menu footer buttons -->
 			</div>
 		</div>
@@ -190,13 +190,14 @@
 		<!-- footer content -->
 		<footer>
 			<div class="pull-right">
-				共享单车泊位管理 powered by 云岛科技
+				互联网租赁自行车智慧管理系统 powered by <a href="#">杭州云岛科技有限公司</a>
 			</div>
 			<div class="clearfix"></div>
 		</footer>
 		<!-- /footer content -->
 	</div>
 </div>
+
 <!-- jQuery -->
 <script src="__PUBLIC__/gentelella/vendors/jquery/dist/jquery.min.js"></script>
 <!-- Bootstrap -->

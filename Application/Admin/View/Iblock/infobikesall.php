@@ -1,35 +1,89 @@
 <extend name="Public:left" />
 <block name="main">
-	<link href="__PUBLIC__/myjslib/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
-    <script src="https://cdn.bootcss.com/jquery/2.1.2/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/2.2.3/jquery.js"></script>
+	<script src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
     <!-- page content -->
+	
+	
+	<div class="row tile_count">
+            <div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-bicycle"></i> {$title}区块历史停放 </span>
+              <div class="count">{$all}</div>
+              <!--<span class="count_bottom"><i class="green">4% </i> </span>-->
+            </div>
+            <!--<div class="col-md-2 col-sm-4 col-xs-6 tile_stats_count">
+              <span class="count_top"><i class="fa fa-bicycle"></i> 所有停放车辆数 </span>
+              <div class="count">{$all}</div>
+              <span class="count_bottom"><i class="green"><i class="fa fa-sort-asc"></i>3% </i> From last Week</span>
+            </div>-->
+    </div>
+	<div id="main" style="width: 100%;height:500px;"></div>
+	<input id="iid" type="hidden" value="{$id}" />
+	<!--<span><a href="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikesall2/id/{$id}">查看详情列表</a></span>-->
+	<!--
+	<table class="table table-striped jambo_table bulk_action">
+                                    <thead>
+                                    <tr class="headings">
+										<th class="column-title">车辆名称</th>
+                                        <th class="column-title">车辆mac地址</th>
+                                        <th class="column-title">信号强度rssi</th>
+										<th class="column-title">最后采集到的时间</th>
+                                        <th class="column-title">采集到的次数</th>
+                                        <th class="column-title no-link last"><span class="nobr">操作</span>
+                                        </th>
+                                        <th class="bulk-actions" colspan="7">
+                                            <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
+                                        </th>
+                                    </tr>
+                                    </thead>
+
+                                    <tbody>
+									<volist name="arr_all" id="vo">
+                                    <tr class="even pointer">
+											<td class="a-center ">
+												<a href="#">{$vo.name}</a>
+                                            </td>
+                                            <td class="a-center ">
+												<a href="#">{$vo.mac}</a>
+                                            </td>
+											<td class="a-center ">
+												<a href="#">{$vo.rssi}</a>
+                                            </td>
+											<td class="a-center ">
+												<a href="#">{$vo.lasttime}</a>
+                                            </td>
+											<td class="a-center ">
+												<a href="#">{$vo.num}</a>
+                                            </td>
+                                            <td class="a-center ">
+												<a id="{$vo.mac}" class="xq" href="#">详情</a>
+                                            </td>
+											
+                                            
+                                    </tr>  
+									</volist>
+										</tbody>
+                                </table>-->
+	
+	
+        <!-- /page content -->
+	<!--
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>车位峰谷情况管理&nbsp;&nbsp;&nbsp; <small>	</small></h3>
-					
-					<div style="margin-bottom: 10px" class="input-group">
-                                <form method="post" action="/manbike0.3/index.php/Admin/Noparking/index">
-									<div class="input-group date form_datetime col-md-20" data-date-format="yyyy-mm-dd hh:mm:ss" data-link-field="dtp_input1">
-										<input name="start" id="start" class="form-control" size="16" type="text" placeholder="起始时间" value="{$start}" readonly>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-									</div>
-									<div class="input-group date form_datetime col-md-20" data-date-format="yyyy-mm-dd hh:mm:ss" data-link-field="dtp_input1">
-										<input name="end" id="end" class="form-control" size="16" type="text" placeholder="结束时间" value="{$end}" readonly>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-remove"></span></span>
-										<span class="input-group-addon"><span class="glyphicon glyphicon-th"></span></span>
-									</div>
-                                    <input type="hidden" class="form-control" style="width: 150px" name="id" value="{$id}" id="id">&nbsp;&nbsp;&nbsp;&nbsp;
-									<input type="submit" value="查询" class="btn btn-default">
-                                </form>
-					</div>
-					
+                    <h3>车位详情信息&nbsp;&nbsp;&nbsp; <small>车位列表</small></h3>
                 </div>
 
-                
-				
-				
+                <div class="title_right">
+                    <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="clearfix"></div>
@@ -42,22 +96,39 @@
 
                 <div class="col-md-12 col-sm-12 col-xs-12">
                     <div class="x_panel">
-					<!--<a id="jisuan" href="javascript:void(0);" type="button" class="btn btn-primary xx">七天闲置车辆筛选</a>-->
+                        <div class="x_title">
+                            <ul class="nav navbar-right panel_toolbox">
+                                <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                </li>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="#">Settings 1</a>
+                                        </li>
+                                        <li><a href="#">Settings 2</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                        </div>
 
                         <div class="x_content">
 
                             <p>
-<!--                                <a class="btn btn-primary" href="javascript:;" onclick="add()">添加车位</a>-->
+                                <a class="btn btn-primary" href="javascript:;" onclick="add()">添加车位</a>
                             </p>
-<!--                            <div style="margin-bottom: 10px" class="input-group">-->
-<!--                                <form method="get" action="{:U('Admin/Bparking/index')}">-->
-<!--                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位名称" name="title" value="{$title}" id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
-<!--                                    <input type="text" class="form-control" style="width: 150px" placeholder="可容纳车辆" name="usable_num" value="{$usable_num}" id="usable_num"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
-<!--                                    <input type="text" class="form-control" style="width: 150px" placeholder="已存储车辆" name="storage_num" value="{$storage_num}" id="storage_num"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
-<!--                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位编号" name="no" value="{$no}" id="no"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
-<!--                                    <input type="submit" value="查询" class="btn btn-default"/>-->
-<!--                                </form>-->
-<!--                            </div>-->
+                            <div style="margin-bottom: 10px" class="input-group">
+                                <form method="get" action="{:U('Admin/Bparking/index')}">
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位名称" name="title" value="{$title}" id="title"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="可容纳车辆" name="usable_num" value="{$usable_num}" id="usable_num"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="已存储车辆" name="storage_num" value="{$storage_num}" id="storage_num"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="车位编号" name="no" value="{$no}" id="no"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <input type="submit" value="查询" class="btn btn-default"/>
+                                </form>
+                            </div>
 
 
                             <div class="table-responsive">
@@ -67,12 +138,16 @@
                                         <th>
 
                                         </th>
-                                        <th class="column-title">编号 </th>
-                                        <th class="column-title">名称</th>
-                                        <th class="column-title">峰值</th>
-                                        <th class="column-title">谷值</th>
-                                        <th class="column-title">操作</th>
-                                        <!--<th class="column-title no-link last"><span class="nobr">操作</span>-->
+                                        <th class="column-title">ID </th>
+                                        <th class="column-title">车位名称 </th>
+                                        <th class="column-title">可容纳车辆 </th>
+                                        <th class="column-title">已存储车辆 </th>
+                                        <th class="column-title">溢出车辆数量 </th>
+                                        <th class="column-title">车位编号 </th>
+                                        <th class="column-title">区域编号 </th>
+                                        <th class="column-title">经度 </th>
+                                        <th class="column-title">纬度 </th>
+                                        <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
                                             <a class="antoo" style="color:#fff; font-weight:500;">Bulk Actions ( <span class="action-cnt"> </span> ) <i class="fa fa-chevron-down"></i></a>
@@ -81,19 +156,25 @@
                                     </thead>
 
                                     <tbody>
-                                    <volist name="infolist" id="vo">
+                                    <volist name="bparking_list" id="vo">
                                         <tr class="even pointer">
                                             <td class="a-center ">
 
                                             </td>
-                                            <td class=" ">{$vo.btitle}</td>
-                                            <td class=" ">{$vo.title}</td>
-                                            <td class=" ">{$vo.max}</td>
-                                            <td class=" ">{$vo.min}</td>
+                                            <td class=" ">{$vo.id}</td>
+                                            <td class=" ">{$vo.title} </td>
+                                            <td class=" ">{$vo.usable_num} </td>
+                                            <td class=" ">{$vo.storage_num} </td>
+                                            <td class=" ">{$vo.overflow_num} </td>
+                                            <td class=" ">{$vo.no} </td>
+                                            <td class="a-right a-right ">{$vo.block_no}</td>
+                                            <td class="a-right a-right ">{$vo.lng}</td>
+                                            <td class="a-right a-right ">{$vo.lat}</td>
                                             <td class=" last">
                                                 <a href="#">
-<!--                                                    <a href="{:U('Admin/Bparking/index',array('id'=>$vo['dwz_info_id'],'mac'=>$vo['mac']))}">删除</a>-->
-                                                    <a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/history/id/{$vo.id}">查看详情</a>
+                                                   <a href="javascript:;" navId="{$vo['id']}" navTitle="{$vo['title']}" navUsable_num="{$vo['usable_num']}" navStorage_num="{$vo['storage_num']}" navOverflow_num="{$vo['overflow_num']}" navNo="{$vo['no']}" navBlock_no="{$vo['block_no']}" navLng_Lat="{$vo['lng']},{$vo['lat']}" onclick="edit(this)">修改</a>
+                                                    | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Bparking/delete',array('id'=>$vo['id']))}'">删除</a>
+                                                    | <a id="{$vo['id']}" class="xiangqing" href="javascript:void(0);">详情</a>
                                                 </a>
                                             </td>
                                         </tr>
@@ -109,6 +190,7 @@
             </div>
             </div>
         </div>
+		-->
     <div class="modal fade" id="bjy-add" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
        <div class="modal-dialog">
             <div class="modal-content">
@@ -330,16 +412,16 @@
             var usable_num = $("#usable_num").val();
             var storage_num = $("#storage_num").val();
             var no = $("#no").val();
-            if(title !== ''){
+            if(title != ''){
                 href = href + '&title='+title;
             }
-            if(usable_num !== ''){
+            if(usable_num != ''){
                 href = href + '&usable_num='+usable_num;
             }
-            if(storage_num !== ''){
+            if(storage_num != ''){
                 href = href + '&storage_num='+storage_num;
             }
-            if(no !== ''){
+            if(no != ''){
                 href = href + '&no='+no;
             }
             //alert(href);
@@ -347,22 +429,78 @@
             return false;
         });
     </script>
+	
+	<script>
+	$(".xq").click(function(){
+		//alert(1);
+		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail";
+		var mac = $(this).attr("id");
+		//alert(mac);
+		//去后台获取数据
+		var iid = $("#iid").val();
+		url = url + '/id/'+iid+'/mac/'+mac;
+		//alert(iid);
+		location.href=url;
+	})
+	</script>
+	<script type="text/javascript">
+
+        // 基于准备好的dom，初始化echarts实例
+        var myChart = echarts.init(document.getElementById('main'));
+//var test = genData(50);
+        
+		var jstr1 = $.parseJSON('{$str1}');
+		var jstr2 = $.parseJSON('{$str2}');
+		var jstr3 = $.parseJSON('{$str3}');
+
+		option = {
+			title : {
+				text: '{$id}历史车位各个公司单车数量',
+				//subtext: '纯属虚构',
+				x:'left'
+			},
+			tooltip : {
+				trigger: 'item',
+				formatter: "{a} <br/>{b} : {c} ({d}%)"
+			},
+			color:jstr3,
+			legend: {
+				type: 'scroll',
+				orient: 'vertical',
+				right: 10,
+				top: 20,
+				bottom: 20,
+				data: jstr1
+			},
+			series : [
+				{
+					name: '车企',
+					type: 'pie',
+					radius : '55%',
+					center: ['40%', '50%'],
+					data: jstr2,
+					itemStyle: {
+						emphasis: {
+							shadowBlur: 10,
+							shadowOffsetX: 0,
+							shadowColor: 'rgba(0, 0, 0, 0.5)'
+						}
+					}
+				}
+			]
+		};
+
+
+        // 使用刚指定的配置项和数据显示图表。
+        myChart.setOption(option);
+    </script>
     <!-- /page content -->
 	
-	<script type="text/javascript" src="__PUBLIC__/myjslib/jquery/jquery-1.8.3.min.js" charset="UTF-8"></script>
-	<script type="text/javascript" src="__PUBLIC__/myjslib/bootstrap/js/bootstrap.min.js"></script>
-	<script type="text/javascript" src="__PUBLIC__/myjslib/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>
-	<script type="text/javascript" src="__PUBLIC__/myjslib/js/locales/bootstrap-datetimepicker.fr.js" charset="UTF-8"></script>
-	<script type="text/javascript">
-    $('.form_datetime').datetimepicker({
-        //language:  'fr',
-        weekStart: 1,
-        todayBtn:  1,
-		autoclose: 1,
-		todayHighlight: 1,
-		startView: 2,
-		forceParse: 0,
-        showMeridian: 1
-    });
+	<script>
+		function realtime(){
+			location.reload();
+			console.log("realtime");
+		}
+		//setInterval("realtime()",60000)
 	</script>
 </block>

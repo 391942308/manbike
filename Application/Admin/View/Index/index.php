@@ -66,7 +66,7 @@
 		var jstr1 = $.parseJSON('{$str1}');
 		var jstr2 = $.parseJSON('{$str2}');
 		var jstr3 = $.parseJSON('{$str_color}');
-
+console.log(jstr3);
 		option = {
 			title : {
 				text: '单车总量统计表',
@@ -118,6 +118,7 @@
 		var jstr11 = $.parseJSON('{$str11}');
 		var jstr22 = $.parseJSON('{$str22}');
 		var jstr33 = $.parseJSON('{$str_color33}');
+		console.log(jstr33);
 		bar(jstr11,jstr22,jstr33);
 		function bar(jstr11,jstr22,jstr33){
 			// 基于准备好的dom，初始化echarts实例
@@ -180,22 +181,22 @@
 	//ajax 获取到数据 ，然后显示
 		$("#day1").click(function(){
 			//alert("day1");
-			var url= 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Index/index'+'/day/1';
+			var url= 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Index/index'+'/day/1';
 			location.href=url;
 		})
 		$("#day3").click(function(){
 			//alert("day3");
-			var url= 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Index/index'+'/day/3';
+			var url= 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Index/index'+'/day/3';
 			location.href=url;
 		})
 		$("#day7").click(function(){
 			//alert("day7");
-			var url= 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Index/index'+'/day/7';
+			var url= 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Index/index'+'/day/7';
 			location.href=url;
 		})
 		$("#day30").click(function(){
 			//alert("day30");
-			var url= 'http://116.62.171.54:8080/manbike0.3/index.php/Admin/Index/index'+'/day/30';
+			var url= 'http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Index/index'+'/day/30';
 			location.href=url;
 		})
 	</script>
@@ -206,7 +207,7 @@
 		var id = $(this).attr("id");
 		var title=$(this).text();
 		//alert(id);
-		var url="http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id+"/company/"+title;
+		var url="http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bike/index"+"/name/"+id+"/company/"+title;
 		window.open(url);
 		
 		

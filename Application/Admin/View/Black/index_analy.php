@@ -5,10 +5,9 @@
         <div class="">
             <div class="page-title">
                 <div class="title_left">
-                    <h3>设备管理&nbsp;&nbsp;&nbsp; <small>设备列表</small></h3>
+                    <h3>黑名单分析结果&nbsp;&nbsp;&nbsp; <small>车辆列表</small></h3>
+					<span style="color:red;">黑名单分析程序在后台运行</span>
                 </div>
-
-          
             </div>
 
             <div class="clearfix"></div>
@@ -26,13 +25,14 @@
                         <div class="x_content">
 
                             <p>
-                                <a class="btn btn-primary" href="javascript:;" onclick="add()">添加设备</a>
+                                <!--<a class="btn btn-primary" href="javascript:;" onclick="add()" >黑名单分析结果</a>-->
                             </p>
                             <div style="margin-bottom: 10px" class="input-group">
-                                <form method="get" action="{:U('Admin/Device/index')}">
-                                    <input type="text" class="form-control" style="width: 150px" placeholder="类型" name="type" value="{$type}" id="type"/>&nbsp;&nbsp;&nbsp;&nbsp;
-                                    <input type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="{$mac}" id="mac"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <form method="get" action="{:U('Admin/Black/index')}">
+                                    <input type="text" class="form-control" style="width: 150px" placeholder="类型" name="name" value="{$name}" id="name"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <!--<input type="text" class="form-control" style="width: 150px" placeholder="mac地址" name="mac" value="{$mac}" id="mac"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
                                     <input type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="info_id" value="{$info_id}" id="info_id"/>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <!--<input type="text" class="form-control" style="width: 150px" placeholder="次数" name="cishu" value="{$cishu}" id="cishu"/>&nbsp;&nbsp;&nbsp;&nbsp;-->
                                     <input type="submit" value="查询" class="btn btn-default"/>
                                 </form>
                             </div>
@@ -46,12 +46,13 @@
 
                                         </th>
                                         <th class="column-title">ID </th>
-                                        <th class="column-title">时间 </th>
-                                        <th class="column-title">类型 </th>
-                                        <th class="column-title">mac地址 </th>
-                                        <th class="column-title">内存 </th>
-                                        <th class="column-title">负载 </th>
-                                        <th class="column-title">车位ID </th>
+                                        <th class="column-title">名称 </th>
+                                        <th class="column-title">mac编号</th>      
+										<th class="column-title">导入时间</th>										
+                                        <th class="column-title">导入车位编号 </th>
+                                        <th class="column-title">次数 </th>
+                                        <th class="column-title">最后车位编号 </th>
+										<th class="column-title">执行时间</th>
                                         <th class="column-title no-link last"><span class="nobr">操作</span>
                                         </th>
                                         <th class="bulk-actions" colspan="7">
@@ -67,17 +68,17 @@
 
                                             </td>
                                             <td class=" ">{$vo.id}</td>
-                                            <td class=" ">{$vo.timestamp} </td>
-                                            <td class=" ">{$vo.type} </td>
+                                            <td class=" ">{$vo.name} </td>
                                             <td class=" ">{$vo.mac} </td>
-                                            <td class=" ">{$vo.gatewayfree} </td>
-                                            <td class=" ">{$vo.gatewayload} </td>
-                                            <td class="a-right a-right ">{$vo.info_id}</td>
+											<td class="a-right a-right ">{$vo.time|date='Y-m-d H:m:s',###}</td>
+                                            <td class=" ">{$vo.dwz_info_id} </td>
+                                            <td class=" ">{$vo.times} </td>
+                                            <td class=" ">{$vo.last_dwz_info_id} </td>
+											<td class="a-right a-right ">{$vo.analy_time|date='Y-m-d H:m:s',###}</td>
                                             <td class=" last">
-                                                <a href="#">
-                                                   <a href="javascript:;" navId="{$vo['id']}" navTimestamp="{$vo['timestamp']}" navType="{$vo['type']}" navMac="{$vo['mac']}" navGatewayfree="{$vo['gatewayfree']}" navGatewayload="{$vo['gatewayload']}" navInfoid="{$vo['info_id']}" onclick="edit(this)">修改</a>
-                                                    | <a href="javascript:if(confirm('确定删除？'))location='{:U('Admin/Device/delete',array('id'=>$vo['id']))}'">删除</a>
-                                                </a>
+                                                <a href="{:U('Admin/Black/detail',array('mac'=>$vo['mac']))}">
+                                                详情
+												</a>
                                             </td>
                                         </tr>
                                     </volist>
@@ -98,41 +99,11 @@
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;
                     </button>
-                    <h4 class="modal-title" id="myModalLabel"> 添加设备</h4>
+                    <h4 class="modal-title" id="myModalLabel"> 黑名单分析</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="bjy-form" class="form-inline" action="{:U('Admin/Device/add')}" method="post">
-                        <table class="table table-striped table-bordered table-hover table-condensed">
-                            <tr>
-                                <th width="20%">时间：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="timestamp">
-                                </td>
-                            </tr>
-                           <tr>
-                                <th>类型：</th>
-                               <td>
-                                    <input class="input-medium" type="text" name="type">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>mac地址：</th>
-                                <td>
-                                   <input class="input-medium" type="text" name="mac">
-                               </td>
-                            </tr>
-                            <tr>
-                                <th>内存：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="gatewayFree">
-                                </td>
-                            </tr>
-                           <tr>
-                                <th>负载：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="gatewayLoad">
-                                </td>
-                            </tr>
+                    <form id="bjy-form" class="form-inline" action="{:U('Admin/Black/analy')}" method="post">
+                        <table class="table table-striped table-bordered table-hover table-condensed">                            
                             <tr>
                                 <th>车位ID：</th>
                                 <td>
@@ -142,7 +113,7 @@
                             <tr>
                                 <th></th>
                                <td>
-                                    <input class="btn btn-success" type="submit" value="添加">
+                                    <input class="btn btn-success" type="submit" value="导入">
                                 </td>
                         </table>
                     </form>
@@ -155,42 +126,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"> &times;</button>
-                    <h4 class="modal-title" id="myModalLabel"> 修改设备</h4>
+                    <h4 class="modal-title" id="myModalLabel"> 删除车辆黑名单</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="bjy-form" class="form-inline" action="{:U('Admin/Device/edit')}" method="post">
+                    <form id="bjy-form" class="form-inline" action="{:U('Admin/Black/edit')}" method="post">
                         <input type="hidden" name="id">
                         <table class="table table-striped table-bordered table-hover table-condensed">
-                            <tr>
-                                <th width="20%">时间：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="timestamp">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>类型：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="type">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>mac地址：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="mac">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>内存：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="gatewayFree">
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>负载：</th>
-                                <td>
-                                    <input class="input-medium" type="text" name="gatewayLoad">
-                                </td>
-                            </tr>
                             <tr>
                                 <th>车位ID：</th>
                                 <td>
@@ -200,7 +141,7 @@
                             <tr>
                                 <th></th>
                                 <td>
-                                    <input class="btn btn-success" type="submit" value="修改">
+                                    <input class="btn btn-success" type="submit" value="删除">
                                 </td>
                             </tr>
                         </table>
@@ -244,15 +185,15 @@
         $("#datatable_paginate a").click(function(){
             var href = $(this).attr("href");
             // $(this).attr("href","#");
-            var type = $("#type").val();
-            var mac = $("#mac").val();
+            var name = $("#name").val();
+            //var mac = $("#mac").val();
             var info_id = $("#info_id").val();
-            if(type !== ''){
-                href = href + '&type='+type;
+            if(name !== ''){
+                href = href + '&name='+name;
             }
-            if(mac !== ''){
+            /*if(mac !== ''){
                 href = href + '&mac='+mac;
-            }
+            }*/
             if(info_id !== ''){
                 href = href + '&info_id='+info_id;
             }

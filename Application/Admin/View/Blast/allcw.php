@@ -50,7 +50,7 @@
                         </div>
 
                         <div class="x_content">
-<!--
+
                             <p><a class="btn btn-primary" href="javascript:;" onclick="add()">添加车辆信息</a></p>
                             <div style="margin-bottom: 10px" class="input-group">
                                 <form method="GET" action="{:U('Admin/Bike/index')}">
@@ -59,7 +59,7 @@
                                     <input id="dwz_info_id" type="text" class="form-control" style="width: 150px" placeholder="车位ID" name="dwz_info_id" value="{$dwz_info_id}"/>
                                     <input type="submit" value="查询" class="btn btn-default"/>
                                 </form>
-                            </div>-->
+                            </div>
                             <div class="table-responsive">
                                 <table class="table table-striped jambo_table bulk_action">
                                     <thead>
@@ -208,18 +208,108 @@
             </div>
         </div>
     </div>
-       
-    
+        <script type="text/javascript">
+            // 传递给B页面
+            document.getElementById('aButton').onclick = function () {
+                var aValue = document.getElementById('aInput').value;
+                art.dialog.data('aValue', aValue);// 存储数据
+
+                var path = art.dialog.data('homeDemoPath') || './';//
+
+                art.dialog.open(path + 'iframeB.html?fd', {
+                    id: 'AAA',
+                    width:500,
+                    left:900,
+                    close: function () {
+                        var bValue = art.dialog.data('bValue');// 读取B页面的数据
+                        if (bValue !== undefined) document.getElementById('aInput').value = bValue;
+                    }
+                }, false);
+            };
+            // 传递给B页面
+            document.getElementById('aButton2').onclick = function () {
+                var aValue = document.getElementById('aInput2').value;
+                art.dialog.data('aValue', aValue);// 存储数据
+
+                var path = art.dialog.data('homeDemoPath') || './';//
+
+                art.dialog.open(path + 'iframeB.html?fd', {
+                    id: 'AAA',
+                    width:500,
+                    left:900,
+                    close: function () {
+                        var bValue = art.dialog.data('bValue');// 读取B页面的数据
+                        if (bValue !== undefined) document.getElementById('aInput2').value = bValue;
+                    }
+                }, false);
+            };
+        // 添加菜单
+        function add(){
+            $("input[name='title'],input[name='mca']").val('');
+            $("input[name='pid']").val(0);
+            $('#bjy-add').modal('show');
+        }
+        // 添加子菜单
+        function add_child(obj){
+            var navId=$(obj).attr('navId');
+            $("input[name='pid']").val(navId);
+            $("input[name='title']").val('');
+            $("input[name='name']").val('');
+            $("input[name='icon']").val('');
+            $('#bjy-add').modal('show');
+        }
+
+        // 修改菜单
+            //navName="{$vo['name']}" navMac="{$vo['mac']}" navRssi="{$vo['rssi']}" navInfoid="{$vo['dwz_info_id']}" navLng_Lat="{$vo['lng']},{$vo['lat']}"
+        function edit(obj){
+            var navName=$(obj).attr('navName');
+            var navMac=$(obj).attr('navMac');
+            var navRssi=$(obj).attr('navRssi');
+            var navInfoid=$(obj).attr('navInfoid');
+            var navLng_Lat=$(obj).attr('navLng_Lat');
+            $("input[name='name']").val(navName);
+            $("input[name='mac']").val(navMac);
+            $("input[name='rssi']").val(navRssi);
+            $("input[name='dwz_info_id']").val(navInfoid);
+            $("input[name='lng_lat']").val(navLng_Lat);
+            $('#bjy-edit').modal('show');
+        }
+    </script>
+    <script>
+        $("#datatable_paginate a").click(function(){
+            var href = $(this).attr("href");
+           // $(this).attr("href","#");
+
+            var name = $("#name").val();
+            var mac = $("#mac").val();
+            var dwz_info_id = $("#dwz_info_id").val();
+            //alert(href);
+            //alert(name);
+            //alert(mac);
+            //alert(dwz_info_id);
+            if(name != ''){
+                href = href + '&name='+name;
+            }
+            if(mac != ''){
+                href = href + '&mac='+mac;
+            }
+            if(dwz_info_id != ''){
+                href = href + '&dwz_info_id='+dwz_info_id;
+            }
+            //alert(href);
+            window.location.href=href;
+            return false;
+        });
+    </script>
     <!-- /page content -->
 	<script>
 	$(".xq").click(function(){
-		var mac = '{$mac}';
-		var iid = $(this).attr("id");
-		//alert(mac);
-		//alert(iid);
-		var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bparking/infobikedetail";
-		url=url + '/id/'+iid+'/mac/'+mac;
+		//alert();
+		/*var url = "http://116.62.171.54:8080/manbike0.3/index.php/Admin/Bike/allcw";
+		var mac = $(this).attr("id");
+		//var iid = '{$iid}';
+		url=url + '/mac/'+mac;
 		location.href=url;
-	})
+	})*/
 	</script>
 </block>

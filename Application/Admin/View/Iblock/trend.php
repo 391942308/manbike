@@ -9,10 +9,10 @@
     <!-- page content -->
 	
 	<div class="row tile_count">
-    <h1>P{$id}总量变化趋势图</h1>
+    <h1>{$b.title}总量变化趋势图</h1>
     </div>
 	
-	<div style="margin-bottom: 10px" class="input-group">
+	<!--<div style="margin-bottom: 10px" class="input-group">
                                 <form method="post" action="/manbike0.3/index.php/Admin/Bparking/history">
 									<div class="input-group date form_datetime col-md-20" data-date-format="yyyy-mm-dd hh:mm:ss" data-link-field="dtp_input1">
 										<input name="start1" id="start1" class="form-control" size="16" type="text" placeholder="起始时间" value="{$start}" readonly>
@@ -27,7 +27,7 @@
                                     <input type="hidden" class="form-control" style="width: 150px" name="id" value="{$id}" id="id">&nbsp;&nbsp;&nbsp;&nbsp;
 									<input type="submit" value="查询" class="btn btn-default">
                                 </form>
-    </div>
+    </div>-->
 	
 	<div id="main" style="width: 100%;height:500px;"></div>
 	
@@ -217,8 +217,7 @@
 					showAllSymbol: true,
 					symbolSize: 1,
 					data: jstr1,
-					
-					markPoint : {
+								markPoint : {
 									data : [
 										{type : 'max', name: '最大值'},
 										{type : 'min', name: '最小值'}
@@ -229,7 +228,6 @@
 										{type : 'average', name: '平均值'}
 									]
 								}
-					
 					//itemStyle : { normal: {label : {show: true}}},
 				}
 			]

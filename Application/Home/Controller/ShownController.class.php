@@ -1,52 +1,8 @@
 <?php
 namespace Home\Controller;
 use Think\Controller;
-class ShowController extends Controller {
-    //首页
-	public function index(){
-		
-		$province='浙江省';
-        $city='杭州市';
-		
-        $list_area = M("info")->distinct(true)->field('area')->select();
-		
-		//var_dump($list_area);
-		$arr_area = array();
-		$arr_area_num = array();
-		foreach($list_area as $k=>$v){
-			//var_dump($v['area']);
-			$area = $v['area'];
-			$arr_area[]=$area;
-			//echo $area;
-			$res = $this->getbikes_pca($province,$city,$area);
-			//var_dump($res);
-			$arr_area_num[$area]=$res['hits']['total'];
-		}
-		//var_dump($arr_area);
-		//var_dump($arr_area_num);
-		
-        $str_area = json_encode($arr_area);
-        $str_area_num = json_encode($arr_area_num);
-		
-		$this->assign('str_area',$str_area);
-		$this->assign('str_area_num',$str_area_num);
-		
-		$list= $this->last_20_item(0);
-
-		//var_dump($list);
-		//$str_bikes = json_encode($list);
-		//$this->assign('str_bikes',$str_bikes);
-		$pic_mobike = "/manbike0.3/Public/images/mobike.jpg";
-		$pic_ofo = "/manbike0.3/Public/images/ofo.jpg";
-		$pic_kq = "/manbike0.3/Public/images/kq.jpeg";
-		$pic_hello = "/manbike0.3/Public/images/hello.jpg";
-		$pic_xm = "/manbike0.3/Public/images/xm.jpg";
-		
-		$this->assign('list',$list);
-		
-		
-		$this->display();
-    }
+class ShownController extends Controller {
+    
 	public function getlnglat(){
 		$id = $_REQUEST['id'];
 		//echo $id;
@@ -57,6 +13,7 @@ class ShowController extends Controller {
 		$res = M("info")->where(array('id'=>$id))->field("id,lng,lat")->find();
 		exit(json_encode(array('error_code'=>0,'error_reason'=>'正确','res'=>$res)));
 	}
+	
 	public function login(){
 		
 		if(IS_POST){
@@ -82,7 +39,7 @@ class ShowController extends Controller {
 				session_start();
 				session('is_login',$now_admin);
 				session('auth',$now_admin);
-				$this->success('登陆成功',"http://116.62.171.54:8080/manbike0.3/index.php/Home/Show/demo");
+				$this->success('登陆成功',"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/map");
 				//exit('1');
 			}else{
 				$this->error("登陆失败");
@@ -97,83 +54,10 @@ class ShowController extends Controller {
 		//echo "logout";
 		unset($_SESSION['is_login']);
 		//var_dump($_SESSION);
-		$this->success('退出成功！', U('/Home/Show/login'));
+		$this->success('退出成功！', U('/Home/Shown/login'));
 	}
 	
-	//首页
-	public function demo(){
-		
-		//$url = "http://116.62.171.54:8080/manbike0.3/index.php/Home/Shown/map";
-	//	header("Location:$url");
-		//exit;
-		if($_SESSION['is_login'] == null){
-			$this->error('请登录后访问', U('/Home/Show/login'));
-		}
-		//echo $_SESSION['is_login']['username'];
-		$this->assign('username',$_SESSION['is_login']['username']);
-		
-		
-		$redis = new \Redis();
-		$redis->connect('127.0.0.1', 6379);
-		
-		$province='浙江省';
-        $city='杭州市';
-		
-        $list_area = M("info")->distinct(true)->field('area')->select();
-		
-		//var_dump($list_area);
-		$arr_area = array();
-		$arr_area_num = array();
-		foreach($list_area as $k=>$v){
-			//var_dump($v['area']);
-			$area = $v['area'];
-			$arr_area[]=$area;
-			//echo $area;
-			$res = $this->getbikes_pca($province,$city,$area);
-			//var_dump($res);
-			$arr_area_num[$area]=$res['hits']['total'];
-		}
-		//var_dump($arr_area);
-		//var_dump($arr_area_num);
-		
-        $str_area = json_encode($arr_area);
-        $str_area_num = json_encode($arr_area_num);
-		
-		$this->assign('str_area',$str_area);
-		$this->assign('str_area_num',$str_area_num);
-		
-		$list= $this->last_20_item(0);
-
-		/*foreach($list as $k=>$v){
-			//echo $v['name'];
-			if($v['name'] == 'mobike'){
-				$list[$k]['name']='老人'.rand(1,1000);
-				$list[$k]['company']='老人';
-			}
-			
-			if($this->startwith($v['name'],'CoolQi')){
-				$list[$k]['name']='宠物'.rand(1,1000);
-				$list[$k]['company']='宠物';
-			}
-		}*/
-		//默认坐标
-		$lat = '30.276691';
-		$lon = '120.059071';
-		if($list != null){
-			$lat = $list[0]['location']['lat'];
-			$lon = $list[0]['location']['lon'];
-		}
-		$this->assign('dlat',$lat);
-		$this->assign('dlon',$lon);
-		//var_dump($list[0]['location']['lon']);
-		//var_dump($list[0]['location']['lat']);
-		//var_dump($list[0].location.lon);
-		//var_dump($list);
-		//$str_bikes = json_encode($list);
-		//$this->assign('str_bikes',$str_bikes);
-		
-		$this->assign('list',$list);
-		
+	public function ajax_heatmap(){
 		//热力图数据
 		$list = M("info")->select();
 		$arr =array();
@@ -188,12 +72,891 @@ class ShowController extends Controller {
 			//echo $v['id'];
 			$this->setalive($v['id']);
 		}
-		//var_dump($arr);
-		$json_str = json_encode($arr);
-		$this->assign('json_str',$json_str);
+		exit(json_encode($arr));
 		
+	}
+	
+	//首页
+	public function map(){
+		if($_SESSION['is_login'] == null){
+			$this->error('请登录后访问', U('/Home/Shown/login'));
+		}
+		$this->assign('username',$_SESSION['is_login']['username']);
 		$this->display();
     }
+	
+	//获取区级别的
+	public function ajax_area(){
+		$province='浙江省';
+        $city='杭州市';
+		$list_area = M("info")->distinct(true)->field('area')->select();
+		$arr_area = array();
+		$arr_area_num = array();
+		foreach($list_area as $k=>$v){
+			//var_dump($v['area']);
+			$area = $v['area'];
+			$arr_area[]=$area;
+			//echo $area;
+			$res = $this->getbikes_ids($province,$city,$area);
+			//var_dump($res);
+			$arr_area_num[$area]=$res['hits']['total'];
+		}
+		///var_dump($arr_area_num);
+		exit(json_encode(array('error_code'=>0,'error_reason'=>'获取成功','info'=>$arr_area_num)));
+	}
+	
+	//获取网格级别的
+	public function ajax_block(){
+		$list = M("info_block")->select();
+		//var_dump($list);
+		//循环获取到相关的数据
+		foreach($list as $k=>$v){
+			//echo $v['content'];
+			$arr = explode('|',$v['content']);
+			//获取其中的一个经纬度，然后将他作为这个区块的经纬度
+			$id=$arr[0];
+			$map['id']=array('eq',$arr[0]);
+			$item = M("info")->where($map)->find();
+			$list[$k]['lat']=$item['lat'];
+			$list[$k]['lng']=$item['lng'];
+			//$list[$k]['block']=$this->realtime($v['id']);
+			$list[$k]['block']=$this->realtime_new($v['id']);
+		}
+		//var_dump($list);
+		exit(json_encode(array('error_code'=>0,'error_msg'=>'获取成功','info'=>$list)));
+	}
+	public function ajax_block_show(){
+		$title = $_REQUEST['title'];
+		if($title == ''){
+			$this->error('参数不正确');
+		}
+		$map['title']=array('eq',$title);
+		//$map['lng']=array('eq',$lng);
+		$block = M("info_block")->where($map)->find();
+		$id = $block['id'];
+		$pie = $this->block_pie($id);
+		//var_dump($pie);
+		$trend = $this->block_trend_new($id);
+		//var_dump($trend);
+		exit(json_encode(array('id'=>$title,'pie'=>$pie,'trend'=>$trend)));
+	}
+	public function ajax_info_show(){
+		$id = $_REQUEST['id'];
+		if($id == ''){
+			$this->error('参数不正确');
+		}
+		$id = str_replace("P","",$id);
+		//$info = M("info")->where(array('id'=>$id))->find();
+		//var_dump($info);
+		//$id = $block['id'];
+		$pie = $this->info_pie($id);
+		//var_dump($pie);
+		$trend = $this->info_trend($id);
+		//var_dump($trend);
+		exit(json_encode(array('id'=>'P'.$id,'pie'=>$pie,'trend'=>$trend)));
+	}
+	public function block_pie_record(){
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		$time=time();
+		//echo $time;
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		$list = M("info_block")->select();
+		var_dump($list[0]);
+		foreach($list as $k=>$v){
+			//var_dump();
+			$id = $v['id'];
+			//var_dump($id);
+			$res =$this->block_pie_total_num($id);
+			//var_dump($res);	
+			$redis->lpush("blockhis20:$id",$time.'_'.$res);
+			$data['bid']=$id;
+			$data['time']=$time;
+			$data['res']=$res;
+			M("block_history")->add($data);
+			
+			if($redis->llen("blockhis20:$id")>2000){
+				$redis->rpop("blockhis20:$id");
+			}
+			
+		}
+		
+	}
+	//获取网格的饼图和历史信息
+	private function block_pie_total_num($id){
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		$map['id']=array('eq',$id);
+		$res = M("info_block")->where($map)->find();
+		$this->assign('title',$res['title']);
+		//var_dump($res['content']);
+		$arr = explode('|',$res['content']);
+		//var_dump($arr);
+		//获取在3分钟内的最后一条！！！
+		$arr_mac=array();
+		foreach($arr as $k=>$v){
+			//每一个车位的查看下 ，然后如果是已经过期了 ，那么就设置为0
+			//$redis->hset('dwz_info:'.$v, 'storage_num',$storage_num);
+			
+			/*$arr_exist = $this->getbikes_exist_es2($v);
+			$arr_exist2 = $arr_exist["hits"]["hits"][0]["_source"]["bikes"];
+			//echo $arr_exist2;
+			$arr_exist3 = json_decode($arr_exist2,true);
+			//var_dump($arr_exist3);
+			$mac = array_column($arr_exist3,'mac');*/
+			
+			if($redis->ttl("infobikesexist:$v")==-2){
+				$redis->hset('dwz_info:'.$v, 'level',-2);
+				$redis->hset('dwz_info:'.$v, 'storage_num',0);
+			}
+			//这边获取mac直接从redis获取，redis那边设置过期时间为2分钟
+			$mac = $redis->smembers("infobikesexist:$v");
+			
+			if(is_array($mac)){
+				$arr_mac = array_merge($arr_mac,$mac);	
+			}
+			
+			//$arr_bikes[]=$arr_exist3;
+			//var_dump($arr_exist2);
+		}
+		
+		$arr_mac = array_unique($arr_mac);
+		//$num = sizeof($arr_mac);
+		
+		
+		$bike = array();
+		foreach($arr_mac as $k=>$v){
+			$exist_list3[$k]['name']= $redis->get('bikes:'.$v);
+			$exist_list3[$k]['mac']= $v;
+		}
+		
+		
+		$arr =array();
+		$bike_company=M("bike_company")->select();
+		foreach($bike_company as $k=>$v){
+			$arr[$v['title']]=explode('|',$v['keyword']);
+		}
+		foreach($exist_list3 as $k=>$v){
+			$flag = 'no';
+			$name = $v['name'];
+			foreach($arr as $kk=>$vv){
+				foreach($vv as $kkk=>$vvv){
+					if($this->startwith($name,$vvv)){
+						$bike_names[]=$kk;
+						$flag = 'yes';
+					}
+				}
+			}
+			/*if($flag=='no'){
+				$bike_names[]='其他';
+			}*/
+		}
+		$num = sizeof($bike_names);
+		
+		return $num;
+	}
+	
+	public function showx(){
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		
+		//$vv=5923;
+		//echo $redis->ttl("infobikesexist:$vv");
+		
+		//$redis->hset('dwz_info:'.$vv, 'level',-2);
+		//$redis->hset('dwz_info:'.$vv, 'storage_num',0);
+		//$redis->expire("infobikesexist:".$vv,60*5);
+		exit;
+		//当过期时间为-1和-2的时候都不处理
+		$blist = M("info_block")->select();
+		foreach($blist as $k=>$v){
+			$arr = explode('|',$v['content']);
+			foreach($arr as $kk=>$vv){
+				//echo $vv;
+				echo "<br />";
+				echo $redis->ttl("infobikesexist:$vv");
+				//$redis->expire("infobikesexist:".$vv,60*5);
+			}
+		}
+		
+		exit;
+		//循环设置下过期时间，然后如果没有了，那么就基本上就是应该设置为0了
+		$v=$_REQUEST['id'];
+		echo $v;
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		
+		$mac = $redis->smembers("infobikesexist:$v");
+		echo $redis->ttl("infobikesexist:$v");
+		var_dump($mac);
+		//$redis->delete("infobikesexist:$v");
+		//$redis->hset('dwz_info:'.$v, 'level',-2);
+		//$redis->hset('dwz_info:'.$v, 'storage_num',0);
+		//var_dump($mac);*/
+		//$list = M("info")->select();
+		//var_dump($list);
+		//foreach($list as $k=>$v){
+			//$redis->expire("infobikesexist:".$v['id'],60*5);
+			//echo $redis->ttl("infobikesexist:".$v['id']);
+		//	exit;
+		//}
+	}	
+	
+	//获取网格的饼图和历史信息
+	private function block_pie($id){
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		$map['id']=array('eq',$id);
+		$res = M("info_block")->where($map)->find();
+		$this->assign('title',$res['title']);
+		//var_dump($res['content']);
+		$arr = explode('|',$res['content']);
+		//var_dump($arr);
+		//获取在3分钟内的最后一条！！！
+		$arr_mac=array();
+		foreach($arr as $k=>$v){
+			$arr_exist = $this->getbikes_exist_es2($v);
+			$arr_exist2 = $arr_exist["hits"]["hits"][0]["_source"]["bikes"];
+			//echo $arr_exist2;
+			$arr_exist3 = json_decode($arr_exist2,true);
+			//var_dump($arr_exist3);
+			$mac = array_column($arr_exist3,'mac');
+			if(is_array($mac)){
+				$arr_mac = array_merge($arr_mac,$mac);	
+			}
+			
+			//$arr_bikes[]=$arr_exist3;
+			//var_dump($arr_exist2);
+		}
+		
+		$arr_mac = array_unique($arr_mac);
+		//var_dump($arr_mac);
+		$bike = array();
+		foreach($arr_mac as $k=>$v){
+			$exist_list3[$k]['name']= $redis->get('bikes:'.$v);
+			$exist_list3[$k]['mac']= $v;
+		}
+		
+		
+		$arr =array();
+		$bike_company=M("bike_company")->select();
+		foreach($bike_company as $k=>$v){
+			$arr[$v['title']]=explode('|',$v['keyword']);
+		}
+		foreach($exist_list3 as $k=>$v){
+			$flag = 'no';
+			$name = $v['name'];
+			foreach($arr as $kk=>$vv){
+				foreach($vv as $kkk=>$vvv){
+					if($this->startwith($name,$vvv)){
+						$bike_names[]=$kk;
+						$flag = 'yes';
+					}
+				}
+			}
+			/*if($flag=='no'){
+				$bike_names[]='其他';
+			}*/
+		}
+
+		$arr1 = $bnames = array_unique($bike_names);
+		$bn = array_count_values($bike_names);
+		$i=0;
+		foreach($bn as $k=>$v){
+			$arr2[$i]['name']=$k.'('.$v.')';
+			$arr2[$i]['value']=$v;
+			foreach($bike_company as $kk=>$vv){
+				if($vv['title']==$k){
+					$arr2[$i]['color']=$vv['color'];
+				}
+			}
+			$i++;
+		}
+		return $arr2;
+		//var_dump($arr2);
+		//exit;
+	}
+	
+	public function block_trend_new_p(){
+		$id = $_REQUEST['id'];
+		//$rrr = $this->block_trend_new($id);
+		//var_dump($rrr);
+		$rrr = $this->realtime_new($id);
+		var_dump($rrr);
+	}
+	
+	private function realtime_new($id){
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		$one = $redis->lrange("blockhis20:$id","0","0");
+		if($one==null){
+			return 0;
+		}else{
+			$arr = explode('_',$one[0]);
+			return $arr[1];	
+		}
+		
+	}
+	
+	private function block_trend_new($id){
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		
+		$list = $redis->lrange("blockhis20:$id","0","20");
+		$list = array_reverse($list);
+		//var_dump($list);
+		$nnarr = array();
+		
+		foreach($list as $k=>$v){
+			$arr = explode('_',$v);
+			$nnarr[$k][0]=date('Y-m-d H:i:s', $arr[0]);
+			$nnarr[$k][1]=$arr[1];
+			$nnarr[$k][2]=$arr[1];
+		}
+		return $nnarr;
+	}
+	
+	private function block_trend($id){
+		$end=time();
+		$start = $end-60*20;
+		$start = $start*1000;
+		$end = $end*1000;
+		$map['id']=array('eq',$id);
+		$res = M("info_block")->where($map)->find();
+		$arr = explode('|',$res['content']);
+		foreach($arr as $k=>$v){
+			$arr[$k]='dwz_info_id:'.$v;
+		}
+		$query = implode(" ",$arr);
+
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		$hosts = [
+				'http://116.62.171.54:8081',         // IP + Port
+		];
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+		//echo $query;
+		$json ='{
+				  "size": 20,
+				  "aggs": {
+					"2": {
+					  "date_histogram": {
+						"field": "timestamp",
+						"interval": "1m",
+						"time_zone": "Asia/Shanghai",
+						"min_doc_count": 1
+					  },
+					  "aggs": {
+						"1": {
+						  "sum": {
+							"field": "storage_num"
+						  }
+						}
+					  }
+					}
+				  },
+				  "version": true,
+				  "query": {
+					"bool": {
+					  "must": [
+						{
+						  "query_string": {
+							"query": "'.$query.'",
+							"analyze_wildcard": true
+						  }
+						},
+						{
+						  "match_phrase": {
+							"_type": {
+							  "query": "dbs_realtime"
+							}
+						  }
+						},
+						{
+						  "range": {
+							"timestamp": {
+							  "gte": '.$start.',
+							  "lte": '.$end.',
+							  "format": "epoch_millis"
+							}
+						  }
+						}
+					  ],
+					  "must_not": []
+					}
+				  }
+				}';
+		$params = [
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
+				'body' => $json
+		];
+
+		$results = $client->search($params);
+		//var_dump($results['aggregations'][2]['buckets']);
+		
+		$nnarr = array();
+		$res = $results['aggregations'][2]['buckets'];
+		//var_dump($res);
+		
+		foreach($res as $k=>$v){
+			//var_dump($v['1']);
+			//exit;
+			$nnarr[$k][0]=date('Y-m-d H:i:s', $v['key']/1000);
+			$nnarr[$k][1]=$v['1']['value'];
+			$nnarr[$k][2]=$v['1']['value'];
+			
+		}
+		//var_dump($nnarr);
+		return $nnarr;
+	}
+	
+	private function info_pie($id){
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		//获取到最后的那个id
+		$exist = $redis->scard("infobikesexist:$id");
+		$exist_list = $redis->smembers("infobikesexist:$id");
+		$arr =array();
+		foreach($exist_list as $k=>$v){
+			$mac = str_replace(':','-',$v);
+			$arr_exist[$k]['name']=$redis->get('bikes:'.$mac);
+			$arr_exist[$k]['mac']=$v;
+		}
+		
+		//var_dump($bikes);
+		$bike_company=M("bike_company")->select();
+		foreach($bike_company as $k=>$v){
+			//var_dump($v);
+			$arr[$v['title']]=explode('|',$v['keyword']);
+		}
+		
+		foreach($arr_exist as $k=>$v){
+			$flag = 'no';
+			$name = $v['name'];
+			foreach($arr as $kk=>$vv){
+				foreach($vv as $kkk=>$vvv){
+					if($this->startwith($name,$vvv)){
+						$bike_names[]=$kk;
+						$flag = 'yes';			
+					}
+				}
+			}
+			
+			/*if($flag=='no'){
+				$bike_names[]='其他';
+			}*/
+		}
+		
+		$bn = array_count_values($bike_names);
+		$len = sizeof($bn);
+		$i=0;
+		foreach($bn as $k=>$v){
+			$arr2[$i]['name']=$k.'('.$v.')';
+			$arr2[$i]['value']=$v;
+			foreach($bike_company as $kk=>$vv){
+				if($vv['title']==$k){
+					$arr2[$i]['color']=$vv['color'];
+				}
+			}
+			$i++;
+		}
+		return $arr2;
+    }
+	
+	
+	
+	private function info_trend($id){
+		
+		$end=time();
+		$start = $end-60*20;
+		$start = $start*1000;
+		$end = $end*1000;
+		
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		$hosts = [
+				'http://116.62.171.54:8081',         // IP + Port
+		];
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		
+		
+		$json='{
+				  "version": true,
+				  "size": 20,
+				  "sort": [
+					{
+					  "timestamp": {
+						"order": "desc",
+						"unmapped_type": "boolean"
+					  }
+					}
+				  ],
+				  "query": {
+					"bool": {
+					  "must": [
+						{
+						  "query_string": {
+							"query": "dwz_info_id:'.$id.'",
+							"analyze_wildcard": true
+						  }
+						},
+						{
+						  "match_phrase": {
+							"_type": {
+							  "query": "dbs_realtime"
+							}
+						  }
+						},
+						{
+						  "range": {
+							"timestamp": {
+							  "gte": '.$start.',
+							  "lte": '.$end.',
+							  "format": "epoch_millis"
+							}
+						  }
+						}
+					  ],
+					  "must_not": []
+					}
+				  }
+				}';
+			$params = [
+					'index' => 'bike_index_v6',
+					'type' => 'dbs_realtime',
+					'body' => $json
+			];
+
+			$results = $client->search($params);
+			$nnarr = array();
+			foreach($results['hits']['hits'] as $k=>$v){
+				$nnarr[$k][0]=date('Y-m-d H:i:s', $v['_source']['ts']);
+				$nnarr[$k][1]=$v['_source']['storage_num'];
+				$nnarr[$k][2]=$v['_source']['storage_num'];
+			}
+			$nnarr = array_reverse($nnarr);
+			return $nnarr;
+	}
+	
+	
+	//获取车位级别的
+	public function ajax_info(){
+		$lng = trim($_REQUEST['lng']);
+		$lat = trim($_REQUEST['lat']);
+		//$lng = '120.18046';
+		//$lat = '30.184333';
+		
+		if(isset($lng) && isset($lat)){
+			$model= D('info');
+			
+			$top = Array();
+			
+			$where_sql = "";
+			
+			//雷达图要置顶， 地图显示不用置顶
+			if(!isset($_GET['ismap'])){
+				//置顶3条
+				$sql = " SELECT 
+					id,
+					title, 
+					longurl,
+					tinyurl,
+					scenetype,
+					sceneicon,
+					lng,
+					lat,
+					beizhu,
+					usable_num,
+					storage_num,
+					level
+				 FROM 
+					dwz_info a 
+				 WHERE
+					a.istop=1 
+					and a.type=1
+					and a.type=1 and a.show_type=1 and a.status=0
+				 LIMIT 30
+				";
+				$top = $model->query($sql);
+				
+				
+				
+			//地图有可能会搜索关键字和分类
+			}else{
+				$keyword = $_GET['keyword'];
+				
+				if(!empty($keyword)){
+					//$keyword = base64_decode($keyword);
+					$where_sql = $where_sql . " and a.title like '%$keyword%' ";
+				}
+				
+				$scenetype = $_GET['scenetype'];
+				if(!empty($scenetype)){
+					$where_sql = $where_sql . " and a.scenetype = '$scenetype' ";
+				}
+			}
+			
+			//距离最近的7条
+			$sql = " SELECT 
+						id,
+						title, 
+						longurl,
+						tinyurl,
+						scenetype,
+						sceneicon,
+						lng,
+						lat,
+						(POWER(MOD(ABS(a.lng - $lng),360),2) + POWER(ABS(a.lat - $lat),2)) AS distance,
+						beizhu,
+						usable_num,
+						storage_num,
+						level
+					 FROM 
+						dwz_info a 
+					   WHERE
+						a.type=1
+						and a.type=1 and a.show_type=1
+						and a.lng is not null and a.lat is not null and a.lng <> '' and a.lat <> '' and a.status=0
+					 " . $where_sql ."
+					 ORDER BY
+						distance
+					 LIMIT 30
+					 ";
+			$tmpData = $model->query($sql);
+			
+			$data = Array();
+			$map = Array();	
+		
+			
+			
+			for($idx=0; $idx<count($tmpData); $idx++){
+				//地图显示30条
+				if(isset($_GET['lng']) && isset($_GET['lat'])){
+					if(count($data) >= 30){
+						break;
+					}
+				}else{
+					if(count($data) >= 30){
+						break;
+					}					
+				}
+				
+				$val = $tmpData[$idx];
+				$title = $val['title'];
+				if(!isset($map[$title])){
+					$map[$title] = $val;
+					$val['longurl'] = "http://url.97farm.com/" . $val['tinyurl'];
+					$data[] = $val;
+				}
+			}
+		}
+		
+		
+		header("Content-type: application/json;");
+		if($error != null && $status == 0){
+			$status = 1;
+		}
+		
+		$result = Array(
+			"status"=>$status,
+			"error"=>$error,
+			"data" => $data
+		);
+		
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		
+		$list = array();
+		foreach($data as $k=>$v){
+			$item['id'] = $redis->hget('dwz_info:'.$v['id'], 'id');
+			$item['lng'] = $redis->hget('dwz_info:'.$v['id'], 'lng');
+			$item['lat'] = $redis->hget('dwz_info:'.$v['id'], 'lat');
+			$item['usable_num'] = $redis->hget('dwz_info:'.$v['id'], 'usable_num');
+			$item['storage_num'] = $redis->hget('dwz_info:'.$v['id'], 'storage_num');
+			$item['level'] = $redis->hget('dwz_info:'.$v['id'], 'level');
+			$list[]=$item;
+		}
+		
+		echo json_encode($list);
+	}
+	
+	
+	//获取最新的那个数量
+	private function realtime($id){
+		
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		
+		if($id == ''){
+			$this->error('参数不正确');
+		}
+		$map['id']=array('eq',$id);
+		$res = M("info_block")->where($map)->find();
+		$this->assign('title',$res['title']);
+		//var_dump($res['content']);
+		$arr = explode('|',$res['content']);
+		//var_dump($arr);
+		//获取在3分钟内的最后一条！！！
+		$arr_mac=array();
+		foreach($arr as $k=>$v){
+			$arr_exist = $this->getbikes_exist_es2($v);
+			$arr_exist2 = $arr_exist["hits"]["hits"][0]["_source"]["bikes"];
+			//echo $arr_exist2;
+			$arr_exist3 = json_decode($arr_exist2,true);
+			//var_dump($arr_exist3);
+			$mac = array_column($arr_exist3,'mac');
+			if(is_array($mac)){
+				$arr_mac = array_merge($arr_mac,$mac);	
+			}
+			
+			//$arr_bikes[]=$arr_exist3;
+			//var_dump($arr_exist2);
+		}
+		
+		$arr_mac = array_unique($arr_mac);
+		//var_dump($arr_mac);
+		$bike = array();
+		foreach($arr_mac as $k=>$v){
+			$exist_list3[$k]['name']= $redis->get('bikes:'.$v);
+			$exist_list3[$k]['mac']= $v;
+		}
+		
+		
+		$arr =array();
+		$bike_company=M("bike_company")->select();
+		foreach($bike_company as $k=>$v){
+			$arr[$v['title']]=explode('|',$v['keyword']);
+		}
+		foreach($exist_list3 as $k=>$v){
+			$flag = 'no';
+			$name = $v['name'];
+			foreach($arr as $kk=>$vv){
+				foreach($vv as $kkk=>$vvv){
+					if($this->startwith($name,$vvv)){
+						$bike_names[]=$kk;
+						$flag = 'yes';
+					}
+				}
+			}
+			if($flag=='no'){
+				$bike_names[]='其他';
+			}
+		}
+
+		$arr1 = $bnames = array_unique($bike_names);
+		$bn = array_count_values($bike_names);
+		$i=0;
+		foreach($bn as $k=>$v){
+			$arr2[$i]['name']=$k.'('.$v.')';
+			$arr2[$i]['value']=$v;
+			$i++;
+		}
+		
+		//var_dump($arr2);
+		if($arr2 == NULL){
+			return 0;
+		}
+		
+		$str1 = json_encode($arr1);
+		$str2 = json_encode($arr2);
+		//var_dump($str1);
+		//var_dump($str2);
+		$this->assign('str1',$str1);
+		$this->assign('str2',$str2);
+		$exist = 0;
+		foreach($arr2 as $k=>$v){
+			$exist +=$v['value'];
+		}
+		//$this->assign('exist',$exist);
+		return $exist;
+		//$this->display();
+	}
+	
+	
+	//根据车位编号和mac地址获取采集到的次数
+	private function getbikes_exist_es2($dwz_info_id){
+		//最后3分钟
+		$end = time();
+		$start = $end - 60*10;
+		$end = $end*1000 ;
+		$start = $start*1000 ;
+		
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		$hosts = [
+				'http://116.62.171.54:8081',         // IP + Port
+		];
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es某mac地址在某车位上被采集到的次数
+		$json = '{
+  "version": true,
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match_all": {}
+        },
+        {
+          "match_phrase": {
+            "_type": {
+              "query": "dbs_realtime"
+            }
+          }
+        },
+        {
+          "match_phrase": {
+            "_index": {
+              "query": "bike_index_v6"
+            }
+          }
+        },
+        {
+          "match_phrase": {
+            "dwz_info_id": {
+              "query": "'.$dwz_info_id.'"
+            }
+          }
+        },
+        {
+          "range": {
+            "timestamp": {
+              "gte": '.$start.',
+              "lte": '.$end.',
+              "format": "epoch_millis"
+            }
+          }
+        }
+      ],
+      "must_not": []
+    }
+  },
+  "size": 1,
+  "sort": [
+    {
+      "ts": {
+        "order": "desc",
+        "unmapped_type": "boolean"
+      }
+    }
+  ],
+  "_source": {
+    "excludes": []
+  }
+}';
+		$params = [
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime',
+				'body' => $json
+		];
+
+		$results = $client->search($params);
+		return $results;
+	}
+
+	
 	
 	//根据是否存活，设置level
 	private function setalive($id){
@@ -380,7 +1143,7 @@ class ShowController extends Controller {
 		
 	}
 	
-	public function last_20_item_p(){
+	/*public function last_20_item_p(){
 		$res = $this->last_20_item(0);
 		$list = $res['hits']['hits'];
 		var_dump($list);
@@ -492,9 +1255,9 @@ class ShowController extends Controller {
 		}
 		//var_dump($list);
 		return $list;
-	}
+	}*/
 	//根据mac 或名称获取到经纬度 然后显示
-	public function ajax_getitem(){
+	/*public function ajax_getitem(){
 		
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
@@ -591,8 +1354,8 @@ class ShowController extends Controller {
 				exit(json_encode(array('error_code'=>1,'error_reason'=>'不存在')));
 			}		
 			
-	}
-	
+	}*/
+	/*
 	public function get_by_center(){
 		$left_bottom_lng = $_REQUEST['left_bottom_lng'];
 		$left_bottom_lat = $_REQUEST['left_bottom_lat'];
@@ -687,7 +1450,7 @@ class ShowController extends Controller {
 		foreach($results['hits']['hits'] as $k=>$v){
 			$list[] = $v['_source'];
 		}
-		/*foreach($list as $k=>$v){
+		foreach($list as $k=>$v){
 			//echo $v['name'];
 			if($v['name'] == 'mobike'){
 				$list[$k]['name']='老人'.rand(1,1000);
@@ -698,60 +1461,14 @@ class ShowController extends Controller {
 				$list[$k]['name']='宠物'.rand(1,1000);
 				$list[$k]['company']='宠物';
 			}
-		}*/
+		}
 		//var_dump($list);
 		exit(json_encode(array('error_code'=>0,'error_reason'=>'成功','list'=>$list)));
 			//$ts = $results['hits']['hits'][0]['_source']['ts'];
 			//var_dump($results);
 			//var_dump($ts);
 		//return $results;
-	}
-	
-	public function test(){
-		$bikes='[{"bind":10,"mac":"FB01D36D8447","name":"mobike","rssi":-79},{"bind":10,"mac":"C37B483E3AED","name":"mobike","rssi":-70},{"bind":10,"mac":"D809CFC50618","name":"mb_GAbFzwnY","rssi":-65},{"bind":10,"mac":"E2D9A1F1D2C4","name":"mobike","rssi":-76},{"bind":10,"mac":"F57B77379335","name":"mb_NZM3d3v1","rssi":-63},{"bind":10,"mac":"CE993F8658B5","name":"67A0518","rssi":-80},{"bind":10,"mac":"C8E947BDED47","name":"67C2757","rssi":-79},{"bind":10,"mac":"D7EE512FCE73","name":"mb_c84vUe7X","rssi":-73},{"bind":10,"mac":"E3CA580737CC","name":"67A1898","rssi":-85},{"bind":10,"mac":"EC0E1EDC5BCD","name":"mobike","rssi":-76},{"bind":10,"mac":"CE3A64289156","name":"mb_VpEoZDrO","rssi":-68},{"bind":10,"mac":"E70259F6D572","name":"mb_ctX2WQLn","rssi":-49},{"bind":10,"mac":"CFB4AB7F1301","name":"mobike","rssi":-64},{"bind":10,"mac":"E95DA9017230","name":"ofo","rssi":-76},{"bind":10,"mac":"D97A04CCD584","name":"mb_hNXMBHrZ","rssi":-69},{"bind":10,"mac":"D0D3F6137BDB","name":"mobike","rssi":-81},{"bind":10,"mac":"E39FA2F1F44D","name":"67A1796","rssi":-79},{"bind":10,"mac":"CE9C43AE60BB","name":"mb_u2CuQ5zO","rssi":-77},{"bind":10,"mac":"C14F04667CED","name":"mobike","rssi":-71},{"bind":10,"mac":"EF803E9719D4","name":"mb_1BmXPoDv","rssi":-68},{"bind":10,"mac":"C12418365DAF","name":"ofo","rssi":-75},{"bind":10,"mac":"D436396AF3E1","name":"CoolQi","rssi":-80},{"bind":10,"mac":"D2667A8CACD2","name":"","rssi":-67},{"bind":10,"mac":"C63E9C95AA80","name":"mobike","rssi":-82},{"bind":10,"mac":"FBE86CBF6722","name":"67A1943","rssi":-74},{"bind":10,"mac":"C3DADB98361B","name":"mobike","rssi":-77},{"bind":10,"mac":"C7E13362FF70","name":"mobike","rssi":-71},{"bind":10,"mac":"EFF0C016B3DE","name":"ofo","rssi":-81},{"bind":10,"mac":"DB75F0A7C5AF","name":"mb_r8Wn8HXb","rssi":-68},{"bind":10,"mac":"F227FBC70EAF","name":"mobike","rssi":-71},{"bind":10,"mac":"74BAB6AEB9C0","name":"","rssi":-80},{"bind":10,"mac":"E6D33A776685","name":"mb_hWZ3OtPm","rssi":-62},{"bind":10,"mac":"C2794EA09592","name":"mb_kpWgTnnC","rssi":-67},{"bind":10,"mac":"E9975B98906A","name":"ofo","rssi":-75},{"bind":10,"mac":"DDCC85BD2261","name":"","rssi":-70},{"bind":10,"mac":"FDED10E73576","name":"mb_djXnEO39","rssi":-81},{"bind":10,"mac":"C1663D3B8D9E","name":"mobike","rssi":-77},{"bind":10,"mac":"FE9BF6F81FAC","name":"mb_rB\/49pv+","rssi":-80},{"bind":10,"mac":"AC233F205F5D","name":"","rssi":-77},{"bind":10,"mac":"E79F44E0730B","name":"mobike","rssi":-69},{"bind":10,"mac":"EBFBD90A9065","name":"6740012","rssi":-78},{"bind":10,"mac":"DA1230E3705D","name":"mobike","rssi":-71},{"bind":10,"mac":"DFB59B681423","name":"mb_IxRom7Xf","rssi":-71},{"bind":10,"mac":"EE047FFEC953","name":"mobike","rssi":-74},{"bind":10,"mac":"D7C901DF23F7","name":"mobike","rssi":-68},{"bind":10,"mac":"C2DEA3B093EC","name":"mobike","rssi":-76},{"bind":10,"mac":"E235DF852585","name":"mobike","rssi":-78},{"bind":10,"mac":"D6ACD7CF229C","name":"mobike","rssi":-69},{"bind":10,"mac":"C0085F372C53","name":"mobike","rssi":-79},{"bind":10,"mac":"DD4E48A34866","name":"mb_ZkijSE7d","rssi":-64},{"bind":10,"mac":"DDED4CD2E3AE","name":"67A1450","rssi":-81},{"bind":10,"mac":"DB7954D7267A","name":"mb_eibXVHnb","rssi":-80},{"bind":10,"mac":"E3DC117BFCC2","name":"mobike","rssi":-76},{"bind":10,"mac":"D3B9E880F560","name":"mobike","rssi":-76},{"bind":10,"mac":"C3ECE55C7041","name":"mb_QXBc5ezD","rssi":-76},{"bind":10,"mac":"50F14A4250F7","name":"XIAOMING","rssi":-68},{"bind":10,"mac":"D86287A360AC","name":"mobike","rssi":-66},{"bind":10,"mac":"C5C57722800E","name":"mobike","rssi":-79},{"bind":10,"mac":"F29C054EA904","name":"mobike","rssi":-66},{"bind":10,"mac":"EDEAF1B9AE67","name":"mobike","rssi":-73},{"bind":10,"mac":"E0BBE970589A","name":"mb_mlhw6bvg","rssi":-50},{"bind":10,"mac":"D432FFA91BD8","name":"mobike","rssi":-68},{"bind":10,"mac":"DA8E4D2D8FD0","name":"mobike","rssi":-68},{"bind":10,"mac":"D9236F98BAB2","name":"mobike","rssi":-76},{"bind":10,"mac":"CE91AFBD52CD","name":"6740295","rssi":-72},{"bind":10,"mac":"CF428A5A79E8","name":"ofo","rssi":-82},{"bind":10,"mac":"DD203F94B4A6","name":"mobike","rssi":-75},{"bind":10,"mac":"E95D3EAD8C1B","name":"mobike","rssi":-76},{"bind":10,"mac":"DFF99BFDA750","name":"mb_UKf9m\/nf","rssi":-68},{"bind":10,"mac":"C1C3BC8A497A","name":"mb_ekmKvMPB","rssi":-69},{"bind":10,"mac":"CB148A6D7F92","name":"mobike","rssi":-70},{"bind":10,"mac":"F3164BD2AF38","name":"mb_OK\/SSxbz","rssi":-63},{"bind":10,"mac":"CD2ED9AB716D","name":"mobike","rssi":-70},{"bind":10,"mac":"F668ED71DA6B","name":"mb_a9px7Wj2","rssi":-76},{"bind":10,"mac":"C610BC9994B6","name":"mobike","rssi":-74},{"bind":10,"mac":"D90F50CFA1E7","name":"mobike","rssi":-79},{"bind":10,"mac":"F696914CA143","name":"mobike","rssi":-61},{"bind":10,"mac":"FCD10964AFC5","name":"mb_xa9kCdH8","rssi":-79},{"bind":10,"mac":"F2EC07CC3FFE","name":"","rssi":-80},{"bind":10,"mac":"C5C48A551584","name":"mb_hBVVisTF","rssi":-74},{"bind":10,"mac":"50338B1238B5","name":"BL-3","rssi":-75},{"bind":10,"mac":"E21537CDE435","name":"mb_NeTNNxXi","rssi":-65},{"bind":10,"mac":"E1E42B5D6432","name":"mobike","rssi":-67},{"bind":10,"mac":"C68E5ED426DD","name":"mobike","rssi":-70},{"bind":10,"mac":"C867B984E040","name":"mb_QOCEuWfI","rssi":-80},{"bind":10,"mac":"FBCE124CAC4E","name":"mobike","rssi":-75},{"bind":10,"mac":"DE29F973A59C","name":"mobike","rssi":-67},{"bind":10,"mac":"C640257AE621","name":"mobike","rssi":-80},{"bind":10,"mac":"E6AB8EBF1F3D","name":"","rssi":-65},{"bind":10,"mac":"EBE8042CA2BF","name":"ofo","rssi":-72},{"bind":10,"mac":"E13F3FABCB48","name":"mobike","rssi":-66},{"bind":10,"mac":"CB966285FBD9","name":"mb_2fuFYpbL","rssi":-81},{"bind":10,"mac":"C6457E7B390A","name":"mb_Cjl7fkXG","rssi":-76},{"bind":10,"mac":"D9C605E65F3B","name":"mb_O1\/mBcbZ","rssi":-74},{"bind":10,"mac":"C435C791DA94","name":"mobike","rssi":-68},{"bind":10,"mac":"E4DB47AD322D","name":"mobike","rssi":-67},{"bind":10,"mac":"F07605F12916","name":"mb_FinxBXbw","rssi":-67},{"bind":10,"mac":"FC88C2DB09D9","name":"mb_2Qnbwoj8","rssi":-79},{"bind":10,"mac":"DA5087ECCBB9","name":"mb_ucvsh1Da","rssi":-63},{"bind":10,"mac":"FA85C117B46B","name":"mobike","rssi":-76},{"bind":10,"mac":"F253C47AB86C","name":"mobike","rssi":-69},{"bind":10,"mac":"9C1D5816FE70","name":"BL-2A","rssi":-76},{"bind":10,"mac":"F686B31AA9DC","name":"mobike","rssi":-61},{"bind":10,"mac":"FF38BB4DBBB2","name":"mobike","rssi":-76},{"bind":10,"mac":"C00FAC87180A","name":"mb_ChiHrA\/A","rssi":-78},{"bind":10,"mac":"C74AEAF35295","name":"mb_lVLz6krH","rssi":-74},{"bind":10,"mac":"FB2D35B43DA4","name":"mobike","rssi":-79},{"bind":10,"mac":"F16A5B458FC5","name":"mobike","rssi":-65},{"bind":10,"mac":"6299233461EF","name":"","rssi":-78},{"bind":10,"mac":"A0E6F8013404","name":"ISE000","rssi":-70},{"bind":10,"mac":"D1541D611FFC","name":"mobike","rssi":-62},{"bind":10,"mac":"C8FD1994CEFE","name":"XIAOMING","rssi":-72},{"bind":10,"mac":"FA0B6F10CD5C","name":"\u5409\u5229\u4e1c\u7ad9","rssi":-70},{"bind":10,"mac":"D8E8C78EE75B","name":"mobike","rssi":-70},{"bind":10,"mac":"AC233F205F72","name":"BrtBeacon505","rssi":-69},{"bind":10,"mac":"E1B6490DDBB9","name":"mobike","rssi":-44},{"bind":10,"mac":"C16A070DC9DC","name":"6740293","rssi":-80},{"bind":10,"mac":"DDA5791CAB80","name":"ofo","rssi":-76},{"bind":10,"mac":"F273F4026CF0","name":"67B3438","rssi":-79},{"bind":10,"mac":"F5396DC5F613","name":"mb_E\/bFbTn1","rssi":-68},{"bind":10,"mac":"CFE6FD7CAF0A","name":"mb_Cq98\/ebP","rssi":-78},{"bind":10,"mac":"FE175232E40A","name":"mobike","rssi":-75},{"bind":10,"mac":"EF3E728BE2DC","name":"mb_3OKLcj7v","rssi":-75},{"bind":10,"mac":"EC783828FCE0","name":"67A1792","rssi":-78},{"bind":10,"mac":"E3B9580B3336","name":"ofo_adv_tes","rssi":-81},{"bind":10,"mac":"C94D4A2867C2","name":"mobike","rssi":-67},{"bind":10,"mac":"CBE19386DAFB","name":"mb_+9qGk+HL","rssi":-69},{"bind":10,"mac":"FE12D2D25548","name":"mb_SFXS0hL+","rssi":-69},{"bind":10,"mac":"F8E2E5E42C7E","name":"mobike","rssi":-66},{"bind":10,"mac":"EC18B0843ED7","name":"mb_1z6EsBjs","rssi":-73},{"bind":10,"mac":"C5D061455EBF","name":"67A1436","rssi":-82}]';
-		$num = $this->cal_nums($bikes);
-		var_dump($num);
-	}
-	
-	private function cal_nums($bikes){
-		$redis = new \Redis();
-		$redis->connect('127.0.0.1', 6379);
-		
-		$exist_list = json_decode($bikes,true);
-		$arr =array();
-		foreach($exist_list as $k=>$v){
-			//$mac = str_replace(':','-',$v);
-			$mac=$v['mac'];
-			$arr_exist[$k]['name']=$redis->get('bikes:'.$mac);
-			$arr_exist[$k]['mac']=$v['mac'];
-		}
-		
-		//var_dump($bikes);
-		$bike_company=M("bike_company")->select();
-		foreach($bike_company as $k=>$v){
-			//var_dump($v);
-			$arr[$v['title']]=explode('|',$v['keyword']);
-		}
-		
-		foreach($arr_exist as $k=>$v){
-			$flag = 'no';
-			$name = $v['name'];
-			foreach($arr as $kk=>$vv){
-				foreach($vv as $kkk=>$vvv){
-					if($this->startwith($name,$vvv)){
-						$bike_names[]=$kk;
-						$flag = 'yes';			
-					}
-				}
-			}
-			
-			/*if($flag=='no'){
-				$bike_names[]='其他';
-			}*/
-		}
-		$num = sizeof($bike_names);
-		return $num;
-	}
+	}*/
 	
 	public function heatmap(){
 		//获取每个车位的一个数量
@@ -809,7 +1526,7 @@ class ShowController extends Controller {
 						{
 						  "match_phrase": {
 							"_type": {
-							  "query": "dwz_bike_sub_realtime_last"
+							  "query": "dbs_realtime_last"
 							}
 						  }
 						}
@@ -820,19 +1537,14 @@ class ShowController extends Controller {
 		}';
 
 			$params = [
-				'index' => 'bike_index_v5',
-				'type' => 'dwz_bike_sub_realtime_last',
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
 				'body' => $json
 			];
 
 			$results = $client->search($params);
 			
 			return $results['hits']['total'];
-			var_dump($results['hits']['total']);
-			//$ts = $results['hits']['hits'][0]['_source']['ts'];
-			//var_dump($results);
-			//var_dump($ts);
-			return $results;
 	}
 	
 	
@@ -917,6 +1629,91 @@ class ShowController extends Controller {
 					}
 				  }
 				}';
+
+			$params = [
+				'index' => 'bike_index_v6',
+				'type' => 'dbs_realtime_last',
+				'body' => $json
+			];
+
+			$results = $client->search($params);
+			//$ts = $results['hits']['hits'][0]['_source']['ts'];
+			//var_dump($results);
+			//var_dump($ts);
+			return $results;
+	}
+	
+	//根据省市区获取到对应的id  然后使用id
+	private function getbikes_ids($province='',$city='',$area=''){
+		//$province = '浙江省';
+		//$city = '杭州市';
+		//$area = '滨江区';
+		
+		//根据省市区获取到ids 字符串 ，然后查es 获取到数量
+		if($province!='') $map['province']=array('eq',$province);
+		if($city!='') $map['city']=array('eq',$city);
+		if($area!='') $map['area']=array('eq',$area);
+		$list = M("info")->where($map)->select();
+		//var_dump($list);
+		$arr_ids = array();
+		foreach($list as $k=>$v){
+			$arr_ids[]='dwz_info_id:'.$v['id'];
+		}
+		$ids = implode(" ",$arr_ids);
+		//var_dump($ids);
+		//exit;
+		
+		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
+		require $lpath;
+		//$hosts = [
+		//'dododo.shop:9200',         // IP + Port
+		//];
+		
+		$hosts = [
+		'116.62.171.54:8081',         // IP + Port
+		];
+		
+		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+		//获取es最后更新的时间,在更新的时候使用
+		
+		$json = '{
+			  "size": 0,
+			  "query": {
+				"bool": {
+				  "must": [
+					{
+					  "query_string": {
+						"analyze_wildcard": true,
+						"query": "'.$ids.'"
+					  }
+					}
+				  ],
+				  "must_not": [
+					{
+					  "match_phrase": {
+						"company": {
+						  "query": "其他"
+						}
+					  }
+					}
+				  ]
+				}
+			  },
+			  "_source": {
+				"excludes": []
+			  },
+			  "aggs": {
+				"3": {
+				  "terms": {
+					"field": "company",
+					"size": 20,
+					"order": {
+					  "_count": "desc"
+					}
+				  }
+				}
+			  }
+			}';
 
 			$params = [
 				'index' => 'bike_index_v6',
@@ -1176,9 +1973,7 @@ class ShowController extends Controller {
 		echo sizeof($res);
 		var_dump($res);
 	}
-	private function get_from_realtime($id){
-		
-	}
+
 	
 	public function history_list(){
 		$redis = new \Redis();

@@ -4,7 +4,7 @@ use Think\Controller;
 class IndexController extends Controller {
     //首页
 	public function index(){
-		$url = "http://116.62.171.54:8080/manbike0.3/index.php/Home/Show/demo";
+		$url = "http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/map";
 		header("Location:$url");
         $this->display();
     }
@@ -188,11 +188,11 @@ class IndexController extends Controller {
 			for($idx=0; $idx<count($tmpData); $idx++){
 				//地图显示30条
 				if(isset($_GET['lng']) && isset($_GET['lat'])){
-					if(count($data) >= 30){
+					if(count($data) >= 35){
 						break;
 					}
 				}else{
-					if(count($data) >= 30){
+					if(count($data) >= 35){
 						break;
 					}					
 				}
@@ -254,18 +254,21 @@ class IndexController extends Controller {
 		$iid = $data['dwz_info_id']=$dwz_info_id=$_POST['dwz_info_id'];
 		//$data['time']=$time=$_POST['time'];
 		$data['time']=$time=time();
-		$data['storage_num']=$storage_num=$_POST['nums'];
+		//$data['storage_num']=$storage_num=$_POST['nums'];
 		$data['backup']=$backup=$_POST['backup'];
 		$data['bikes']=$bikes=$_POST['bikes'];
+		$data['storage_num']=$storage_num=$this->cal_nums($bikes);
 		
 		if($dwz_info_id=='' || $time=='' || $storage_num=='' ||$bikes==''){
-			exit(json_encode(array('error_code'=>1,'reason'=>'参数不正确','result'=>'')));
+			exit(json_encode(array('error_code'=>1,'reason'=>'未发现有效车辆','result'=>'')));
 		}
 		//流水插入到数据库
-		M("bike_sub_realtime")->add($data);
+		$bsrid = M("bike_sub_realtime")->add($data);
 		
 		$redis = new \Redis();
 		$redis->connect('127.0.0.1', 6379);
+		
+		$redis->lpush("bsrid",$bsrid);
 		
 		$redis->set('lasttime:'.$iid,$time);
 		
@@ -274,8 +277,8 @@ class IndexController extends Controller {
 		//
 		$arr = json_decode($bikes);
 		$map_bike['dwz_info_id']=array('eq',$dwz_info_id);
-		$data['status']=0;
-		M("bike")->where($map_bike)->save($data);
+		//$data_bike['status']=0;
+		//M("bike")->where($map_bike)->save($data);
 		foreach($arr as $k => $v){
 			$mac = str_replace(':','-',$v->mac);
 			$flag = $redis->exists('bikes:'.$mac);
@@ -290,19 +293,19 @@ class IndexController extends Controller {
 			//插入到redis bike:$mac dwz_info_id
 			//var_dump($v);
 			//$dwz_info_id = 5820;
-			$data['bind']=$v->bind;
+			$data_bike['bind']=$v->bind;
 			if($v->mac == null or $v->mac == ''){
-				$data['mac']=' ';	
+				$data_bike['mac']=' ';	
 			}else{
-				$data['mac']=$v->mac;
+				$data_bike['mac']=$v->mac;
 			}
-			$data['name']=$v->name;
-			$data['rssi']=$v->rssi;
-			$data['dwz_info_id']=$dwz_info_id;
-			$data['lng']=$lng;
-			$data['lat']=$lat;
-			$data['time']=time();
-			$data['status']=1;
+			$data_bike['name']=$v->name;
+			$data_bike['rssi']=$v->rssi;
+			$data_bike['dwz_info_id']=$dwz_info_id;
+			$data_bike['lng']=$lng;
+			$data_bike['lat']=$lat;
+			$data_bike['time']=time();
+			$data_bike['status']=1;
 			//M("bike")->add($data,$options=array(),$replace=true);
 			$map['mac']=array('eq',$v->mac);
 			
@@ -310,9 +313,9 @@ class IndexController extends Controller {
 			if($item!=null){
 				//车在了  名称在了 就不需要更新
 				if($v->name !='' and $v->name !=null)
-					M("bike")->add($data,$options=array(),$replace=true);
+					M("bike")->add($data_bike,$options=array(),$replace=true);
 			}else{
-				M("bike")->add($data,$options=array(),$replace=true);
+				M("bike")->add($data_bike,$options=array(),$replace=true);
 			}
 		}
 		//车位信息更新
@@ -344,11 +347,12 @@ class IndexController extends Controller {
 			$mac = str_replace(':','-',$v->mac);
 			//$redis->sadd("infobikes:".$iid,$v->mac);	
 			$redis->sadd("infobikesexist:".$iid,$v->mac);	//当前的车辆
-			$redis->sadd("infobike:$iid:".$mac,$time); //车辆在某个车位采集到的所以时间
-			$redis->expire("infobike:$iid:".$mac,60*60*24*3);
+			//$redis->sadd("infobike:$iid:".$mac,$time); //车辆在某个车位采集到的所以时间	
+			//$redis->expire("infobike:$iid:".$mac,60*60*24*3);
 			$redis->incr("caijicishu:$dwz_info_id:".$mac);		//车辆在某个车位采集到的次数
 			//$redis->sadd("bikeinfo:".$mac,$iid);	
 		}
+		$redis->expire("infobikesexist:".$iid,60*5);	//有效时间5分钟
 		
 		////////////////////////////////////
 
@@ -358,6 +362,7 @@ class IndexController extends Controller {
 		$la = $redis->hget('dwz_info:'.$dwz_info_id, 'la');
 		$lb = $redis->hget('dwz_info:'.$dwz_info_id, 'lb');
 		$lc = $redis->hget('dwz_info:'.$dwz_info_id, 'lc');
+		
 		
 		$redis->hset('dwz_info:'.$dwz_info_id, 'storage_num',$storage_num);
 
@@ -419,7 +424,7 @@ class IndexController extends Controller {
 		//file_get_contents("http://116.62.171.54:8083/?method=sub_realtime");
 		$url = "http://116.62.171.54:8083/?method=sub_realtime";
 		
-		$this->getws($message);
+		//$this->getws($message);
 		
 		exit(json_encode(array('error_code'=>0,'reason'=>'提交成功','result'=>'')));
 		
@@ -435,6 +440,60 @@ class IndexController extends Controller {
 		//echo "real";
 		//echo json_encode(array('xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44','xm_11-aa-33-44'));
 	}
+	
+	public function test(){
+		$bikes='[{"bind":10,"mac":"FB01D36D8447","name":"mobike","rssi":-79},{"bind":10,"mac":"C37B483E3AED","name":"mobike","rssi":-70},{"bind":10,"mac":"D809CFC50618","name":"mb_GAbFzwnY","rssi":-65},{"bind":10,"mac":"E2D9A1F1D2C4","name":"mobike","rssi":-76},{"bind":10,"mac":"F57B77379335","name":"mb_NZM3d3v1","rssi":-63},{"bind":10,"mac":"CE993F8658B5","name":"67A0518","rssi":-80},{"bind":10,"mac":"C8E947BDED47","name":"67C2757","rssi":-79},{"bind":10,"mac":"D7EE512FCE73","name":"mb_c84vUe7X","rssi":-73},{"bind":10,"mac":"E3CA580737CC","name":"67A1898","rssi":-85},{"bind":10,"mac":"EC0E1EDC5BCD","name":"mobike","rssi":-76},{"bind":10,"mac":"CE3A64289156","name":"mb_VpEoZDrO","rssi":-68},{"bind":10,"mac":"E70259F6D572","name":"mb_ctX2WQLn","rssi":-49},{"bind":10,"mac":"CFB4AB7F1301","name":"mobike","rssi":-64},{"bind":10,"mac":"E95DA9017230","name":"ofo","rssi":-76},{"bind":10,"mac":"D97A04CCD584","name":"mb_hNXMBHrZ","rssi":-69},{"bind":10,"mac":"D0D3F6137BDB","name":"mobike","rssi":-81},{"bind":10,"mac":"E39FA2F1F44D","name":"67A1796","rssi":-79},{"bind":10,"mac":"CE9C43AE60BB","name":"mb_u2CuQ5zO","rssi":-77},{"bind":10,"mac":"C14F04667CED","name":"mobike","rssi":-71},{"bind":10,"mac":"EF803E9719D4","name":"mb_1BmXPoDv","rssi":-68},{"bind":10,"mac":"C12418365DAF","name":"ofo","rssi":-75},{"bind":10,"mac":"D436396AF3E1","name":"CoolQi","rssi":-80},{"bind":10,"mac":"D2667A8CACD2","name":"","rssi":-67},{"bind":10,"mac":"C63E9C95AA80","name":"mobike","rssi":-82},{"bind":10,"mac":"FBE86CBF6722","name":"67A1943","rssi":-74},{"bind":10,"mac":"C3DADB98361B","name":"mobike","rssi":-77},{"bind":10,"mac":"C7E13362FF70","name":"mobike","rssi":-71},{"bind":10,"mac":"EFF0C016B3DE","name":"ofo","rssi":-81},{"bind":10,"mac":"DB75F0A7C5AF","name":"mb_r8Wn8HXb","rssi":-68},{"bind":10,"mac":"F227FBC70EAF","name":"mobike","rssi":-71},{"bind":10,"mac":"74BAB6AEB9C0","name":"","rssi":-80},{"bind":10,"mac":"E6D33A776685","name":"mb_hWZ3OtPm","rssi":-62},{"bind":10,"mac":"C2794EA09592","name":"mb_kpWgTnnC","rssi":-67},{"bind":10,"mac":"E9975B98906A","name":"ofo","rssi":-75},{"bind":10,"mac":"DDCC85BD2261","name":"","rssi":-70},{"bind":10,"mac":"FDED10E73576","name":"mb_djXnEO39","rssi":-81},{"bind":10,"mac":"C1663D3B8D9E","name":"mobike","rssi":-77},{"bind":10,"mac":"FE9BF6F81FAC","name":"mb_rB\/49pv+","rssi":-80},{"bind":10,"mac":"AC233F205F5D","name":"","rssi":-77},{"bind":10,"mac":"E79F44E0730B","name":"mobike","rssi":-69},{"bind":10,"mac":"EBFBD90A9065","name":"6740012","rssi":-78},{"bind":10,"mac":"DA1230E3705D","name":"mobike","rssi":-71},{"bind":10,"mac":"DFB59B681423","name":"mb_IxRom7Xf","rssi":-71},{"bind":10,"mac":"EE047FFEC953","name":"mobike","rssi":-74},{"bind":10,"mac":"D7C901DF23F7","name":"mobike","rssi":-68},{"bind":10,"mac":"C2DEA3B093EC","name":"mobike","rssi":-76},{"bind":10,"mac":"E235DF852585","name":"mobike","rssi":-78},{"bind":10,"mac":"D6ACD7CF229C","name":"mobike","rssi":-69},{"bind":10,"mac":"C0085F372C53","name":"mobike","rssi":-79},{"bind":10,"mac":"DD4E48A34866","name":"mb_ZkijSE7d","rssi":-64},{"bind":10,"mac":"DDED4CD2E3AE","name":"67A1450","rssi":-81},{"bind":10,"mac":"DB7954D7267A","name":"mb_eibXVHnb","rssi":-80},{"bind":10,"mac":"E3DC117BFCC2","name":"mobike","rssi":-76},{"bind":10,"mac":"D3B9E880F560","name":"mobike","rssi":-76},{"bind":10,"mac":"C3ECE55C7041","name":"mb_QXBc5ezD","rssi":-76},{"bind":10,"mac":"50F14A4250F7","name":"XIAOMING","rssi":-68},{"bind":10,"mac":"D86287A360AC","name":"mobike","rssi":-66},{"bind":10,"mac":"C5C57722800E","name":"mobike","rssi":-79},{"bind":10,"mac":"F29C054EA904","name":"mobike","rssi":-66},{"bind":10,"mac":"EDEAF1B9AE67","name":"mobike","rssi":-73},{"bind":10,"mac":"E0BBE970589A","name":"mb_mlhw6bvg","rssi":-50},{"bind":10,"mac":"D432FFA91BD8","name":"mobike","rssi":-68},{"bind":10,"mac":"DA8E4D2D8FD0","name":"mobike","rssi":-68},{"bind":10,"mac":"D9236F98BAB2","name":"mobike","rssi":-76},{"bind":10,"mac":"CE91AFBD52CD","name":"6740295","rssi":-72},{"bind":10,"mac":"CF428A5A79E8","name":"ofo","rssi":-82},{"bind":10,"mac":"DD203F94B4A6","name":"mobike","rssi":-75},{"bind":10,"mac":"E95D3EAD8C1B","name":"mobike","rssi":-76},{"bind":10,"mac":"DFF99BFDA750","name":"mb_UKf9m\/nf","rssi":-68},{"bind":10,"mac":"C1C3BC8A497A","name":"mb_ekmKvMPB","rssi":-69},{"bind":10,"mac":"CB148A6D7F92","name":"mobike","rssi":-70},{"bind":10,"mac":"F3164BD2AF38","name":"mb_OK\/SSxbz","rssi":-63},{"bind":10,"mac":"CD2ED9AB716D","name":"mobike","rssi":-70},{"bind":10,"mac":"F668ED71DA6B","name":"mb_a9px7Wj2","rssi":-76},{"bind":10,"mac":"C610BC9994B6","name":"mobike","rssi":-74},{"bind":10,"mac":"D90F50CFA1E7","name":"mobike","rssi":-79},{"bind":10,"mac":"F696914CA143","name":"mobike","rssi":-61},{"bind":10,"mac":"FCD10964AFC5","name":"mb_xa9kCdH8","rssi":-79},{"bind":10,"mac":"F2EC07CC3FFE","name":"","rssi":-80},{"bind":10,"mac":"C5C48A551584","name":"mb_hBVVisTF","rssi":-74},{"bind":10,"mac":"50338B1238B5","name":"BL-3","rssi":-75},{"bind":10,"mac":"E21537CDE435","name":"mb_NeTNNxXi","rssi":-65},{"bind":10,"mac":"E1E42B5D6432","name":"mobike","rssi":-67},{"bind":10,"mac":"C68E5ED426DD","name":"mobike","rssi":-70},{"bind":10,"mac":"C867B984E040","name":"mb_QOCEuWfI","rssi":-80},{"bind":10,"mac":"FBCE124CAC4E","name":"mobike","rssi":-75},{"bind":10,"mac":"DE29F973A59C","name":"mobike","rssi":-67},{"bind":10,"mac":"C640257AE621","name":"mobike","rssi":-80},{"bind":10,"mac":"E6AB8EBF1F3D","name":"","rssi":-65},{"bind":10,"mac":"EBE8042CA2BF","name":"ofo","rssi":-72},{"bind":10,"mac":"E13F3FABCB48","name":"mobike","rssi":-66},{"bind":10,"mac":"CB966285FBD9","name":"mb_2fuFYpbL","rssi":-81},{"bind":10,"mac":"C6457E7B390A","name":"mb_Cjl7fkXG","rssi":-76},{"bind":10,"mac":"D9C605E65F3B","name":"mb_O1\/mBcbZ","rssi":-74},{"bind":10,"mac":"C435C791DA94","name":"mobike","rssi":-68},{"bind":10,"mac":"E4DB47AD322D","name":"mobike","rssi":-67},{"bind":10,"mac":"F07605F12916","name":"mb_FinxBXbw","rssi":-67},{"bind":10,"mac":"FC88C2DB09D9","name":"mb_2Qnbwoj8","rssi":-79},{"bind":10,"mac":"DA5087ECCBB9","name":"mb_ucvsh1Da","rssi":-63},{"bind":10,"mac":"FA85C117B46B","name":"mobike","rssi":-76},{"bind":10,"mac":"F253C47AB86C","name":"mobike","rssi":-69},{"bind":10,"mac":"9C1D5816FE70","name":"BL-2A","rssi":-76},{"bind":10,"mac":"F686B31AA9DC","name":"mobike","rssi":-61},{"bind":10,"mac":"FF38BB4DBBB2","name":"mobike","rssi":-76},{"bind":10,"mac":"C00FAC87180A","name":"mb_ChiHrA\/A","rssi":-78},{"bind":10,"mac":"C74AEAF35295","name":"mb_lVLz6krH","rssi":-74},{"bind":10,"mac":"FB2D35B43DA4","name":"mobike","rssi":-79},{"bind":10,"mac":"F16A5B458FC5","name":"mobike","rssi":-65},{"bind":10,"mac":"6299233461EF","name":"","rssi":-78},{"bind":10,"mac":"A0E6F8013404","name":"ISE000","rssi":-70},{"bind":10,"mac":"D1541D611FFC","name":"mobike","rssi":-62},{"bind":10,"mac":"C8FD1994CEFE","name":"XIAOMING","rssi":-72},{"bind":10,"mac":"FA0B6F10CD5C","name":"\u5409\u5229\u4e1c\u7ad9","rssi":-70},{"bind":10,"mac":"D8E8C78EE75B","name":"mobike","rssi":-70},{"bind":10,"mac":"AC233F205F72","name":"BrtBeacon505","rssi":-69},{"bind":10,"mac":"E1B6490DDBB9","name":"mobike","rssi":-44},{"bind":10,"mac":"C16A070DC9DC","name":"6740293","rssi":-80},{"bind":10,"mac":"DDA5791CAB80","name":"ofo","rssi":-76},{"bind":10,"mac":"F273F4026CF0","name":"67B3438","rssi":-79},{"bind":10,"mac":"F5396DC5F613","name":"mb_E\/bFbTn1","rssi":-68},{"bind":10,"mac":"CFE6FD7CAF0A","name":"mb_Cq98\/ebP","rssi":-78},{"bind":10,"mac":"FE175232E40A","name":"mobike","rssi":-75},{"bind":10,"mac":"EF3E728BE2DC","name":"mb_3OKLcj7v","rssi":-75},{"bind":10,"mac":"EC783828FCE0","name":"67A1792","rssi":-78},{"bind":10,"mac":"E3B9580B3336","name":"ofo_adv_tes","rssi":-81},{"bind":10,"mac":"C94D4A2867C2","name":"mobike","rssi":-67},{"bind":10,"mac":"CBE19386DAFB","name":"mb_+9qGk+HL","rssi":-69},{"bind":10,"mac":"FE12D2D25548","name":"mb_SFXS0hL+","rssi":-69},{"bind":10,"mac":"F8E2E5E42C7E","name":"mobike","rssi":-66},{"bind":10,"mac":"EC18B0843ED7","name":"mb_1z6EsBjs","rssi":-73},{"bind":10,"mac":"C5D061455EBF","name":"67A1436","rssi":-82}]';
+		$num = $this->cal_nums($bikes);
+		var_dump($num);
+	}
+	
+	private function cal_nums($bikes){
+		$redis = new \Redis();
+		$redis->connect('127.0.0.1', 6379);
+		
+		$exist_list = json_decode($bikes,true);
+		$arr =array();
+		foreach($exist_list as $k=>$v){
+			//$mac = str_replace(':','-',$v);
+			$mac=$v['mac'];
+			$arr_exist[$k]['name']=$redis->get('bikes:'.$mac);
+			$arr_exist[$k]['mac']=$v['mac'];
+		}
+		
+		//var_dump($bikes);
+		$bike_company=M("bike_company")->select();
+		foreach($bike_company as $k=>$v){
+			//var_dump($v);
+			$arr[$v['title']]=explode('|',$v['keyword']);
+		}
+		
+		foreach($arr_exist as $k=>$v){
+			$flag = 'no';
+			$name = $v['name'];
+			foreach($arr as $kk=>$vv){
+				foreach($vv as $kkk=>$vvv){
+					if($this->startwith($name,$vvv)){
+						$bike_names[]=$kk;
+						$flag = 'yes';			
+					}
+				}
+			}
+			
+			/*if($flag=='no'){
+				$bike_names[]='其他';
+			}*/
+		}
+		$num = sizeof($bike_names);
+		return $num;
+	}
+	
+	private function startwith($str,$pattern) {
+		if(strpos($str,$pattern) === 0)
+          return true;
+		else
+          return false;
+	}
+	
 	public function sub(){
 		//require("mylibs/phpMQTT.php");
 		//$mqtt = new \phpMQTT("116.62.171.54", 8081, "test"); //Change client name to something unique
@@ -599,8 +658,9 @@ class IndexController extends Controller {
 			//实际提交的数据，存入mysql数据库
 			$postText = trim(file_get_contents('php://input'));			
 			$data['bikes']=$postText;
-			M("new_ibeacon")->add($data);
-			file_put_contents('/root/logxxx.txt', var_export($postText, true) . "\n", FILE_APPEND);
+			$id = M("new_ibeacon")->add($data);
+			
+			//file_put_contents('/root/logxxx.txt', var_export($postText, true) . "\n", FILE_APPEND);
 		}
 		
 		

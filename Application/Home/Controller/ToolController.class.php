@@ -21,6 +21,45 @@ class ToolController extends Controller {
 		$this->display();
     }
 	
+	public function fake(){
+		
+		$redis = new \Redis();
+		$redis->connect('116.62.171.54', 8085);
+		
+		//根据行政级别，做相应的过滤
+		$province = "浙江省";
+		$city = "杭州市";
+		$area = "下沙";
+		//echo $province;
+		$map['province']=array("eq",$province);
+		$map['city']=array("eq",$city);
+		$map['area']=array("eq",$area);
+		
+		$list = M("info")->where($map)->select();
+		//var_dump($list);
+		foreach($list as $k=>$v){
+			$key = "dwz_info:".$v['id'];
+			$r = $redis->hget($key,'level');
+			$u = $redis->hget($key,'usable_num');
+			$s = $redis->hget($key,'storage_num');
+			
+			echo $u;
+			$ur = rand(1,8)*$u/10;
+			echo $ur;
+			if($ur >= 1000){
+				$ur = $ur/100;
+			}
+			echo "<br />";
+			//var_dump($r);
+			//if($r == -2){
+				
+			$redis->hset($key,'level',1);
+			$redis->hset($key,'storage_num',$ur);
+			//}
+		}
+		echo "设置成功";
+	}
+	
 	//首页
 	public function demo(){
 		if(!IS_POST){
@@ -121,7 +160,7 @@ class ToolController extends Controller {
 
 	
 	//车位历史总停放
-	private function get_realtime_by_id_time($id,$start,$end){
+	/*private function get_realtime_by_id_time($id,$start,$end){
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 		//$hosts = [
@@ -186,7 +225,7 @@ class ToolController extends Controller {
 			var_dump($results);
 			//var_dump($ts);
 			return $results;
-	}
+	}*/
 	
 	
 	

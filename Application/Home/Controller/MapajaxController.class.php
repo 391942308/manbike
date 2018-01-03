@@ -56,9 +56,9 @@ class MapajaxController extends Controller {
 				}
 			}
 			
-			if($flag=='no'){
+			/*if($flag=='no'){
 				$bike_names[]='其他';
-			}
+			}*/
 		}
 		
 		$bn = array_count_values($bike_names);
@@ -204,10 +204,12 @@ class MapajaxController extends Controller {
 			$list[$i]['time'] = $redis->hget("realtime:$id:$i","time");
 			$list[$i]['time'] = date("Y-m-d H:i:s",$list[$i]['time']);
 			$list[$i]['storage_num'] = $redis->hget("realtime:$id:$i","storage_num");
+			//$list[$i]['bikes'] = $redis->hget("realtime:$id:$i","bikes");
 		}
 		//var_dump($list);
 		exit(json_encode(array('error_code'=>0,'error_reason'=>'正确','length'=>$len,'result'=>$list)));
 	}
+	
 	//某个车位曾经停过的车辆
 	/*public function infobike(){
 		$redis = new \Redis();

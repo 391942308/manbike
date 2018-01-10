@@ -20,6 +20,7 @@ class ChangebikesController extends CommonController {
 			foreach($did_arr as $k=>$v){
 				$did_str .="dwz_info_id:".$v["id"]." ";
 			}
+
 			$this->assign("province2",$province2);
 			$this->assign("city2",$city2);
 			$this->assign("area2",$area2);
@@ -178,9 +179,7 @@ class ChangebikesController extends CommonController {
 		$ofo = array();
 		$hb = array();
 		$size = sizeof($buckets);
-		//var_dump($buckets);
-		//exit;
-
+		$init = array(0=> array("key"=> "酷骑","doc_count"=>5),1=> array("key"=>"摩拜","doc_count"=>119),2=> array("key"=>"小鸣单车" ,"doc_count"=> 3 ), 3=> array("key"=> "ofo" ,"doc_count"=>543), 4=> array ("key"=>"HelloBike","doc_count"=>10) );
 		foreach ($buckets as $k=>$v) {
 			if(sizeof($v[3]['buckets'])==5){
 				$init=$v[3]['buckets'];
@@ -191,10 +190,6 @@ class ChangebikesController extends CommonController {
 		foreach ($init as $k=>$v) {
 			$init[$k]['doc_count']=0;
 		}
-
-		//var_dump($init);
-		//exit;
-
 		foreach($buckets as $k=>$v){
 			//var_dump($v[3]['buckets']);
 			if(sizeof($v[3]['buckets'])<5){
@@ -253,6 +248,11 @@ class ChangebikesController extends CommonController {
 				$ts[$k] = date('Y-m-d H:i:s',strtotime($v["key_as_string"]));
 			}
 		}
+//		var_dump($kq);
+//		var_dump($mb);
+//		var_dump($xm);
+//		var_dump($ofo);
+//		var_dump($hb);
 		$sum_kq = 0;
 		$sum_mb = 0;
 		$sum_xm = 0;
@@ -494,7 +494,7 @@ class ChangebikesController extends CommonController {
         {
           "match_phrase": {
             "_type": {
-              "query": "dbs_realtime_one_first"
+              "query": "dbs_realtime_first"
             }
           }
         },
@@ -547,7 +547,7 @@ class ChangebikesController extends CommonController {
               {
                 "match_phrase": {
                   "_type": {
-                    "query": "dbs_realtime_one_first"
+                    "query": "dbs_realtime_first"
                   }
                 }
               },
@@ -586,7 +586,7 @@ class ChangebikesController extends CommonController {
 }';
 		$params = [
 				'index' => 'bike_index_v6',
-				'type' => 'dbs_realtime_one_first',
+				'type' => 'dbs_realtime_first',
 				'body' => $json
 		];
 
@@ -605,7 +605,6 @@ class ChangebikesController extends CommonController {
 		];
 		$client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 		//获取es最后更新的时间,在更新的时候使用
-
 		$json = '{
   "size": 0,
   "aggs": {

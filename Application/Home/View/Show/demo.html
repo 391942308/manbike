@@ -181,15 +181,12 @@ $("#tiaozhuan").click(function(){
         minZoom : 11,  
         maxZoom : 19
     });
-	//var point = new BMap.Point(120.059071,30.276691);
-	//map.centerAndZoom(point, 12);
-	
-	var point = new BMap.Point(120.175707,30.196643);
-	map.centerAndZoom(point, 15);
+	var point = new BMap.Point(120.059071,30.276691);
+	map.centerAndZoom(point, 12);
 	map.enableScrollWheelZoom(true);
 	map.enableInertialDragging();
-	//city = '杭州市';
-	//map.centerAndZoom(point,12);
+	city = '杭州市';
+	map.centerAndZoom(point,12);
 	
 	var json_str = '{$json_str}';
 	function heatmap(){
@@ -356,7 +353,6 @@ $("#tiaozhuan").click(function(){
 	
 	var markers = [];
 	
-var username = '{$username}';
 	// 编写自定义函数,创建标注
 	function addMarker(point,label,usable_num,level){
 		if(usable_num == 0 ){
@@ -614,15 +610,7 @@ var username = '{$username}';
 											shadowBlur: 10,
 											shadowOffsetX: 0,
 											shadowColor: 'rgba(0, 0, 0, 0.5)'
-										},
-										normal:{ 
-											label:{ 
-												show: true, 
-												formatter: '{b} :  ({d}%)' 
-											}, 
-											labelLine :{show:true} 
-										} 
-										
+										}
 									}
 								}
 							]
@@ -905,14 +893,7 @@ var username = '{$username}';
 						//var label = new BMap.Label("P"+allpoints[i].id+":"+"可停"+allpoints[i].usable_num+",已停"+allpoints[i].storage_num,{offset:new BMap.Size(20,20)});
 						var label = new BMap.Label("P"+allpoints[i].id+":"+allpoints[i].storage_num+"/"+allpoints[i].usable_num,{offset:new BMap.Size(20,20)});
 						var point = new BMap.Point(allpoints[i].lng, allpoints[i].lat);
-						if(username=='admin'){
-							addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
-						}else{
-							if(allpoints[i].level!=-2){
-								addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
-							}
-						}
-						
+						addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
 					}
 					heatmap();	
 			},'json');
@@ -940,14 +921,7 @@ var username = '{$username}';
 						//var label = new BMap.Label("P"+allpoints[i].id+":"+"可停"+allpoints[i].usable_num+",已停"+allpoints[i].storage_num,{offset:new BMap.Size(20,20)});
 						var label = new BMap.Label("P"+allpoints[i].id+":"+allpoints[i].storage_num+"/"+allpoints[i].usable_num,{offset:new BMap.Size(20,20)});
 						var point = new BMap.Point(allpoints[i].lng, allpoints[i].lat);
-						//addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
-						if(username=='admin'){
-							addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
-						}else{
-							if(allpoints[i].level!=-2){
-								addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
-							}
-						}
+						addMarker(point,label,allpoints[i].usable_num,allpoints[i].level);	
 					}
 				left_show_after_drag();	
 				heatmap();	

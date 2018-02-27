@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<style type="text/css">
+		body, html {width: 100%;height: 100%;margin:0;font-family:"微软雅黑";}
+		#allmap{width:100%;height:100%;	}
+		#r-result{width:300px;margin-top:5px;}
+		p{margin:5px; font-size:14px;}
+	</style>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=YeWyudDrXPyGtndIQlMztw7cIjI7si1t"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/TextIconOverlay/1.2/src/TextIconOverlay_min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/MarkerClusterer/1.2/src/MarkerClusterer_min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
+	
+	<script src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+	<link href="http://www.bootcss.com/p/buttons/css/buttons.css" rel="stylesheet" type="text/css"/>
+	
+	<title>互联网租赁自行车智慧管理系统</title>
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+</head>
+<body>
+<div>
+	<div style="float:left;"><img style="" src="/manbike0.3/Public/myimages/nlogo.png" />
+	</div>
+	<div style="margin-bottom:10px;">&nbsp;</div>
+
+	<!--<select style="margin-top:30px;margin-left:10px;" id="citys">
+	  <option value ="杭州市">杭州市</option>
+	  <option value="北京市">北京市</option>
+	  <option value="上海市">上海市</option>
+	  <option value ="广州市">广州市</option>
+	</select>
+	<input id="keyword" type="text" placeholder="车辆名称" name="热点名称" value="" />
+	<input id="chaxun" type="button" value="查询" />-->
+	<input id="tkeyword" type="text" placeholder="车位编号" name="车位名称" value="" />
+	<input id="tiaozhuan" type="button" value="看车位" />
+	<!--<input id="shishi_5000_0" class="shishi" type="button" value="隔5S刷新中" />
+	<input id="getlevel" type="button" value="查询等级" />-->
+	
+	<input id="nav_one" type="button" value="显示区块" />
+	<input id="nav_two" type="button" value="显示网格" />
+	<input id="nav_three" type="button" value="显示车位" />
+	<input type="button"  onclick="openHeatmap();" value="打开热力图"/>
+	<input id="shuaxin" type="button"  value="10S刷新"/>
+	<input id="clear" type="button" value="清除" />
+	<input id="setting" type="button" value="设置" />
+	<a href="http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/logout"> 
+		<input type="button" value="登出" />
+	</a>
+	<!--<span>区域</span>
+	<span>板块</span>
+	<span>清除条件</span>-->
+	<input id="block_title" type="hidden" value="西兴地铁站" />
+	<input id="info_id" type="hidden" value="P5925" />
+	
+	<div style="display:none;" id="r-result">
+		城市名: <input id="cityName" type="text" style="width:100px; margin-right:10px;" />
+		<input id="cityName_click" type="button" value="查询" onclick="theLocation()" />
+	</div>
+	<div style="clear:both;"></div>
+</div>
+<div style="width:100%;height:90%;">
+	<div id="stool" style="position:absolute;left:26%;width:1%;height:100px;background-color:white;z-index:100;margin-top:20%;display:none;">
+		<br /><br /><
+	</div>
+	<div id="list_panel" style="position:absolute;width:26%;height:90%;background-color:#f0f0f0;z-index:99;overflow:auto; display:none;">
+	
+		<div style="padding:15px;">为您找到以下物品</div>
+		<div id="list_info"></div>
+		<volist name="list" id="vo">
+		<div id="{$vo.area}" data-lon="{$vo.location.lon}" data-lat="{$vo.location.lat}" class="item" style="border-bottom:solid 1px grey ;margin-top:1px;">
+			<div style="float:left;background-color:white;width:30%;height:100px;">
+			<if condition="($vo.company eq '摩拜')">
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/dc.png" />
+			<elseif condition="($vo.company eq 'ofo')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/dc.png" />
+			<elseif condition="($vo.company eq 'HelloBike')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/dc.png" />
+			<elseif condition="($vo.company eq '酷骑')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/dc.png" />
+			<elseif condition="($vo.company eq '小明单车')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/dc.png" />
+			<elseif condition="($vo.company eq '老人')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/yl.png" />
+			<elseif condition="($vo.company eq '宠物')"/>
+			<img style="width:100px;height:100px;" src="/manbike0.3/Public/images/cw.png" />
+			<else /> 无图片
+			</if>
+			</div>
+			<div style="float:left;background-color:white;width:70%;height:100px;">
+			<br />
+			&nbsp;名称：{$vo.name} &nbsp;<br /> 
+			<!--&nbsp;mac：{$vo.mac} &nbsp; rssi：{$vo.rssi} &nbsp; <br />-->
+			&nbsp;时间：{$vo.ts|date='Y-m-d h:i:s',###}<br />
+			&nbsp;地点：{$vo.province}{$vo.city}{$vo.area}P{$vo.dwz_info_id}
+			
+			</div>
+			<div style="clear:both"></div>
+		</div>
+		</volist>
+	</div>
+	
+	<div id="stool1" style="position:absolute;left:30%;width:2%;height:100px;background-color:white;z-index:100;margin-top:20%;">
+		<br /><br />&nbsp;&nbsp;<
+	</div>
+	<div id="list_panel1" style="position:absolute;width:38%;height:90%;background-color:#f0f0f0;z-index:88;overflow:auto;display:none;">
+		<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+		<br />
+		<br />
+		<div id="main" style="width: 600px;height:300px;"></div>
+		<br />
+		<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+		<div id="main_2" style="width: 600px;height:300px;"></div>
+		<!--<div id="diaodu_message" style="width:100%;height:40px;bottom:0px;right:0px;text-align:center;padding-top:10px;background:#4876FF;color:white;">未初始化</div>
+		<a id="setting" href="javascript:void(0);" class="button button-3d button-primary button-rounded button-small">设置</a>-->
+	</div>
+	
+	<div id="allmap"></div>
+</div>
+	
+	
+</body>
+</html>
+
+
+<script>
+	
+		//加入一个记录数据，记录所有前面的post ， 
+		//然后如果最新的一个post来了 就把前面那几个都清除掉
+		var inter ;
+		
+		//初始化百度地图
+		var map = new BMap.Map("allmap",{  
+			minZoom : 10,  
+			maxZoom : 19
+		});
+		//var point = new BMap.Point(120.059071,30.276691);
+		var point = new BMap.Point(120.175707,30.196643);
+		map.centerAndZoom(point, 14);
+		map.enableScrollWheelZoom(true);
+		map.enableInertialDragging();
+		var control = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_RIGHT});// 左上角，添加比例尺
+		var navigation = new BMap.NavigationControl({anchor: BMAP_ANCHOR_TOP_RIGHT,enableGeolocation: true});  //左上角，添加默认缩放平移控件
+		map.addControl(navigation); 
+		map.addControl(control); 	
+
+		$(document).ready(function(){
+			$("#nav_two").trigger("click");
+		})
+		
+		//缩放
+		map.addEventListener("zoomend", function () {
+			//...
+			var level = map.getZoom();
+			if(level<=12){
+					$("#nav_one").trigger("click");
+			}
+			if(level<=15 && level>=13){
+					$("#nav_two").trigger("click");
+			}
+			if(level>=16){
+					$("#nav_three").trigger("click");
+			}
+			console.log(level);
+		});
+		
+		
+		function clock(){
+			var level = map.getZoom();
+			if(level<=12){
+					$("#nav_one").trigger("click");
+			}
+			if(level<=15 && level>=13){
+					$("#nav_two").trigger("click");
+			}
+			if(level>=16){
+					$("#nav_three").trigger("click");
+			}
+			console.log(level);
+		}
+		
+		
+		//拖动
+		map.addEventListener('dragend', function(e){
+		
+			is_move = true;
+			var lng=this.getCenter().lng;
+			var lat = this.getCenter().lat;
+			//var level = map.getZoom();
+			//alert(level);
+			
+			clock();
+			
+		});
+		
+</script>
+
+<script>
+//辅助工具
+	$("#getlevel").click(function(){
+		var level = map.getZoom();
+		alert(level);
+	})
+//使用名称获取经纬度
+function getlatlng_by_name(addr,value){
+				//console.log(value);
+				// 创建地址解析器实例
+				var myGeo = new BMap.Geocoder();
+				// 将地址解析结果显示在地图上,并调整地图视野
+				myGeo.getPoint(addr, function(point){
+					if (point) {
+						if(addr == "下沙"){
+							console.log("下沙");
+							var point = new BMap.Point("120.363329", "30.305675");
+						}
+					
+						//console.log(point);
+						//map.centerAndZoom(point, 19);
+						//map.addOverlay(new BMap.Marker(point));
+						//添加一个图标到地图上
+						var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-1.png", new BMap.Size(92,92));
+						var marker = new BMap.Marker(point,{icon:myIcon});
+						var label = new BMap.Label(addr+'<br />'+value+'辆',{offset:new BMap.Size(20,20)});
+						//var marker = new BMap.Marker(point);
+						map.addOverlay(marker);
+						label.setStyle({ 
+							color : "#fff", 
+							fontSize : "16px", 
+							backgroundColor :"0.05",
+							border :"0", 
+							fontWeight :"bold" 
+							});
+						marker.setLabel(label);
+						marker.addEventListener("click",function(e){
+							//以当前点为中心放大到网格
+						/*	var lng=map.getCenter().lng;
+							var lat = map.getCenter().lat;
+							//alert(lng);
+							//alert(lat);
+							var p = e.target;
+							//alert("marker的位置是" + p.getPosition().lng + "," + p.getPosition().lat);    
+							var point = new BMap.Point(p.getPosition().lng,p.getPosition().lat);
+							map.centerAndZoom(point, map.getZoom()); */
+						});
+						
+						
+						
+					}else{
+						//alert("您选择地址没有解析到结果!");
+					}
+				}, "杭州市");
+}
+function add_block_one_by_one(value,icon){
+						//比较la lb lc 然后以不同的颜色显示
+						var point = new BMap.Point(value.lng, value.lat);
+						/*var icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-green.png";
+						
+							if(value.block <= value.la && value.la!=0){
+								icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-light.png";
+							}
+							if(value.block > value.lb && value.lb!=0){
+								icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-yellow.png";
+							}
+							if(value.block > value.lc && value.lc!=0){
+								icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-red.png";
+							}
+						*/
+						console.log("info:"+value+icon);
+						var myIcon = new BMap.Icon(icon, new BMap.Size(92,92));
+						var marker = new BMap.Marker(point,{icon:myIcon});
+						
+						//var label = new BMap.Label(addr+'<br />'+value+'辆',{offset:new BMap.Size(20,20)});
+						var label = new BMap.Label("<br />"+value.title+"<br />&nbsp;&nbsp;&nbsp;"+value.block+"/"+value.lc,{offset:new BMap.Size(10,10)});
+						//var marker = new BMap.Marker(point);
+						map.addOverlay(marker);
+						label.setStyle({ 
+							color : "#fff", 
+							fontSize : "13px", 
+							backgroundColor :"0.05",
+							border :"0", 
+							fontWeight :"bold" 
+							});
+						marker.setLabel(label);
+						marker.addEventListener("click",function(e){
+						
+							//以当前点为中心放大到网格
+						/*	var lng=map.getCenter().lng;
+							var lat = map.getCenter().lat;
+							//alert(lng);
+							//alert(lat);
+							var p = e.target;
+							//alert("marker的位置是" + p.getPosition().lng + "," + p.getPosition().lat);    
+							var point = new BMap.Point(p.getPosition().lng,p.getPosition().lat);
+							map.centerAndZoom(point, map.getZoom());*/
+							//左边显示
+							//console.log(lng);
+							//console.log(lat);
+							var arr = e.target.getLabel().content.split('<br />');
+							
+							//将label的内容传入去获取相关的数据
+							show_block(arr[1]);
+							$("#block_title").val(arr[1]);
+						});
+}
+
+
+function add_info_one_by_one(value){
+						console.log("one_by_one:"+value);
+						var point = new BMap.Point(value.lng, value.lat);
+						if(value.usable_num == 0){
+							var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/grey.png", new BMap.Size(92,92));
+							var marker = new BMap.Marker(point,{icon:myIcon});
+						}else{
+							if(value.level == -2){
+								var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/alive.png", new BMap.Size(50,50),{ anchor: new BMap.Size(20, 30) });
+								var marker = new window.BMap.Marker(point,{icon:myIcon}); //按照地图点坐标生成标记  
+							}
+							if(value.level == -1){
+								var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/light.png", new BMap.Size(50,50),{ anchor: new BMap.Size(20, 30) });
+								var marker = new window.BMap.Marker(point,{icon:myIcon}); //按照地图点坐标生成标记  
+							}
+							if(value.level == 1){
+								var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/green.png", new BMap.Size(50,50),{ anchor: new BMap.Size(20, 30) });
+								var marker = new window.BMap.Marker(point,{icon:myIcon}); //按照地图点坐标生成标记  
+							}
+							if(value.level == 2){
+								var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/yellow.png", new BMap.Size(50,50),{ anchor: new BMap.Size(20, 30) });
+								var marker = new window.BMap.Marker(point,{icon:myIcon}); //按照地图点坐标生成标记  
+							}
+							if(value.level == 3){
+								var myIcon = new BMap.Icon("http://baohe.toalls.com:8080/manbike0.3/Public/myimages/red.png", new BMap.Size(50,50),{ anchor: new BMap.Size(20, 30) });
+								var marker = new window.BMap.Marker(point,{icon:myIcon}); //按照地图点坐标生成标记  
+							}
+						}
+						
+						
+						var label = new BMap.Label("P"+value.id+":"+value.storage_num+'/'+value.usable_num,{offset:new BMap.Size(20,20)});
+						map.addOverlay(marker);
+						/*label.setStyle({ 
+							color : "#fff", 
+							fontSize : "13px", 
+							backgroundColor :"0.05",
+							border :"0", 
+							fontWeight :"bold" 
+							});*/
+							
+						if (typeof(marker) == "undefined") { 
+							console.log("============================");
+							return false;
+						}
+						
+						marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+						marker.setLabel(label);
+						marker.addEventListener("click",function(e){
+							//使用经纬度获取到相关的车位，然后使用车位获取到相关的数据，然后显示
+							//以当前点为中心放大到网格
+							/*var lng=map.getCenter().lng;
+							var lat = map.getCenter().lat;
+							//alert(lng);
+							//alert(lat);
+							var p = e.target;
+							//alert("marker的位置是" + p.getPosition().lng + "," + p.getPosition().lat);    
+							var point = new BMap.Point(p.getPosition().lng,p.getPosition().lat);
+							map.centerAndZoom(point, map.getZoom());*/
+							//在左边显示饼状图和折线图
+							//使用id获取信息
+							var arr = e.target.getLabel().content.split(':');
+							
+							//将label的内容传入去获取相关的数据
+							show_info(arr[0]);
+							$("#info_id").val(arr[0]);
+						});
+}
+
+
+function clear(){
+	var allOverlay = map.getOverlays();
+	for (var i = 0; i < allOverlay.length ; i++)
+	{       
+		map.removeOverlay(allOverlay[i]);
+	}
+}
+
+//使用标题获取，然后显示在左侧
+function show_block(title){
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_block_show",
+			{
+				title:title
+			},
+			function(res){
+				//console.log(res);
+				var id = res.id;
+				var pie = res.pie;
+				var trend = res.trend;
+				//console.log(pie);
+				//console.log(trend);
+				show_pie(id,pie);
+				show_trend(id,trend);
+			},'json');
+}
+//使用经纬度获取到车位id,然后将实时和历史的数据反馈回来,在左边以图标的显示展现
+function show_info(id){
+		console.log(id);
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_info_show",
+			{
+				id:id
+			},
+			function(res){
+				console.log(res);
+				var id = res.id;
+				var pie = res.pie;
+				var trend = res.trend;
+				//console.log(pie);
+				//console.log(trend);
+				show_pie(id,pie);
+				show_trend(id,trend);
+			},'json');
+}
+
+function show_pie(id,pie){
+					if(pie.length==0){  
+						 return false;
+					}
+					var name = new Array();
+					var value = new Array();
+					var color = new Array();
+					for (i in pie)
+					{
+						console.log(pie);
+						name[i]=pie[i]['name'];
+						value[i]=pie[i];
+						color[i]=pie[i]['color'];
+					}
+//					return ;
+					
+					var myChart = echarts.init(document.getElementById('main'));
+					// 指定图表的配置项和数据
+					option = {
+							title : {
+								text: id+'各个单车公司单车数量统计图',
+								//subtext: '纯属虚构',
+								x:'center'
+							},
+							tooltip : {
+								trigger: 'item',
+								formatter: "{a} <br/>{b} : {c} ({d}%)"
+							},
+							color:color,
+							legend: {
+								orient: 'vertical',
+								left: 'left',
+								data: name
+							},
+							series : [
+								{
+									name: '公司',
+									type: 'pie',
+									radius : '55%',
+									center: ['50%', '60%'],
+									data:value,
+									itemStyle: {
+										emphasis: {
+											shadowBlur: 10,
+											shadowOffsetX: 0,
+											shadowColor: 'rgba(0, 0, 0, 0.5)'
+										},
+										normal:{ 
+											label:{ 
+												show: true, 
+												formatter: '{b} : \n ({d}%)' 
+											}, 
+											labelLine :{show:true} 
+										} 
+										
+									}
+								}
+							]
+						};
+
+					// 使用刚指定的配置项和数据显示图表。
+					myChart.setOption(option);
+}
+function show_trend(id,trend){
+					if(trend.length==0){  
+						 return false;
+					}
+					//console.log(trend);
+					var name = new Array();
+					var value = new Array();
+					for (i in trend)
+					{
+						//console.log(pie[i]);
+						name[i]=trend[i][0];
+						value[i]=trend[i][1];
+					}
+					//console.log(name);
+					//console.log(value);
+					
+					// 基于准备好的dom，初始化echarts实例
+					var myChart = echarts.init(document.getElementById('main_2'));
+
+					// 指定图表的配置项和数据
+					option = {
+						grid : {
+							top : 100,    //距离容器上边界40像素
+							bottom: 100,   //距离容器下边界30像素
+							right:100,
+							tooltip:{
+								position: [100, 100]
+							}
+						},
+						title : {
+							text: id+'车位车辆变化情况',
+							//subtext: '纯属虚构'
+						},
+						tooltip : {
+							trigger: 'axis'
+						},
+						legend: {
+							data:['停车数量']
+						},
+						toolbox: {
+							show : true,
+							//left:500,
+							feature : {
+								mark : {show: true},
+								dataView : {show: true, readOnly: false},
+								magicType : {show: true, type: ['line', 'bar']},
+								restore : {show: true},
+								saveAsImage : {show: true}
+							}
+						},
+						calculable : true,
+						xAxis : [
+							{
+								type : 'category',
+								boundaryGap: [0, 0.01],  
+								axisLabel:{
+									interval:0,
+									rotate:-30
+								},
+								data : name
+							}
+						],
+						yAxis : [
+							{
+								type : 'value',
+								axisLabel : {
+									formatter: '{value} 辆'
+								}
+							}
+						],
+						series : [
+							{
+								name:'停车数量',
+								type:'line',
+								data:value,
+								markPoint : {
+									data : [
+										{type : 'max', name: '最大值'},
+										{type : 'min', name: '最小值'}
+									]
+								},
+								markLine : {
+									data : [
+										{type : 'average', name: '平均值'}
+									]
+								}
+							}
+						],
+						color:['#4876FF', 'green','yellow','blueviolet']
+					};
+
+					// 使用刚指定的配置项和数据显示图表。
+					myChart.setOption(option);
+}
+
+
+
+</script>
+
+<script>
+	function nav_one(){
+		clear();
+		//var point = new BMap.Point(120.175707,30.196643);
+		var lng =map.getCenter().lng;
+		var lat =map.getCenter().lat;
+		var point = new BMap.Point(lng,lat);
+		map.centerAndZoom(point, map.getZoom());
+		//获取区的显示
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_area",
+			function(res){
+				clear();
+				//console.log(res);
+				if(res.error_code !=0) return false;
+				$.each(res.info,function(index,value){
+					getlatlng_by_name(index,value);
+				})
+				
+			},'json');
+	}
+	//nav_one();
+	
+	function nav_two(){
+		clear();
+		//var point = new BMap.Point(120.175707,30.196643);
+		var lng =map.getCenter().lng;
+		var lat =map.getCenter().lat;
+		var point = new BMap.Point(lng,lat);
+		map.centerAndZoom(point, map.getZoom());
+		//获取网格的显示
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_block",
+			function(res){
+			
+				clear();
+				console.log(res.error_code);
+				if(res.error_code !=0) return false;
+				$.each(res.info,function(index,value){
+					console.log(value);
+					
+					var icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-green.png";
+						
+					if(parseInt(value.block) <= parseInt(value.la) && parseInt(value.la)!==0){
+						icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-light.png";		
+					}
+					if(parseInt(value.block) >= parseInt(value.lb) && parseInt(value.lb)!==0){
+						icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-yellow.png";
+					}
+					if(parseInt(value.block) >=parseInt(value.lc) && parseInt(value.lc)!==0){
+						icon = "http://baohe.toalls.com:8080/manbike0.3/Public/images/map-sp-mark-red.png";
+					}
+					
+					add_block_one_by_one(value,icon);
+				})
+				
+			},'json');
+	}
+	
+	
+	//nav_two();
+	
+	var username='{$username}';
+	
+	function nav_three(){
+		clear();
+		//var point = new BMap.Point(120.175707,30.196643);
+		var lng =map.getCenter().lng;
+		var lat =map.getCenter().lat;
+		var point = new BMap.Point(lng,lat);
+		map.centerAndZoom(point, map.getZoom());
+		//获取屏幕中心点
+		
+		//获取热点的显示
+		//获取区的显示
+		//获取网格的显示
+		//var lng ='120.18046';
+		//var lat ='30.184333';
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_info",
+			{
+				lat:lat,
+				lng:lng
+			},
+			function(res){
+				clear();
+				//console.log(res);
+				$.each(res,function(index,value){
+					//console.log(value);
+					if(username=='admin'){
+						add_info_one_by_one(value);
+					}else{
+						if(value.level !=-2){
+							add_info_one_by_one(value);
+						}
+					}
+					
+				})
+				
+			},'json');
+	}
+	
+	//热点图显示
+	function openHeatmap(){
+		//$("#list_panel1").css("display","none");
+		//clear();
+		var heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
+		map.addOverlay(heatmapOverlay);
+		//heatmapOverlay.setDataSet({data:points,max:100});
+		//heatmapOverlay.show();
+		$.post(
+			"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/ajax_heatmap",
+			function(res){
+				console.log(res);
+				heatmapOverlay.setDataSet({data:res,max:1000});
+				heatmapOverlay.show();
+			},'json');
+	}
+	
+
+</script>
+
+<script>
+	
+	//点击事件
+	$("#nav_one").click(function(){
+		$("#list_panel1").css("display","none");
+		$("#stool1").css("left","0%");
+		$("#stool1").html("<br /><br />&nbsp;&nbsp;>");
+		nav_one();
+		
+	})
+	
+	$("#nav_two").click(function(){
+		nav_two();
+		var block_title = $("#block_title").val();
+		//alert(block_title);
+		show_block(block_title);
+		$("#list_panel1").css("display","block");
+		$("#stool1").css("left","38%");
+		$("#stool1").html("<br /><br />&nbsp;&nbsp;<");
+	})
+	
+	$("#nav_three").click(function(){
+		nav_three();
+		var info_id = $("#info_id").val();
+		show_info(info_id);
+		$("#list_panel1").css("display","block");
+		$("#stool1").css("left","38%");
+		$("#stool1").html("<br /><br />&nbsp;&nbsp;<");
+	})
+	
+	inter=self.setInterval("clock()",10000)
+	
+	$("#shuaxin").click(function(){
+		var v = $(this).val();
+		//alert(v);
+		if(v=='10S刷新'){
+			clearInterval(inter);
+			$(this).val("点击刷新中");
+		}else{
+			inter=self.setInterval("clock()",10000);
+			$(this).val("10S刷新");
+			//alert(v);
+		}
+	})
+
+	
+	$("#clear").click(function(){
+		clear();
+	})
+	
+	$("#tiaozhuan").click(function(){
+		var tkeyword = $("#tkeyword").val();
+		$("#info_id").val('P'+tkeyword);
+		//alert(tkeyword);
+		$.post(
+				"http://baohe.toalls.com:8080/manbike0.3/index.php/Home/Shown/getlnglat",
+				{
+					id:tkeyword
+				},
+				function(res){
+					//alert(res.error_code);
+					console.log(res);
+					if(res.error_code == 0){
+						//var level = map.getZoom();
+						var point = new BMap.Point(res.res.lng,res.res.lat);
+						map.centerAndZoom(point, map.getZoom());	
+					}
+				},'json');
+		
+	})
+	
+
+	//点击事件
+	$("#setting").click(function(){
+		//console.log('setting');
+		var info_id = $("#info_id").val();
+		info_id = info_id.replace(/P/,'');
+		var url = "http://baohe.toalls.com:8080/manbike0.3/index.php/Admin/Bparking/index.html?no="+info_id+"&title=&usable_num=&storage_num=";
+		window.open(url);
+	})
+
+</script>
+<script>
+//控制面板
+	$("#stool1").click(function(){
+		//alert("xx");
+		var style = $("#list_panel1").css("display");
+		if(style == 'block'){
+			$("#list_panel1").css("display","none");
+			$("#stool1").css("left","0%");
+			$("#stool1").html("<br /><br />&nbsp;&nbsp;>");
+		}else{
+			$("#list_panel1").css("display","block");
+			$("#stool1").css("left","38%");
+			$("#stool1").html("<br /><br />&nbsp;&nbsp;<");
+		}
+		//alert(style);
+		
+	});
+
+</script>
+

@@ -78,10 +78,10 @@ class ShownnController extends Controller {
 	
 	//首页
 	public function map(){
-		if($_SESSION['is_login'] == null){
-			$this->error('请登录后访问', U('/Home/Shown/login'));
-		}
-		$this->assign('username',$_SESSION['is_login']['username']);
+		//if($_SESSION['is_login'] == null){
+		//$this->error('请登录后访问', U('/Home/Shown/login'));
+		//}
+		//$this->assign('username',$_SESSION['is_login']['username']);
 		$this->display();
     }
 	
@@ -572,7 +572,6 @@ class ShownnController extends Controller {
 		$start = $end-60*20;
 		$start = $start*1000;
 		$end = $end*1000;
-		
 		$lpath =  THINK_PATH.'Library/Vendor/vendor/autoload.php';
 		require $lpath;
 	  $hosts = [['host' =>'47.97.218.117','port' =>'9200','user' =>'elastic','pass' =>'Admin===']];
@@ -623,14 +622,14 @@ class ShownnController extends Controller {
 					'type' => 'dbs_realtime',
 					'body' => $json
 			];
-
 			$results = $client->search($params);
 			$nnarr = array();
-			foreach($results['hits']['hits'] as $k=>$v){
-				$nnarr[$k][0]=date('Y-m-d H:i:s', $v['_source']['ts']);
+			foreach($results['hits']['hits'] as $k=>$v){ 
+				$nnarr[$k][0]=str_replace('T',' ',$v['_source']['ts']);
 				$nnarr[$k][1]=$v['_source']['storage_num'];
 				$nnarr[$k][2]=$v['_source']['storage_num'];
 			}
+			
 			$nnarr = array_reverse($nnarr);
 			return $nnarr;
 	}
@@ -769,6 +768,7 @@ class ShownnController extends Controller {
 			$item['level'] = $redis->hget('dwz_info:'.$v['id'], 'level');
 			$list[]=$item;
 		}
+
 		echo json_encode($list);
 	}
 	

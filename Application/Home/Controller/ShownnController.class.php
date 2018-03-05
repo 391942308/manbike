@@ -78,10 +78,10 @@ class ShownnController extends Controller {
 	
 	//首页
 	public function map(){
-		//if($_SESSION['is_login'] == null){
-		//$this->error('请登录后访问', U('/Home/Shown/login'));
-		//}
-		//$this->assign('username',$_SESSION['is_login']['username']);
+		if($_SESSION['is_login'] == null){
+		$this->error('请登录后访问', U('/Home/Shown/login'));
+		}
+		$this->assign('username',$_SESSION['is_login']['username']);
 		$this->display();
     }
 	
